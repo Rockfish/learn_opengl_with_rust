@@ -1,5 +1,5 @@
 [package]
-name = "learn_opengl"
+name = "learn_opengl_with_rust"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,3 +11,15 @@ glad-gl = { path = "./glad-gl" }
 
 [dependencies.glfw]
 version = "*"
+
+[[example]]
+name = "1_1-hello_window"
+path = "examples/1-getting_started/1_1-hello_window/main.rs"
+
+[[example]]
+name = "1_2-hello_window_clear"
+path = "examples/1-getting_started/1_2-hello_window_clear/main.rs"
+
+[[example]]
+name = "2_1-hello_triangle"
+path = "examples/1-getting_started/2_1-hello_triangle/main.rs"

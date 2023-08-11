@@ -1,6 +1,5 @@
 extern crate glfw;
 
-use glad_gl::gl;
 use glfw::{Action, Context, Key};
 
 fn main() {
@@ -13,19 +12,10 @@ fn main() {
     window.set_key_polling(true);
     window.make_current();
 
-    // Initialize glad
-    gl::load(|e| glfw.get_proc_address_raw(e) as *const std::os::raw::c_void);
-
     while !window.should_close() {
         glfw.poll_events();
         for (_, event) in glfw::flush_messages(&events) {
             handle_window_event(&mut window, event);
-        }
-
-        unsafe {
-            // gl::Viewport(0, 0, 300, 300);
-            gl::ClearColor(0.7, 0.9, 0.1, 1.0);
-            gl::Clear(gl::COLOR_BUFFER_BIT);
         }
 
         window.swap_buffers();
