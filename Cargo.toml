@@ -23,3 +23,23 @@ path = "examples/1-getting_started/1_2-hello_window_clear/main.rs"
 [[example]]
 name = "2_1-hello_triangle"
 path = "examples/1-getting_started/2_1-hello_triangle/main.rs"
+
+[[example]]
+name = "2_2-hello_triangle_indexed"
+path = "examples/1-getting_started/2_2-hello_triangle_indexed/main.rs"
+
+[[example]]
+name = "2_3-hello_triangle_exercise1"
+path = "examples/1-getting_started/2_3-hello_triangle_exercise1/main.rs"
+
+[[example]]
+name = "2_4-hello_triangle_exercise2"
+path = "examples/1-getting_started/2_4-hello_triangle_exercise2/main.rs"
+
+[[example]]
+name = "2_5-hello_triangle_exercise3"
+path = "examples/1-getting_started/2_5-hello_triangle_exercise3/main.rs"
+
+[[example]]
+name = "3_1-shaders_uniform"
+path = "examples/1-getting_started/3_1-shaders_uniform/main.rs"

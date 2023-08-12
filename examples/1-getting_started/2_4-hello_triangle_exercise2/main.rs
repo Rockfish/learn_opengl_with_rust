@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
+#![allow(unused_assignments)]
 
 extern crate glfw;
 
@@ -42,28 +43,26 @@ fn main() {
         .create_window(
             SCR_WIDTH,
             SCR_HEIGHT,
-            "Hello this is window",
+            "LearnOpenGL - triangle indexed",
             glfw::WindowMode::Windowed,
         )
         .expect("Failed to create GLFW window.");
 
-    window.set_key_polling(true);
+    // Turn on all GLFW polling so that we can receive all WindowEvents
+    window.set_all_polling(true);
     window.make_current();
 
     // Initialize glad: load all OpenGL function pointers
     // --------------------------------------------------
     gl::load(|e| glfw.get_proc_address_raw(e) as *const std::os::raw::c_void);
 
-    // Turn on GLFW polling so that we can receive all WindowEvents
-    window.set_all_polling(true);
-
     // build and compile our shader program
     // ------------------------------------
 
     // Vertex Array Object id
-    let mut VAO: GLuint = 0;
+    let mut VAOs: [GLuint; 2] = [0; 2];
     // Vertex Buffer Object id
-    let mut VBO: GLuint = 0;
+    let mut VBOs: [GLuint; 2] = [0; 2];
     // Shader Program id
     let mut shaderProgram: GLuint = 0;
 
@@ -71,6 +70,7 @@ fn main() {
         // vertex shader
         let vertexShader = gl::CreateShader(gl::VERTEX_SHADER);
         let c_source = CString::new(VERTEX_SHADER_SOURCE).unwrap();
+
         gl::ShaderSource(vertexShader, 1, &c_source.as_ptr(), ptr::null());
         gl::CompileShader(vertexShader);
 
@@ -84,6 +84,7 @@ fn main() {
         // fragment shader
         let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
         let c_source = CString::new(FRAGMENT_SHADER_SOURCE).unwrap();
+
         gl::ShaderSource(fragmentShader, 1, &c_source.as_ptr(), ptr::null());
         gl::CompileShader(fragmentShader);
 
@@ -121,25 +122,40 @@ fn main() {
         gl::DeleteShader(vertexShader);
         gl::DeleteShader(fragmentShader);
 
-        // Vertices for the triangle.
-        let vertices: [f32; 9] = [-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0];
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+        // ------------------------------------------------------------------
+        // add a new set of vertices to form a second triangle (a total of 6 vertices); the vertex attribute configuration remains the same (still one 3-float position vector per vertex)
+        #[rustfmt::skip]
+        let firstTriangle: [f32; 9] = [
+            -0.9, -0.5, 0.0,  // left
+            -0.0, -0.5, 0.0,  // right
+            -0.45, 0.5, 0.0,  // top
+        ];
 
-        // Generate the Vertex Array object and store the id.
-        gl::GenVertexArrays(1, &mut VAO);
+        #[rustfmt::skip]
+        let secondTriangle: [f32; 9] = [
+            0.0, -0.5, 0.0,  // left
+            0.9, -0.5, 0.0,  // right
+            0.45, 0.5, 0.0   // top
+        ];
 
-        // Generate the Vertex Buffer object and store the id.
-        gl::GenBuffers(1, &mut VBO);
+        // Generate the Vertex Array objects and store their ids.
+        // we can also generate multiple VAOs or buffers at the same time
+        gl::GenVertexArrays(2, VAOs.as_mut_ptr());
 
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s),
-        // and then configure vertex attributes(s).
-        gl::BindVertexArray(VAO);
+        // Generate the Buffer objects and store their ids.
+        gl::GenBuffers(2, VBOs.as_mut_ptr());
 
-        gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
+        // first triangle setup
+        // --------------------
+        gl::BindVertexArray(VAOs[0]);
+
+        gl::BindBuffer(gl::ARRAY_BUFFER, VBOs[0]);
 
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            vertices.len() as GLsizeiptr * mem::size_of::<f32>() as GLsizeiptr,
-            mem::transmute(vertices.as_ptr()),
+            (firstTriangle.len() * mem::size_of::<f32>()) as GLsizeiptr,
+            mem::transmute(firstTriangle.as_ptr()),
             gl::STATIC_DRAW,
         );
 
@@ -154,14 +170,29 @@ fn main() {
 
         gl::EnableVertexAttribArray(0);
 
-        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the
-        // vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-        gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+        // second triangle setup
+        // ---------------------
+        gl::BindVertexArray(VAOs[1]);
 
-        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO,
-        // but this rarely happens. Modifying other VAOs requires a call to glBindVertexArray anyways
-        // so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-        gl::BindVertexArray(0);
+        gl::BindBuffer(gl::ARRAY_BUFFER, VBOs[1]);
+
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            (secondTriangle.len() * mem::size_of::<f32>()) as GLsizeiptr,
+            mem::transmute(secondTriangle.as_ptr()),
+            gl::STATIC_DRAW,
+        );
+
+        gl::VertexAttribPointer(
+            0,
+            3,
+            gl::FLOAT,
+            gl::FALSE,
+            (3 * mem::size_of::<f32>()) as GLsizei,
+            ptr::null(),
+        );
+
+        gl::EnableVertexAttribArray(0);
 
         // uncomment this call to draw in wireframe polygons.
         // gl::PolygonMode(gl::FRONT_AND_BACK, gl::LINE);
@@ -177,11 +208,14 @@ fn main() {
             gl::ClearColor(0.3, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
 
-            // draw our first triangle
             gl::UseProgram(shaderProgram);
-            // Bind the VAO we want to use. Seeing as we only have a single VAO there's no need
-            // to bind it every time, but we'll do so to keep things a bit more organized.
-            gl::BindVertexArray(VAO);
+
+            // draw first triangle using the data from the first VAO
+            gl::BindVertexArray(VAOs[0]);
+            gl::DrawArrays(gl::TRIANGLES, 0, 3);
+
+            // then we draw the second triangle using the data from the second VAO
+            gl::BindVertexArray(VAOs[1]);
             gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }
 
@@ -191,8 +225,8 @@ fn main() {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     unsafe {
-        gl::DeleteVertexArrays(1, &VAO);
-        gl::DeleteBuffers(1, &VBO);
+        gl::DeleteVertexArrays(2, VAOs.as_ptr());
+        gl::DeleteBuffers(2, VBOs.as_ptr());
         gl::DeleteProgram(shaderProgram);
     }
 }

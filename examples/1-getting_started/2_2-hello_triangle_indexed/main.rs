@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
+#![allow(unused_assignments)]
 
 extern crate glfw;
 
@@ -42,20 +43,18 @@ fn main() {
         .create_window(
             SCR_WIDTH,
             SCR_HEIGHT,
-            "Hello this is window",
+            "LearnOpenGL - triangle indexed",
             glfw::WindowMode::Windowed,
         )
         .expect("Failed to create GLFW window.");
 
-    window.set_key_polling(true);
+    // Turn on all GLFW polling so that we can receive all WindowEvents
+    window.set_all_polling(true);
     window.make_current();
 
     // Initialize glad: load all OpenGL function pointers
     // --------------------------------------------------
     gl::load(|e| glfw.get_proc_address_raw(e) as *const std::os::raw::c_void);
-
-    // Turn on GLFW polling so that we can receive all WindowEvents
-    window.set_all_polling(true);
 
     // build and compile our shader program
     // ------------------------------------
@@ -64,6 +63,8 @@ fn main() {
     let mut VAO: GLuint = 0;
     // Vertex Buffer Object id
     let mut VBO: GLuint = 0;
+    // Element Buffer Object id
+    let mut EBO: GLuint = 0;
     // Shader Program id
     let mut shaderProgram: GLuint = 0;
 
@@ -71,6 +72,7 @@ fn main() {
         // vertex shader
         let vertexShader = gl::CreateShader(gl::VERTEX_SHADER);
         let c_source = CString::new(VERTEX_SHADER_SOURCE).unwrap();
+
         gl::ShaderSource(vertexShader, 1, &c_source.as_ptr(), ptr::null());
         gl::CompileShader(vertexShader);
 
@@ -84,6 +86,7 @@ fn main() {
         // fragment shader
         let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
         let c_source = CString::new(FRAGMENT_SHADER_SOURCE).unwrap();
+
         gl::ShaderSource(fragmentShader, 1, &c_source.as_ptr(), ptr::null());
         gl::CompileShader(fragmentShader);
 
@@ -121,14 +124,28 @@ fn main() {
         gl::DeleteShader(vertexShader);
         gl::DeleteShader(fragmentShader);
 
-        // Vertices for the triangle.
-        let vertices: [f32; 9] = [-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0];
+        // set up vertex data (and buffer(s)) and configure vertex attributes
+        // ------------------------------------------------------------------
+        #[rustfmt::skip]
+        let vertices: [f32; 12] = [
+            0.5,  0.5, 0.0,  // top right
+            0.5, -0.5, 0.0,  // bottom right
+           -0.5, -0.5, 0.0,  // bottom left
+           -0.5,  0.5, 0.0   // top left
+        ];
+
+        #[rustfmt::skip]
+        let indices: [u32; 6] = [  // note that we start from 0!
+            0, 1, 3,  // first Triangle
+            1, 2, 3   // second Triangle
+        ];
 
         // Generate the Vertex Array object and store the id.
         gl::GenVertexArrays(1, &mut VAO);
 
-        // Generate the Vertex Buffer object and store the id.
+        // Generate the Vertex Buffer and Element objects and store their ids.
         gl::GenBuffers(1, &mut VBO);
+        gl::GenBuffers(1, &mut EBO);
 
         // bind the Vertex Array Object first, then bind and set vertex buffer(s),
         // and then configure vertex attributes(s).
@@ -140,6 +157,15 @@ fn main() {
             gl::ARRAY_BUFFER,
             vertices.len() as GLsizeiptr * mem::size_of::<f32>() as GLsizeiptr,
             mem::transmute(vertices.as_ptr()),
+            gl::STATIC_DRAW,
+        );
+
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, EBO);
+
+        gl::BufferData(
+            gl::ELEMENT_ARRAY_BUFFER,
+            indices.len() as GLsizeiptr * mem::size_of::<u32>() as GLsizeiptr,
+            mem::transmute(indices.as_ptr()),
             gl::STATIC_DRAW,
         );
 
@@ -157,6 +183,10 @@ fn main() {
         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the
         // vertex attribute's bound vertex buffer object so afterwards we can safely unbind
         gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+
+        // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object
+        // IS stored in the VAO; keep the EBO bound.
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO,
         // but this rarely happens. Modifying other VAOs requires a call to glBindVertexArray anyways
@@ -182,7 +212,8 @@ fn main() {
             // Bind the VAO we want to use. Seeing as we only have a single VAO there's no need
             // to bind it every time, but we'll do so to keep things a bit more organized.
             gl::BindVertexArray(VAO);
-            gl::DrawArrays(gl::TRIANGLES, 0, 3);
+            // gl::DrawArrays(gl::TRIANGLES, 0, 3);
+            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
         }
 
         window.swap_buffers();
@@ -193,6 +224,7 @@ fn main() {
     unsafe {
         gl::DeleteVertexArrays(1, &VAO);
         gl::DeleteBuffers(1, &VBO);
+        gl::DeleteBuffers(1, &EBO);
         gl::DeleteProgram(shaderProgram);
     }
 }

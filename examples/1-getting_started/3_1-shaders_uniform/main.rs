@@ -1,11 +1,12 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
+#![allow(unused_assignments)]
 
 extern crate glfw;
 
 use glad_gl::gl;
-use glad_gl::gl::{GLchar, GLint, GLsizei, GLsizeiptr, GLuint};
+use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint};
 use glfw::{Action, Context, Key};
 use std::ffi::CString;
 use std::{mem, ptr};
@@ -17,14 +18,15 @@ const VERTEX_SHADER_SOURCE: &str = r#"#version 330 core
     layout (location = 0) in vec3 aPos;
     void main()
     {
-       gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+       gl_Position = vec4(aPos, 1.0);
     }"#;
 
-const FRAGMENT_SHADER_SOURCE: &str = r#"#version 330 core
+const FRAGMENT_SHADER_1_SOURCE: &str = r#"#version 330 core
     out vec4 FragColor;
+    uniform vec4 ourColor;
     void main()
     {
-       FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+       FragColor = ourColor;
     }"#;
 
 fn main() {
@@ -42,103 +44,77 @@ fn main() {
         .create_window(
             SCR_WIDTH,
             SCR_HEIGHT,
-            "Hello this is window",
+            "LearnOpenGL - triangle indexed",
             glfw::WindowMode::Windowed,
         )
         .expect("Failed to create GLFW window.");
 
-    window.set_key_polling(true);
+    // Turn on all GLFW polling so that we can receive all WindowEvents
+    window.set_all_polling(true);
     window.make_current();
 
     // Initialize glad: load all OpenGL function pointers
     // --------------------------------------------------
     gl::load(|e| glfw.get_proc_address_raw(e) as *const std::os::raw::c_void);
 
-    // Turn on GLFW polling so that we can receive all WindowEvents
-    window.set_all_polling(true);
-
     // build and compile our shader program
     // ------------------------------------
 
     // Vertex Array Object id
-    let mut VAO: GLuint = 0;
+    let mut VAOs: [GLuint; 1] = [0; 1];
     // Vertex Buffer Object id
-    let mut VBO: GLuint = 0;
+    let mut VBOs: [GLuint; 1] = [0; 1];
     // Shader Program id
     let mut shaderProgram: GLuint = 0;
 
     unsafe {
         // vertex shader
         let vertexShader = gl::CreateShader(gl::VERTEX_SHADER);
+        let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
+        shaderProgram = gl::CreateProgram();
+
         let c_source = CString::new(VERTEX_SHADER_SOURCE).unwrap();
         gl::ShaderSource(vertexShader, 1, &c_source.as_ptr(), ptr::null());
         gl::CompileShader(vertexShader);
 
-        let mut status = gl::FALSE as GLint;
-        gl::GetShaderiv(vertexShader, gl::COMPILE_STATUS, &mut status);
-
-        if status != (gl::TRUE as GLint) {
-            panic!("Vertex shader compile failed.");
-        }
-
-        // fragment shader
-        let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
-        let c_source = CString::new(FRAGMENT_SHADER_SOURCE).unwrap();
+        let c_source = CString::new(FRAGMENT_SHADER_1_SOURCE).unwrap();
         gl::ShaderSource(fragmentShader, 1, &c_source.as_ptr(), ptr::null());
         gl::CompileShader(fragmentShader);
 
-        let mut status = gl::FALSE as GLint;
-        gl::GetShaderiv(fragmentShader, gl::COMPILE_STATUS, &mut status);
-
-        if status != (gl::TRUE as GLint) {
-            panic!("Fragment shader compile failed.");
-        }
-
-        // link shaders to the shader program.
-        shaderProgram = gl::CreateProgram();
+        // link the first program object
         gl::AttachShader(shaderProgram, vertexShader);
         gl::AttachShader(shaderProgram, fragmentShader);
         gl::LinkProgram(shaderProgram);
 
-        let mut status = gl::FALSE as GLint;
-        gl::GetProgramiv(shaderProgram, gl::LINK_STATUS, &mut status);
-
-        if status != (gl::TRUE as GLint) {
-            let mut len = 0;
-            gl::GetProgramiv(shaderProgram, gl::INFO_LOG_LENGTH, &mut len);
-            // Subtract 1 to skip the trailing null character.
-            let mut infoLog = vec![0; len as usize - 1];
-            gl::GetProgramInfoLog(
-                shaderProgram,
-                512,
-                ptr::null_mut(),
-                infoLog.as_mut_ptr() as *mut GLchar,
-            );
-            panic!("Shader program linking failed: {:?}", infoLog);
-        }
-
-        // Now that the shader program has been built we can free up memory by deleting the shaders.
+        // Now that the shader programs have been built we can free up memory by deleting the shaders.
         gl::DeleteShader(vertexShader);
         gl::DeleteShader(fragmentShader);
 
-        // Vertices for the triangle.
-        let vertices: [f32; 9] = [-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0];
+        // set up vertex data (and buffer(s)) and configure vertex attributes
+        // ------------------------------------------------------------------
+        #[rustfmt::skip]
+        let vertices: [f32; 9] = [
+             0.5, -0.5, 0.0,  // bottom right
+            -0.5, -0.5, 0.0,  // bottom left
+             0.0,  0.5, 0.0,  // top
+        ];
 
-        // Generate the Vertex Array object and store the id.
-        gl::GenVertexArrays(1, &mut VAO);
+        // Generate the Vertex Array objects and store their ids.
+        // we can also generate multiple VAOs or buffers at the same time
+        gl::GenVertexArrays(1, VAOs.as_mut_ptr());
 
-        // Generate the Vertex Buffer object and store the id.
-        gl::GenBuffers(1, &mut VBO);
+        // Generate the Buffer objects and store their ids.
+        gl::GenBuffers(1, VBOs.as_mut_ptr());
 
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s),
-        // and then configure vertex attributes(s).
-        gl::BindVertexArray(VAO);
+        // triangle setup
+        // --------------------
+        gl::BindVertexArray(VAOs[0]);
 
-        gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
+        gl::BindBuffer(gl::ARRAY_BUFFER, VBOs[0]);
 
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            vertices.len() as GLsizeiptr * mem::size_of::<f32>() as GLsizeiptr,
+            (vertices.len() * mem::size_of::<f32>()) as GLsizeiptr,
             mem::transmute(vertices.as_ptr()),
             gl::STATIC_DRAW,
         );
@@ -154,17 +130,14 @@ fn main() {
 
         gl::EnableVertexAttribArray(0);
 
-        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the
-        // vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-        gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+        // glBindVertexArray(0);
 
-        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO,
-        // but this rarely happens. Modifying other VAOs requires a call to glBindVertexArray anyways
-        // so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-        gl::BindVertexArray(0);
 
-        // uncomment this call to draw in wireframe polygons.
-        // gl::PolygonMode(gl::FRONT_AND_BACK, gl::LINE);
+        // bind the VAO (it was already bound, but just to demonstrate): seeing as we only have a single VAO we can
+        // just bind it beforehand before rendering the respective triangle; this is another approach.
+        gl::BindVertexArray(VAOs[0]);
     }
 
     while !window.should_close() {
@@ -177,11 +150,17 @@ fn main() {
             gl::ClearColor(0.3, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
 
-            // draw our first triangle
+            // be sure to activate the shader before any calls to glUniform
             gl::UseProgram(shaderProgram);
-            // Bind the VAO we want to use. Seeing as we only have a single VAO there's no need
-            // to bind it every time, but we'll do so to keep things a bit more organized.
-            gl::BindVertexArray(VAO);
+
+            // update shader uniform
+            let timeValue = glfw.get_time();
+            let greenValue = (timeValue.sin() / 2.0 + 0.5) as f32;
+            let c_str = CString::new("ourColor").unwrap();
+            let vertexColorLocation = gl::GetUniformLocation(shaderProgram, c_str.as_ptr());
+            gl::Uniform4f(vertexColorLocation, 0.0, greenValue, 0.0, 1.0);
+
+            // render the triangle
             gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }
 
@@ -191,8 +170,8 @@ fn main() {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     unsafe {
-        gl::DeleteVertexArrays(1, &VAO);
-        gl::DeleteBuffers(1, &VBO);
+        gl::DeleteVertexArrays(2, VAOs.as_ptr());
+        gl::DeleteBuffers(2, VBOs.as_ptr());
         gl::DeleteProgram(shaderProgram);
     }
 }
