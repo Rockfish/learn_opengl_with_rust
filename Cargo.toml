@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 #glfw = "0.52.0"
 glad-gl = { path = "./glad-gl" }
+learnopengl_lib = { path = "./learnopengl_lib" }
 
 [dependencies.glfw]
 version = "*"
@@ -43,3 +44,15 @@ path = "examples/1-getting_started/2_5-hello_triangle_exercise3/main.rs"
 [[example]]
 name = "3_1-shaders_uniform"
 path = "examples/1-getting_started/3_1-shaders_uniform/main.rs"
+
+[[example]]
+name = "3_2-shaders_interpolation"
+path = "examples/1-getting_started/3_2-shaders_interpolation/main.rs"
+
+[[example]]
+name = "3_3-shaders_class"
+path = "examples/1-getting_started/3_3-shaders_class/main.rs"
+
+
+
+

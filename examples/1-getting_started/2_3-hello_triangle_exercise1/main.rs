@@ -122,7 +122,7 @@ fn main() {
         gl::DeleteShader(vertexShader);
         gl::DeleteShader(fragmentShader);
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
+        // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
         // add a new set of vertices to form a second triangle (a total of 6 vertices); the vertex attribute configuration remains the same (still one 3-float position vector per vertex)
         #[rustfmt::skip]
