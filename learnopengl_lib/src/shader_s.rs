@@ -45,13 +45,13 @@ impl Shader_S {
             let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
             self.shaderProgramId = gl::CreateProgram();
 
-            let c_source = CString::new(vertexCode).unwrap();
-            gl::ShaderSource(vertexShader, 1, &c_source.as_ptr(), ptr::null());
+            let c_string = c_str!(vertexCode);
+            gl::ShaderSource(vertexShader, 1, &c_string.as_ptr(), ptr::null());
             gl::CompileShader(vertexShader);
             checkCompileErrors(vertexShader, "VERTEX");
 
-            let c_source = CString::new(fragmentCode).unwrap();
-            gl::ShaderSource(fragmentShader, 1, &c_source.as_ptr(), ptr::null());
+            let c_string = c_str!(fragmentCode);
+            gl::ShaderSource(fragmentShader, 1, &c_string.as_ptr(), ptr::null());
             gl::CompileShader(fragmentShader);
             checkCompileErrors(fragmentShader, "VERTEX");
 
@@ -80,15 +80,20 @@ impl Shader_S {
     pub fn setBool(&self, name: &str, value: bool) {
         unsafe {
             let v = if value { 1 } else { 0 };
-            gl::Uniform1i(gl::GetUniformLocation(self.shaderProgramId, c_str(name)), v);
+            let c_string = c_str!(name);
+            gl::Uniform1i(
+                gl::GetUniformLocation(self.shaderProgramId, c_string.as_ptr()),
+                v,
+            );
         }
     }
 
     // ------------------------------------------------------------------------
     pub fn setInt(&self, name: &str, value: i32) {
         unsafe {
+            let c_string = c_str!(name);
             gl::Uniform1i(
-                gl::GetUniformLocation(self.shaderProgramId, c_str(name)),
+                gl::GetUniformLocation(self.shaderProgramId, c_string.as_ptr()),
                 value,
             );
         }
@@ -97,8 +102,9 @@ impl Shader_S {
     // ------------------------------------------------------------------------
     pub fn setFloat(&self, name: &str, value: f32) {
         unsafe {
+            let c_string = c_str!(name);
             gl::Uniform1f(
-                gl::GetUniformLocation(self.shaderProgramId, c_str(name)),
+                gl::GetUniformLocation(self.shaderProgramId, c_string.as_ptr()),
                 value,
             );
         }

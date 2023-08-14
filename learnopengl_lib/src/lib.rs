@@ -1,4 +1,3 @@
-use std::ffi::c_char;
 use std::ffi::CString;
 pub mod shader_s;
 
@@ -14,10 +13,12 @@ pub mod shader_s;
 //
 // use:
 //
-//    let name = "thingy";
-//    foo(c_str(name));
+//    let name = c_str!("thingy");
+//    foo(name.as_ptr());
 //
-pub fn c_str<T: Into<Vec<u8>>>(t: T) -> *const c_char {
-    let c_str = CString::new(t).unwrap();
-    return c_str.as_ptr();
+#[macro_export]
+macro_rules! c_str {
+    ($a_string:expr) => {{
+        CString::new($a_string).unwrap()
+    }};
 }

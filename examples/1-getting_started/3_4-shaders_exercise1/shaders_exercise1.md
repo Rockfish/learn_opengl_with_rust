@@ -15,7 +15,8 @@ Make the following changes to the vertex shader:
 
     void main()
     {
-        gl_Position = vec4(aPos.x, -aPos.y, aPos.z, 1.0); // just add a - to the y position
+        // just add a - to the y position
+        gl_Position = vec4(aPos.x, -aPos.y, aPos.z, 1.0); 
         ourColor = aColor;
     }
 
