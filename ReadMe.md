@@ -8,9 +8,11 @@ See the examples directory for the examples that follow the book.
 
 ## Dependencies
 
-* glfw - https://crates.io/crates/glfw
+* glfw - https://docs.rs/glfw/0.52.0/glfw/
 * glad generated from https://gen.glad.sh/ 
 
   See https://github.com/Dav1dde/glad/tree/glad2
+* image - https://docs.rs/image/0.24.7/image/
+ 
 
 

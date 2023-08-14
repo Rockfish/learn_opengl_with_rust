@@ -29,7 +29,7 @@ fn main() {
         .create_window(
             SCR_WIDTH,
             SCR_HEIGHT,
-            "LearnOpenGL - triangle indexed",
+            "LearnOpenGL",
             glfw::WindowMode::Windowed,
         )
         .expect("Failed to create GLFW window.");
