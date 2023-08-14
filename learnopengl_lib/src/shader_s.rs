@@ -122,7 +122,10 @@ fn checkCompileErrors(shaderId: u32, checkType: &str) {
                     ptr::null_mut(),
                     infoLog.as_mut_ptr() as *mut GLchar,
                 );
-                panic!("Shader compilation failed.\n{}", String::from_utf8_lossy(&infoLog));
+                panic!(
+                    "Shader compilation failed.\n{}",
+                    String::from_utf8_lossy(&infoLog)
+                );
             }
         } else {
             gl::GetProgramiv(shaderId, gl::LINK_STATUS, &mut status);
@@ -137,7 +140,10 @@ fn checkCompileErrors(shaderId: u32, checkType: &str) {
                     ptr::null_mut(),
                     infoLog.as_mut_ptr() as *mut GLchar,
                 );
-                panic!("Shader program linking failed.\n{}", String::from_utf8_lossy(&infoLog));
+                panic!(
+                    "Shader program linking failed.\n{}",
+                    String::from_utf8_lossy(&infoLog)
+                );
             }
         }
     }

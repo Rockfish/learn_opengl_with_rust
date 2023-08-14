@@ -8,8 +8,8 @@ extern crate glfw;
 use glad_gl::gl;
 use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glfw::{Action, Context, Key};
-use std::{mem, ptr};
 use learnopengl_lib::shader_s::Shader_S;
+use std::{mem, ptr};
 
 const SCR_WIDTH: u32 = 800;
 const SCR_HEIGHT: u32 = 800;
@@ -55,10 +55,12 @@ fn main() {
     unsafe {
         // build and compile our shader program
         // ------------------------------------
-        ourShader.build(
-            "examples/1-getting_started/3_3-shaders_class/3_3-shader.vert",
-            "examples/1-getting_started/3_3-shaders_class/3_3-shader.frag"
-        ).unwrap();
+        ourShader
+            .build(
+                "examples/1-getting_started/3_3-shaders_class/3_3-shader.vert",
+                "examples/1-getting_started/3_3-shaders_class/3_3-shader.frag",
+            )
+            .unwrap();
 
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
