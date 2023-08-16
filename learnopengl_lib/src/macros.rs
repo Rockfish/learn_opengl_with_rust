@@ -33,3 +33,11 @@ macro_rules! size_of_uint {
         ($value * mem::size_of::<u32>())
     }};
 }
+
+#[macro_export]
+macro_rules! gl_get_uniform_location {
+    ($id: expr, $value:expr) => {{
+        let c_str = c_string!($value);
+        gl::GetUniformLocation($id, c_str.as_ptr())
+    }};
+}

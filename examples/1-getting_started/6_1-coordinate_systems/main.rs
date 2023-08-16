@@ -9,8 +9,8 @@ use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use glfw::{Action, Context, Key};
-use learnopengl_lib::shader_s::Shader_S;
-use learnopengl_lib::{c_string, size_of_float, size_of_uint};
+use learnopengl_lib::shader_m::Shader_M;
+use learnopengl_lib::{c_string, gl_get_uniform_location, size_of_float, size_of_uint};
 use std::ffi::CString;
 use std::mem;
 
@@ -56,15 +56,15 @@ fn main() {
     let mut texture1: GLuint = 0;
     let mut texture2: GLuint = 0;
     // Shader program
-    let mut ourShader = Shader_S::new();
+    let mut ourShader = Shader_M::new();
 
     unsafe {
         // build and compile our shader program
         // ------------------------------------
         ourShader
             .build(
-                "examples/1-getting_started/5_2-transformations_exercise2/5_2-transform.vert",
-                "examples/1-getting_started/5_2-transformations_exercise2/5_2-transform.frag",
+                "examples/1-getting_started/6_1-coordinate_systems/6_1-coordinate_systems.vert",
+                "examples/1-getting_started/6_1-coordinate_systems/6_1-coordinate_systems.frag",
             )
             .unwrap();
 
@@ -209,14 +209,8 @@ fn main() {
 
         // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
         // -------------------------------------------------------------------------------------------
-        ourShader.use_shader(); // don't forget to activate/use the shader before setting uniforms!
-                                // either set it manually like so:
-        let c_str = c_string!("texture1");
-        gl::Uniform1i(
-            gl::GetUniformLocation(ourShader.programId, c_str.as_ptr()),
-            0,
-        );
-        // or set it via the texture class
+        ourShader.use_shader();
+        ourShader.setInt("texture1", 0);
         ourShader.setInt("texture2", 1);
     }
 
@@ -238,45 +232,37 @@ fn main() {
             gl::ActiveTexture(gl::TEXTURE1);
             gl::BindTexture(gl::TEXTURE_2D, texture2);
 
-            // create transformations using glam
-            let mut transform = Mat4::IDENTITY;
-            transform = transform * Mat4::from_translation(Vec3::new(0.5, -0.5, 0.0));
-            transform =
-                transform * Mat4::from_axis_angle(Vec3::new(0.0, 0.0, 1.0), glfw.get_time() as f32);
-
-            // get matrix's uniform location and set matrix
-            let c_str = c_string!("transform");
-            let transformLoc = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
-            gl::UniformMatrix4fv(
-                transformLoc,
-                1,
-                gl::FALSE,
-                transform.to_cols_array().as_ptr(),
-            );
-
-            // render the triangle
+            // activate shader
             ourShader.use_shader();
+
+            // create transformations using glam
+            let mut model = Mat4::IDENTITY;
+            let mut view = Mat4::IDENTITY;
+            let mut projection = Mat4::IDENTITY;
+
+            model = model * Mat4::from_rotation_x((-55.0f32).to_radians());
+            view = view * Mat4::from_translation(Vec3::new(0.0, 0.0, -3.0));
+            projection = projection
+                * Mat4::perspective_rh_gl(
+                    45.0f32.to_radians(),
+                    (SCR_WIDTH / SCR_HEIGHT) as f32,
+                    0.1,
+                    100.0,
+                );
+
+            // retrieve the matrix uniform locations
+            let modelLoc = gl_get_uniform_location!(ourShader.programId, "model");
+            let viewLoc = gl_get_uniform_location!(ourShader.programId, "view");
+
+            // pass them to the shaders two different ways
+            gl::UniformMatrix4fv(modelLoc, 1, gl::FALSE, model.to_cols_array().as_ptr());
+            gl::UniformMatrix4fv(viewLoc, 1, gl::FALSE, view.to_cols_array().as_ptr());
+            // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes
+            // it's often best practice to set it outside the main loop only once.
+            ourShader.setMat4("projection", &projection);
+
+            // render container
             gl::BindVertexArray(VAO);
-            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, 0 as *const GLvoid);
-
-            // second transformation
-            let mut transform = Mat4::IDENTITY;
-            transform = transform * Mat4::from_translation(Vec3::new(-0.5, 0.5, 0.0));
-            let scaleAmount = glfw.get_time().sin() as f32;
-            transform =
-                transform * Mat4::from_scale(Vec3::new(scaleAmount, scaleAmount, scaleAmount));
-
-            // get matrix's uniform location and set matrix
-            let c_str = c_string!("transform");
-            let transformLoc = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
-            gl::UniformMatrix4fv(
-                transformLoc,
-                1,
-                gl::FALSE,
-                transform.to_cols_array().as_ptr(),
-            );
-
-            // now with the uniform matrix being replaced with new transformations, draw it again.
             gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, 0 as *const GLvoid);
         }
 

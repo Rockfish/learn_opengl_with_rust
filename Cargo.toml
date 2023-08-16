@@ -91,14 +91,14 @@ path = "examples/1-getting_started/5_1-transformations/main.rs"
 name = "5_2-transformations_exercise2"
 path = "examples/1-getting_started/5_2-transformations_exercise2/main.rs"
 
-#[[example]]
-#name = "6_1-coordinate_systems"
-#path = "examples/1-getting_started/6_1-coordinate_systems/main.rs"
-#
-#[[example]]
-#name = "6_2-coordinate_systems_depth"
-#path = "examples/1-getting_started/6_2-coordinate_systems_depth/main.rs"
-#
+[[example]]
+name = "6_1-coordinate_systems"
+path = "examples/1-getting_started/6_1-coordinate_systems/main.rs"
+
+[[example]]
+name = "6_2-coordinate_systems_depth"
+path = "examples/1-getting_started/6_2-coordinate_systems_depth/main.rs"
+
 #[[example]]
 #name = "6_3-coordinate_systems_multiple"
 #path = "examples/1-getting_started/6_3-coordinate_systems_multiple/main.rs"
