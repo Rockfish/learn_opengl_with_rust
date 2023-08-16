@@ -7,6 +7,7 @@ extern crate glfw;
 
 use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
+use glam::*;
 use glfw::{Action, Context, Key};
 use learnopengl_lib::shader_s::Shader_S;
 use learnopengl_lib::{c_string, size_of_float, size_of_uint};
@@ -15,11 +16,7 @@ use std::mem;
 
 const SCR_WIDTH: u32 = 800;
 const SCR_HEIGHT: u32 = 800;
-
-// Struct for passing state between the window loop and the event handler.
-struct State {
-    mix_value: f32,
-}
+const SIZE_OF_FLOAT: usize = mem::size_of::<f32>();
 
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -66,20 +63,20 @@ fn main() {
         // ------------------------------------
         ourShader
             .build(
-                "examples/1-getting_started/4_6-textures_exercise4/4_6-texture.vert",
-                "examples/1-getting_started/4_6-textures_exercise4/4_6-texture.frag",
+                "examples/1-getting_started/5_2-transformations_exercise2/5_2-transform.vert",
+                "examples/1-getting_started/5_2-transformations_exercise2/5_2-transform.frag",
             )
             .unwrap();
 
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
         #[rustfmt::skip]
-        let vertices: [f32; 32] = [
-            // positions      // colors        // texture coordinates
-            0.5,  0.5, 0.0,   1.0, 0.0, 0.0,   1.0, 1.0, // top right
-            0.5, -0.5, 0.0,   0.0, 1.0, 0.0,   1.0, 0.0, // bottom right
-           -0.5, -0.5, 0.0,   0.0, 0.0, 1.0,   0.0, 0.0, // bottom left
-           -0.5,  0.5, 0.0,   1.0, 1.0, 0.0,   0.0, 1.0  // top left
+        let vertices: [f32; 20] = [
+            // positions      // texture coordinates
+            0.5,  0.5, 0.0,   1.0, 1.0, // top right
+            0.5, -0.5, 0.0,   1.0, 0.0, // bottom right
+           -0.5, -0.5, 0.0,   0.0, 0.0, // bottom left
+           -0.5,  0.5, 0.0,   0.0, 1.0  // top left
         ];
 
         #[rustfmt::skip]
@@ -116,32 +113,21 @@ fn main() {
             3,
             gl::FLOAT,
             gl::FALSE,
-            size_of_float!(8) as GLsizei,
+            5 * SIZE_OF_FLOAT as GLsizei,
             0 as *const GLvoid,
         );
         gl::EnableVertexAttribArray(0);
 
-        // color attribute
-        gl::VertexAttribPointer(
-            1,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            size_of_float!(8) as GLsizei,
-            size_of_float!(3) as *const GLvoid,
-        );
-        gl::EnableVertexAttribArray(1);
-
         // texture coordinate attribute
         gl::VertexAttribPointer(
-            2,
+            1,
             2,
             gl::FLOAT,
             gl::FALSE,
-            size_of_float!(8) as GLsizei,
-            size_of_float!(6) as *const GLvoid,
+            (5 * SIZE_OF_FLOAT) as GLsizei,
+            (3 * SIZE_OF_FLOAT) as *const GLvoid,
         );
-        gl::EnableVertexAttribArray(2);
+        gl::EnableVertexAttribArray(1);
 
         // load and create a texture
         // -------------------------
@@ -234,13 +220,11 @@ fn main() {
         ourShader.setInt("texture2", 1);
     }
 
-    let mut state = State { mix_value: 0.0 };
-
     // render loop
     while !window.should_close() {
         glfw.poll_events();
         for (_, event) in glfw::flush_messages(&events) {
-            handle_window_event(&mut window, event, &mut state);
+            handle_window_event(&mut window, event);
         }
 
         unsafe {
@@ -254,14 +238,44 @@ fn main() {
             gl::ActiveTexture(gl::TEXTURE1);
             gl::BindTexture(gl::TEXTURE_2D, texture2);
 
-            // Use the mixValue uniform to adjust the mixing of the texture in the fragment shader
-            let c_str = CString::new("mixValue").unwrap();
-            let mixValueLocation = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
-            gl::Uniform1f(mixValueLocation, state.mix_value);
+            // create transformations using glam
+            let mut transform = Mat4::IDENTITY;
+            transform = transform * Mat4::from_translation(Vec3::new(0.5, -0.5, 0.0));
+            transform =
+                transform * Mat4::from_axis_angle(Vec3::new(0.0, 0.0, 1.0), glfw.get_time() as f32);
+
+            // get matrix's uniform location and set matrix
+            let c_str = c_string!("transform");
+            let transformLoc = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
+            gl::UniformMatrix4fv(
+                transformLoc,
+                1,
+                gl::FALSE,
+                transform.to_cols_array().as_ptr(),
+            );
 
             // render the triangle
             ourShader.use_shader();
             gl::BindVertexArray(VAO);
+            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, 0 as *const GLvoid);
+
+            // second transformation
+            let mut transform = Mat4::IDENTITY;
+            transform = transform * Mat4::from_translation(Vec3::new(-0.5, 0.5, 0.0));
+            let scaleAmount = glfw.get_time().sin() as f32;
+            transform = transform * Mat4::from_scale(Vec3::new(scaleAmount, scaleAmount, scaleAmount));
+
+            // get matrix's uniform location and set matrix
+            let c_str = c_string!("transform");
+            let transformLoc = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
+            gl::UniformMatrix4fv(
+                transformLoc,
+                1,
+                gl::FALSE,
+                transform.to_cols_array().as_ptr(),
+            );
+
+            // now with the uniform matrix being replaced with new transformations, draw it again.
             gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, 0 as *const GLvoid);
         }
 
@@ -281,23 +295,11 @@ fn main() {
 //
 // GLFW maps callbacks to events.
 //
-fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, state: &mut State) {
+fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent) {
     match event {
         glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) => window.set_should_close(true),
         glfw::WindowEvent::FramebufferSize(width, height) => {
             framebuffer_size_event(window, width, height);
-        }
-        glfw::WindowEvent::Key(Key::Up, _, _, _) => {
-            state.mix_value += 0.01;
-            if state.mix_value > 1.0 {
-                state.mix_value = 1.0;
-            }
-        }
-        glfw::WindowEvent::Key(Key::Down, _, _, _) => {
-            state.mix_value -= 0.01;
-            if state.mix_value < 0.0 {
-                state.mix_value = 0.0;
-            }
         }
         evt => {
             println!("WindowEvent: {:?}", evt);

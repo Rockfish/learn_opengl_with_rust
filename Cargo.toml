@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 #glfw = "0.52.0"
 glad-gl = { path = "./glad-gl" }
+glam = "0.24.1"
 image = "0.24.7"
 learnopengl_lib = { path = "./learnopengl_lib" }
 
@@ -78,19 +79,18 @@ path = "examples/1-getting_started/4_5-textures_exercise3/main.rs"
 name = "4_6-textures_exercise4"
 path = "examples/1-getting_started/4_6-textures_exercise4/main.rs"
 
+[[example]]
+name = "5_1-transformations"
+path = "examples/1-getting_started/5_1-transformations/main.rs"
 
-#[[example]]
-#name = "5_1-transformations"
-#path = "examples/1-getting_started/5_1-transformations/main.rs"
-#
 #[[example]]
 #name = "5_2-transformations_exercise1"
 #path = "examples/1-getting_started/5_2-transformations_exercise1/main.rs"
-#
-#[[example]]
-#name = "5_2-transformations_exercise2"
-#path = "examples/1-getting_started/5_2-transformations_exercise2/main.rs"
-#
+
+[[example]]
+name = "5_2-transformations_exercise2"
+path = "examples/1-getting_started/5_2-transformations_exercise2/main.rs"
+
 #[[example]]
 #name = "6_1-coordinate_systems"
 #path = "examples/1-getting_started/6_1-coordinate_systems/main.rs"

@@ -197,6 +197,7 @@ fn main() {
         // load image, create texture and generate mipmaps
         let img =
             image::open("resources/textures/awesomeface.png").expect("Texture failed to load");
+        let (width, height) = (img.width() as GLsizei, img.height() as GLsizei);
 
         // flip image vertically so that the texture is rendered upright
         // use into_rgba since the image has an alpha transparency
@@ -206,8 +207,8 @@ fn main() {
             gl::TEXTURE_2D,
             0,
             gl::RGB as GLint,
-            img.width() as GLsizei,
-            img.height() as GLsizei,
+            width,
+            height,
             0,
             gl::RGBA, // RGB with Alpha
             gl::UNSIGNED_BYTE,
