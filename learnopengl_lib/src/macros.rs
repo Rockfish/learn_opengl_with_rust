@@ -15,29 +15,29 @@
 //
 #[macro_export]
 macro_rules! c_string {
-    ($a_string:expr) => {{
+    ($a_string:expr) => {
         CString::new($a_string).unwrap()
-    }};
+    };
 }
 
 #[macro_export]
-macro_rules! size_of_float {
-    ($value:expr) => {{
+macro_rules! size_of_floats {
+    ($value:expr) => {
         ($value * mem::size_of::<f32>())
-    }};
+    };
 }
 
 #[macro_export]
 macro_rules! size_of_uint {
-    ($value:expr) => {{
+    ($value:expr) => {
         ($value * mem::size_of::<u32>())
-    }};
+    };
 }
 
 #[macro_export]
 macro_rules! gl_get_uniform_location {
     ($id: expr, $value:expr) => {{
-        let c_str = c_string!($value);
+        let c_str = CString::new($value).unwrap();
         gl::GetUniformLocation($id, c_str.as_ptr())
     }};
 }

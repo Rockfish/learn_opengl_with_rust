@@ -10,7 +10,7 @@ use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use glfw::{Action, Context, Key};
 use learnopengl_lib::shader_s::Shader_S;
-use learnopengl_lib::{c_string, size_of_float, size_of_uint};
+use learnopengl_lib::{c_string, size_of_floats, size_of_uint};
 use std::ffi::CString;
 use std::mem;
 
@@ -94,7 +94,7 @@ fn main() {
         gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            size_of_float!(vertices.len()) as GLsizeiptr,
+            size_of_floats!(vertices.len()) as GLsizeiptr,
             vertices.as_ptr() as *const GLvoid,
             gl::STATIC_DRAW,
         );

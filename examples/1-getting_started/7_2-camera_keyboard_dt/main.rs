@@ -9,14 +9,20 @@ use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use glfw::{Action, Context, Key};
-use learnopengl_lib::shader_s::Shader_S;
-use learnopengl_lib::{c_string, size_of_floats, size_of_uint};
-use std::ffi::CString;
-use std::mem;
+use learnopengl_lib::shader_m::Shader_M;
+use learnopengl_lib::SIZE_OF_FLOAT;
 
 const SCR_WIDTH: u32 = 800;
 const SCR_HEIGHT: u32 = 800;
-const SIZE_OF_FLOAT: usize = mem::size_of::<f32>();
+
+// Struct for passing state between the window loop and the event handler.
+struct State {
+    cameraPos: Vec3,
+    cameraFront: Vec3,
+    cameraUp: Vec3,
+    deltaTime: f32,
+    lastFrame: f32,
+}
 
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -50,60 +56,97 @@ fn main() {
     let mut VAO: GLuint = 0;
     // Vertex Buffer Object id
     let mut VBO: GLuint = 0;
-    // Element Buffer Object id
-    let mut EBO: GLuint = 0;
     // Texture ids
     let mut texture1: GLuint = 0;
     let mut texture2: GLuint = 0;
+
     // Shader program
-    let mut ourShader = Shader_S::new();
+    let mut ourShader = Shader_M::new();
+
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
+    #[rustfmt::skip]
+    let vertices: [f32; 180] = [
+        -0.5, -0.5, -0.5,  0.0, 0.0,
+         0.5, -0.5, -0.5,  1.0, 0.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+        -0.5,  0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, 0.0,
+
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+         0.5, -0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5,  0.5,  1.0, 1.0,
+         0.5,  0.5,  0.5,  1.0, 1.0,
+        -0.5,  0.5,  0.5,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+
+        -0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5,  0.5, -0.5,  1.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+        -0.5,  0.5,  0.5,  1.0, 0.0,
+
+         0.5,  0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+         0.5, -0.5, -0.5,  0.0, 1.0,
+         0.5, -0.5, -0.5,  0.0, 1.0,
+         0.5, -0.5,  0.5,  0.0, 0.0,
+         0.5,  0.5,  0.5,  1.0, 0.0,
+
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+         0.5, -0.5, -0.5,  1.0, 1.0,
+         0.5, -0.5,  0.5,  1.0, 0.0,
+         0.5, -0.5,  0.5,  1.0, 0.0,
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+
+        -0.5,  0.5, -0.5,  0.0, 1.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+         0.5,  0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5,  0.5,  0.5,  0.0, 0.0,
+        -0.5,  0.5, -0.5,  0.0, 1.0,
+    ];
+
+    // world space positions of our cubes
+    #[rustfmt::skip]
+    let cubePositions: [Vec3; 10] = [
+        Vec3::new( 0.0,  0.0,  0.0),
+        Vec3::new( 2.0,  5.0, -15.0),
+        Vec3::new(-1.5, -2.2, -2.5),
+        Vec3::new(-3.8, -2.0, -12.3),
+        Vec3::new( 2.4, -0.4, -3.5),
+        Vec3::new(-1.7,  3.0, -7.5),
+        Vec3::new( 1.3, -2.0, -2.5),
+        Vec3::new( 1.5,  2.0, -2.5),
+        Vec3::new( 1.5,  0.2, -1.5),
+        Vec3::new(-1.3,  1.0, -1.5)
+    ];
 
     unsafe {
+        gl::Enable(gl::DEPTH_TEST);
+
         // build and compile our shader program
         // ------------------------------------
         ourShader
             .build(
-                "examples/1-getting_started/5_2-transformations_exercise2/5_2-transform.vert",
-                "examples/1-getting_started/5_2-transformations_exercise2/5_2-transform.frag",
+                "examples/1-getting_started/7_2-camera_keyboard_dt/7_2-camera.vert",
+                "examples/1-getting_started/7_2-camera_keyboard_dt/7_2-camera.frag",
             )
             .unwrap();
 
-        // set up vertex data (and buffer(s)) and configure vertex attributes
-        // ------------------------------------------------------------------
-        #[rustfmt::skip]
-        let vertices: [f32; 20] = [
-            // positions      // texture coordinates
-            0.5,  0.5, 0.0,   1.0, 1.0, // top right
-            0.5, -0.5, 0.0,   1.0, 0.0, // bottom right
-           -0.5, -0.5, 0.0,   0.0, 0.0, // bottom left
-           -0.5,  0.5, 0.0,   0.0, 1.0  // top left
-        ];
-
-        #[rustfmt::skip]
-        let indices: [u32; 6] = [
-            0, 1, 3, // first triangle
-            1, 2, 3  // second triangle
-        ];
-
         gl::GenVertexArrays(1, &mut VAO);
         gl::GenBuffers(1, &mut VBO);
-        gl::GenBuffers(1, &mut EBO);
 
         gl::BindVertexArray(VAO);
 
         gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            size_of_floats!(vertices.len()) as GLsizeiptr,
+            (vertices.len() * SIZE_OF_FLOAT) as GLsizeiptr,
             vertices.as_ptr() as *const GLvoid,
-            gl::STATIC_DRAW,
-        );
-
-        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, EBO);
-        gl::BufferData(
-            gl::ELEMENT_ARRAY_BUFFER,
-            size_of_uint!(indices.len()) as GLsizeiptr,
-            indices.as_ptr() as *const GLvoid,
             gl::STATIC_DRAW,
         );
 
@@ -124,7 +167,7 @@ fn main() {
             2,
             gl::FLOAT,
             gl::FALSE,
-            (5 * SIZE_OF_FLOAT) as GLsizei,
+            5 * SIZE_OF_FLOAT as GLsizei,
             (3 * SIZE_OF_FLOAT) as *const GLvoid,
         );
         gl::EnableVertexAttribArray(1);
@@ -178,11 +221,7 @@ fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
 
         // set texture filtering parameters
-        gl::TexParameteri(
-            gl::TEXTURE_2D,
-            gl::TEXTURE_MIN_FILTER,
-            gl::LINEAR_MIPMAP_LINEAR as GLint,
-        );
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as GLint);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
 
         // load image, create texture and generate mipmaps
@@ -209,28 +248,45 @@ fn main() {
 
         // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
         // -------------------------------------------------------------------------------------------
-        ourShader.use_shader(); // don't forget to activate/use the shader before setting uniforms!
-                                // either set it manually like so:
-        let c_str = c_string!("texture1");
-        gl::Uniform1i(
-            gl::GetUniformLocation(ourShader.programId, c_str.as_ptr()),
-            0,
-        );
-        // or set it via the texture class
+        ourShader.use_shader();
+        ourShader.setInt("texture1", 0);
         ourShader.setInt("texture2", 1);
+
+        // pass projection matrix to shader (as projection matrix rarely changes there's no need to do this per frame)
+        // -----------------------------------------------------------------------------------------------------------
+        let projection = Mat4::perspective_rh_gl(
+            45.0f32.to_radians(),
+            (SCR_WIDTH / SCR_HEIGHT) as f32,
+            0.1,
+            100.0,
+        );
+        ourShader.setMat4("projection", &projection);
     }
+
+    // Initialize the world state
+    let mut state = State {
+        cameraPos: vec3(0.0, 0.0, 3.0),
+        cameraFront: vec3(0.0, 0.0, -1.0),
+        cameraUp: vec3(0.0, 1.0, 0.0),
+        deltaTime: 0.0,
+        lastFrame: 0.0,
+    };
 
     // render loop
     while !window.should_close() {
+        let currentFrame = glfw.get_time() as f32;
+        state.deltaTime = currentFrame - state.lastFrame;
+        state.lastFrame = currentFrame;
+
         glfw.poll_events();
         for (_, event) in glfw::flush_messages(&events) {
-            handle_window_event(&mut window, event);
+            handle_window_event(&mut window, event, &mut state);
         }
 
         unsafe {
             // render
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT); // also clear the depth buffer now!
 
             // bind textures on corresponding texture units
             gl::ActiveTexture(gl::TEXTURE0);
@@ -238,46 +294,32 @@ fn main() {
             gl::ActiveTexture(gl::TEXTURE1);
             gl::BindTexture(gl::TEXTURE_2D, texture2);
 
-            // create transformations using glam
-            let mut transform = Mat4::IDENTITY;
-            transform = transform * Mat4::from_translation(Vec3::new(0.5, -0.5, 0.0));
-            transform =
-                transform * Mat4::from_axis_angle(Vec3::new(0.0, 0.0, 1.0), glfw.get_time() as f32);
-
-            // get matrix's uniform location and set matrix
-            let c_str = c_string!("transform");
-            let transformLoc = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
-            gl::UniformMatrix4fv(
-                transformLoc,
-                1,
-                gl::FALSE,
-                transform.to_cols_array().as_ptr(),
-            );
-
-            // render the triangle
+            // activate shader
             ourShader.use_shader();
-            gl::BindVertexArray(VAO);
-            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, 0 as *const GLvoid);
 
-            // second transformation
-            let mut transform = Mat4::IDENTITY;
-            transform = transform * Mat4::from_translation(Vec3::new(-0.5, 0.5, 0.0));
-            let scaleAmount = glfw.get_time().sin() as f32;
-            transform =
-                transform * Mat4::from_scale(Vec3::new(scaleAmount, scaleAmount, scaleAmount));
-
-            // get matrix's uniform location and set matrix
-            let c_str = c_string!("transform");
-            let transformLoc = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
-            gl::UniformMatrix4fv(
-                transformLoc,
-                1,
-                gl::FALSE,
-                transform.to_cols_array().as_ptr(),
+            // OpenGL uses a right handed coordinate system so use *_rh methods.
+            // eye: Position of the camera
+            // center: Position where the camera is looking at
+            // up: Normalized up vector, how the camera is oriented.
+            let view = Mat4::look_at_rh(
+                state.cameraPos,
+                state.cameraPos + state.cameraFront,
+                state.cameraUp,
             );
 
-            // now with the uniform matrix being replaced with new transformations, draw it again.
-            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, 0 as *const GLvoid);
+            ourShader.setMat4("view", &view);
+
+            // render boxes
+            gl::BindVertexArray(VAO);
+
+            for (i, cube_pos) in cubePositions.iter().enumerate() {
+                let mut model = Mat4::from_translation(*cube_pos);
+                let angle = (20.0 * i as f32).to_radians();
+                model = model * Mat4::from_axis_angle(Vec3::new(1.0, 0.3, 0.5), angle);
+                ourShader.setMat4("model", &model);
+
+                gl::DrawArrays(gl::TRIANGLES, 0, 36);
+            }
         }
 
         window.swap_buffers();
@@ -288,7 +330,6 @@ fn main() {
     unsafe {
         gl::DeleteVertexArrays(2, &VAO);
         gl::DeleteBuffers(2, &VBO);
-        gl::DeleteBuffers(1, &EBO);
         gl::DeleteProgram(ourShader.programId);
     }
 }
@@ -296,11 +337,25 @@ fn main() {
 //
 // GLFW maps callbacks to events.
 //
-fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent) {
+fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, state: &mut State) {
+    let cameraSpeed = state.deltaTime * 2.5;
+
     match event {
         glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) => window.set_should_close(true),
         glfw::WindowEvent::FramebufferSize(width, height) => {
             framebuffer_size_event(window, width, height);
+        }
+        glfw::WindowEvent::Key(Key::W, _, _, _) => {
+            state.cameraPos += cameraSpeed * state.cameraFront;
+        }
+        glfw::WindowEvent::Key(Key::S, _, _, _) => {
+            state.cameraPos -= cameraSpeed * state.cameraFront;
+        }
+        glfw::WindowEvent::Key(Key::A, _, _, _) => {
+            state.cameraPos -= state.cameraFront.cross(state.cameraUp).normalize() * cameraSpeed;
+        }
+        glfw::WindowEvent::Key(Key::D, _, _, _) => {
+            state.cameraPos += state.cameraFront.cross(state.cameraUp).normalize() * cameraSpeed;
         }
         evt => {
             println!("WindowEvent: {:?}", evt);

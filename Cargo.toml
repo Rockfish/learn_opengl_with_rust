@@ -99,26 +99,26 @@ path = "examples/1-getting_started/6_1-coordinate_systems/main.rs"
 name = "6_2-coordinate_systems_depth"
 path = "examples/1-getting_started/6_2-coordinate_systems_depth/main.rs"
 
-#[[example]]
-#name = "6_3-coordinate_systems_multiple"
-#path = "examples/1-getting_started/6_3-coordinate_systems_multiple/main.rs"
-#
-#[[example]]
-#name = "6_4-coordinate_systems_exercise3"
-#path = "examples/1-getting_started/6_4-coordinate_systems_exercise3/main.rs"
-#
-#[[example]]
-#name = "7_1-camera_circle"
-#path = "examples/1-getting_started/7_1-camera_circle/main.rs"
-#
-#[[example]]
-#name = "7_2-camera_keyboard_dt"
-#path = "examples/1-getting_started/7_2-camera_keyboard_dt/main.rs"
-#
-#[[example]]
-#name = "7_3-camera_mouse_zoom"
-#path = "examples/1-getting_started/7_3-camera_mouse_zoom/main.rs"
-#
+[[example]]
+name = "6_3-coordinate_systems_multiple"
+path = "examples/1-getting_started/6_3-coordinate_systems_multiple/main.rs"
+
+[[example]]
+name = "6_4-coordinate_systems_exercise3"
+path = "examples/1-getting_started/6_4-coordinate_systems_exercise3/main.rs"
+
+[[example]]
+name = "7_1-camera_circle"
+path = "examples/1-getting_started/7_1-camera_circle/main.rs"
+
+[[example]]
+name = "7_2-camera_keyboard_dt"
+path = "examples/1-getting_started/7_2-camera_keyboard_dt/main.rs"
+
+[[example]]
+name = "7_3-camera_mouse_zoom"
+path = "examples/1-getting_started/7_3-camera_mouse_zoom/main.rs"
+
 #[[example]]
 #name = "7_4-camera_class"
 #path = "examples/1-getting_started/7_4-camera_class/main.rs"
