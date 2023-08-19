@@ -11,7 +11,6 @@ use glam::*;
 use glfw::{Action, Context, Key};
 use learnopengl_lib::shader_m::Shader_M;
 use learnopengl_lib::{gl_get_uniform_location, SIZE_OF_FLOAT};
-use std::ffi::CString;
 
 const SCR_WIDTH: u32 = 800;
 const SCR_HEIGHT: u32 = 800;

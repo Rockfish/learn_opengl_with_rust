@@ -119,14 +119,14 @@ path = "examples/1-getting_started/7_2-camera_keyboard_dt/main.rs"
 name = "7_3-camera_mouse_zoom"
 path = "examples/1-getting_started/7_3-camera_mouse_zoom/main.rs"
 
-#[[example]]
-#name = "7_4-camera_class"
-#path = "examples/1-getting_started/7_4-camera_class/main.rs"
-#
+[[example]]
+name = "7_4-camera_class"
+path = "examples/1-getting_started/7_4-camera_class/main.rs"
+
 #[[example]]
 #name = "7_5-camera_exercise1"
 #path = "examples/1-getting_started/7_5-camera_exercise1/main.rs"
-#
+
 #[[example]]
 #name = "7_6-camera_exercise2"
 #path = "examples/1-getting_started/7_6-camera_exercise2/main.rs"

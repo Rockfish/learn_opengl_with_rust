@@ -9,13 +9,22 @@ use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use glfw::{Action, Context, Key};
+use learnopengl_lib::camera::{Camera, CameraMovement, PITCH, YAW};
 use learnopengl_lib::shader_m::Shader_M;
-use learnopengl_lib::{gl_get_uniform_location, size_of_floats, size_of_uint};
-use std::mem;
+use learnopengl_lib::SIZE_OF_FLOAT;
 
-const SCR_WIDTH: u32 = 800;
-const SCR_HEIGHT: u32 = 800;
-const SIZE_OF_FLOAT: usize = mem::size_of::<f32>();
+const SCR_WIDTH: f32 = 800.0;
+const SCR_HEIGHT: f32 = 800.0;
+
+// Struct for passing state between the window loop and the event handler.
+struct State {
+    camera: Camera,
+    deltaTime: f32,
+    lastFrame: f32,
+    firstMouse: bool,
+    lastX: f32,
+    lastY: f32,
+}
 
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -30,8 +39,8 @@ fn main() {
 
     let (mut window, events) = glfw
         .create_window(
-            SCR_WIDTH,
-            SCR_HEIGHT,
+            SCR_WIDTH as u32,
+            SCR_HEIGHT as u32,
             "LearnOpenGL",
             glfw::WindowMode::Windowed,
         )
@@ -49,60 +58,97 @@ fn main() {
     let mut VAO: GLuint = 0;
     // Vertex Buffer Object id
     let mut VBO: GLuint = 0;
-    // Element Buffer Object id
-    let mut EBO: GLuint = 0;
     // Texture ids
     let mut texture1: GLuint = 0;
     let mut texture2: GLuint = 0;
+
     // Shader program
     let mut ourShader = Shader_M::new();
 
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
+    #[rustfmt::skip]
+    let vertices: [f32; 180] = [
+        -0.5, -0.5, -0.5,  0.0, 0.0,
+         0.5, -0.5, -0.5,  1.0, 0.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+        -0.5,  0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, 0.0,
+
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+         0.5, -0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5,  0.5,  1.0, 1.0,
+         0.5,  0.5,  0.5,  1.0, 1.0,
+        -0.5,  0.5,  0.5,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+
+        -0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5,  0.5, -0.5,  1.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+        -0.5,  0.5,  0.5,  1.0, 0.0,
+
+         0.5,  0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+         0.5, -0.5, -0.5,  0.0, 1.0,
+         0.5, -0.5, -0.5,  0.0, 1.0,
+         0.5, -0.5,  0.5,  0.0, 0.0,
+         0.5,  0.5,  0.5,  1.0, 0.0,
+
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+         0.5, -0.5, -0.5,  1.0, 1.0,
+         0.5, -0.5,  0.5,  1.0, 0.0,
+         0.5, -0.5,  0.5,  1.0, 0.0,
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+
+        -0.5,  0.5, -0.5,  0.0, 1.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+         0.5,  0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5,  0.5,  0.5,  0.0, 0.0,
+        -0.5,  0.5, -0.5,  0.0, 1.0,
+    ];
+
+    // world space positions of our cubes
+    #[rustfmt::skip]
+    let cubePositions: [Vec3; 10] = [
+        Vec3::new( 0.0,  0.0,  0.0),
+        Vec3::new( 2.0,  5.0, -15.0),
+        Vec3::new(-1.5, -2.2, -2.5),
+        Vec3::new(-3.8, -2.0, -12.3),
+        Vec3::new( 2.4, -0.4, -3.5),
+        Vec3::new(-1.7,  3.0, -7.5),
+        Vec3::new( 1.3, -2.0, -2.5),
+        Vec3::new( 1.5,  2.0, -2.5),
+        Vec3::new( 1.5,  0.2, -1.5),
+        Vec3::new(-1.3,  1.0, -1.5)
+    ];
+
     unsafe {
+        gl::Enable(gl::DEPTH_TEST);
+
         // build and compile our shader program
         // ------------------------------------
         ourShader
             .build(
-                "examples/1-getting_started/6_1-coordinate_systems/6_1-coordinate_systems.vert",
-                "examples/1-getting_started/6_1-coordinate_systems/6_1-coordinate_systems.frag",
+                "examples/1-getting_started/7_4-camera_class/7_4-camera.vert",
+                "examples/1-getting_started/7_4-camera_class/7_4-camera.frag",
             )
             .unwrap();
 
-        // set up vertex data (and buffer(s)) and configure vertex attributes
-        // ------------------------------------------------------------------
-        #[rustfmt::skip]
-        let vertices: [f32; 20] = [
-            // positions      // texture coordinates
-            0.5,  0.5, 0.0,   1.0, 1.0, // top right
-            0.5, -0.5, 0.0,   1.0, 0.0, // bottom right
-           -0.5, -0.5, 0.0,   0.0, 0.0, // bottom left
-           -0.5,  0.5, 0.0,   0.0, 1.0  // top left
-        ];
-
-        #[rustfmt::skip]
-        let indices: [u32; 6] = [
-            0, 1, 3, // first triangle
-            1, 2, 3  // second triangle
-        ];
-
         gl::GenVertexArrays(1, &mut VAO);
         gl::GenBuffers(1, &mut VBO);
-        gl::GenBuffers(1, &mut EBO);
 
         gl::BindVertexArray(VAO);
 
         gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            size_of_floats!(vertices.len()) as GLsizeiptr,
+            (vertices.len() * SIZE_OF_FLOAT) as GLsizeiptr,
             vertices.as_ptr() as *const GLvoid,
-            gl::STATIC_DRAW,
-        );
-
-        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, EBO);
-        gl::BufferData(
-            gl::ELEMENT_ARRAY_BUFFER,
-            size_of_uint!(indices.len()) as GLsizeiptr,
-            indices.as_ptr() as *const GLvoid,
             gl::STATIC_DRAW,
         );
 
@@ -123,7 +169,7 @@ fn main() {
             2,
             gl::FLOAT,
             gl::FALSE,
-            (5 * SIZE_OF_FLOAT) as GLsizei,
+            5 * SIZE_OF_FLOAT as GLsizei,
             (3 * SIZE_OF_FLOAT) as *const GLvoid,
         );
         gl::EnableVertexAttribArray(1);
@@ -177,11 +223,7 @@ fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
 
         // set texture filtering parameters
-        gl::TexParameteri(
-            gl::TEXTURE_2D,
-            gl::TEXTURE_MIN_FILTER,
-            gl::LINEAR_MIPMAP_LINEAR as GLint,
-        );
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as GLint);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
 
         // load image, create texture and generate mipmaps
@@ -213,17 +255,33 @@ fn main() {
         ourShader.setInt("texture2", 1);
     }
 
+    let camera = Camera::camera_vec3(vec3(0.0, 0.0, 3.0), vec3(0.0, 1.0, 0.0), YAW, PITCH);
+
+    // Initialize the world state
+    let mut state = State {
+        camera,
+        deltaTime: 0.0,
+        lastFrame: 0.0,
+        firstMouse: true,
+        lastX: SCR_WIDTH / 2.0,
+        lastY: SCR_HEIGHT / 2.0,
+    };
+
     // render loop
     while !window.should_close() {
+        let currentFrame = glfw.get_time() as f32;
+        state.deltaTime = currentFrame - state.lastFrame;
+        state.lastFrame = currentFrame;
+
         glfw.poll_events();
         for (_, event) in glfw::flush_messages(&events) {
-            handle_window_event(&mut window, event);
+            handle_window_event(&mut window, event, &mut state);
         }
 
         unsafe {
             // render
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT); // also clear the depth buffer now!
 
             // bind textures on corresponding texture units
             gl::ActiveTexture(gl::TEXTURE0);
@@ -234,35 +292,31 @@ fn main() {
             // activate shader
             ourShader.use_shader();
 
-            // create transformations using glam
-            let mut model = Mat4::IDENTITY;
-            let mut view = Mat4::IDENTITY;
-            let mut projection = Mat4::IDENTITY;
-
-            model = model * Mat4::from_rotation_x((-55.0f32).to_radians());
-            view = view * Mat4::from_translation(Vec3::new(0.0, 0.0, -3.0));
-            projection = projection
-                * Mat4::perspective_rh_gl(
-                    45.0f32.to_radians(),
-                    (SCR_WIDTH / SCR_HEIGHT) as f32,
-                    0.1,
-                    100.0,
-                );
-
-            // retrieve the matrix uniform locations
-            let modelLoc = gl_get_uniform_location!(ourShader.programId, "model");
-            let viewLoc = gl_get_uniform_location!(ourShader.programId, "view");
-
-            // pass them to the shaders two different ways
-            gl::UniformMatrix4fv(modelLoc, 1, gl::FALSE, model.to_cols_array().as_ptr());
-            gl::UniformMatrix4fv(viewLoc, 1, gl::FALSE, view.to_cols_array().as_ptr());
-            // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes
-            // it's often best practice to set it outside the main loop only once.
+            // pass projection matrix to shader (as projection matrix rarely changes there's no need to do this per frame)
+            // -----------------------------------------------------------------------------------------------------------
+            let projection = Mat4::perspective_rh_gl(
+                state.camera.Zoom.to_radians(),
+                SCR_WIDTH / SCR_HEIGHT,
+                0.1,
+                100.0,
+            );
             ourShader.setMat4("projection", &projection);
 
-            // render container
+            // camera/view transformation
+            let view = state.camera.GetViewMatrix();
+            ourShader.setMat4("view", &view);
+
+            // render boxes
             gl::BindVertexArray(VAO);
-            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, 0 as *const GLvoid);
+
+            for (i, cube_pos) in cubePositions.iter().enumerate() {
+                let mut model = Mat4::from_translation(*cube_pos);
+                let angle = (20.0 * i as f32).to_radians();
+                model = model * Mat4::from_axis_angle(Vec3::new(1.0, 0.3, 0.5), angle);
+                ourShader.setMat4("model", &model);
+
+                gl::DrawArrays(gl::TRIANGLES, 0, 36);
+            }
         }
 
         window.swap_buffers();
@@ -273,7 +327,6 @@ fn main() {
     unsafe {
         gl::DeleteVertexArrays(2, &VAO);
         gl::DeleteBuffers(2, &VBO);
-        gl::DeleteBuffers(1, &EBO);
         gl::DeleteProgram(ourShader.programId);
     }
 }
@@ -281,12 +334,34 @@ fn main() {
 //
 // GLFW maps callbacks to events.
 //
-fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent) {
+fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, state: &mut State) {
     match event {
         glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) => window.set_should_close(true),
         glfw::WindowEvent::FramebufferSize(width, height) => {
             framebuffer_size_event(window, width, height);
         }
+        glfw::WindowEvent::Key(Key::W, _, _, _) => {
+            state
+                .camera
+                .ProcessKeyboard(CameraMovement::FORWARD, state.deltaTime);
+        }
+        glfw::WindowEvent::Key(Key::S, _, _, _) => {
+            state
+                .camera
+                .ProcessKeyboard(CameraMovement::BACKWARD, state.deltaTime);
+        }
+        glfw::WindowEvent::Key(Key::A, _, _, _) => {
+            state
+                .camera
+                .ProcessKeyboard(CameraMovement::LEFT, state.deltaTime);
+        }
+        glfw::WindowEvent::Key(Key::D, _, _, _) => {
+            state
+                .camera
+                .ProcessKeyboard(CameraMovement::RIGHT, state.deltaTime);
+        }
+        glfw::WindowEvent::CursorPos(xpos, ypos) => mouse_handler(state, xpos, ypos),
+        glfw::WindowEvent::Scroll(xoffset, ysoffset) => scroll_handler(state, xoffset, ysoffset),
         evt => {
             println!("WindowEvent: {:?}", evt);
         }
@@ -302,4 +377,27 @@ fn framebuffer_size_event(_window: &mut glfw::Window, width: i32, height: i32) {
     unsafe {
         gl::Viewport(0, 0, width, height);
     }
+}
+
+fn mouse_handler(state: &mut State, xposIn: f64, yposIn: f64) {
+    let xpos = xposIn as f32;
+    let ypos = yposIn as f32;
+
+    if state.firstMouse {
+        state.lastX = xpos;
+        state.lastY = ypos;
+        state.firstMouse = false;
+    }
+
+    let xoffset = xpos - state.lastX;
+    let yoffset = state.lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    state.lastX = xpos;
+    state.lastY = ypos;
+
+    state.camera.ProcessMouseMovement(xoffset, yoffset, true);
+}
+
+fn scroll_handler(state: &mut State, _xoffset: f64, yoffset: f64) {
+    state.camera.ProcessMouseScroll(yoffset as f32);
 }
