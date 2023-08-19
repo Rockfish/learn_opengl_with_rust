@@ -15,120 +15,388 @@ learnopengl_lib = { path = "./learnopengl_lib" }
 [dependencies.glfw]
 version = "*"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "1_1-hello_window"
 path = "examples/1-getting_started/1_1-hello_window/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "1_2-hello_window_clear"
 path = "examples/1-getting_started/1_2-hello_window_clear/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "2_1-hello_triangle"
 path = "examples/1-getting_started/2_1-hello_triangle/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "2_2-hello_triangle_indexed"
 path = "examples/1-getting_started/2_2-hello_triangle_indexed/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "2_3-hello_triangle_exercise1"
 path = "examples/1-getting_started/2_3-hello_triangle_exercise1/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "2_4-hello_triangle_exercise2"
 path = "examples/1-getting_started/2_4-hello_triangle_exercise2/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "2_5-hello_triangle_exercise3"
 path = "examples/1-getting_started/2_5-hello_triangle_exercise3/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "3_1-shaders_uniform"
 path = "examples/1-getting_started/3_1-shaders_uniform/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "3_2-shaders_interpolation"
 path = "examples/1-getting_started/3_2-shaders_interpolation/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "3_3-shaders_class"
 path = "examples/1-getting_started/3_3-shaders_class/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "4_1-textures"
 path = "examples/1-getting_started/4_1-textures/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "4_2-textures_combined"
 path = "examples/1-getting_started/4_2-textures_combined/main.rs"
 
-#[[example]]
+#[[example]]  # 1-getting_started
 #name = "4_3-textures_exercise1"
 #path = "examples/1-getting_started/4_3-textures_exercise1/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "4_4-textures_exercise2"
 path = "examples/1-getting_started/4_4-textures_exercise2/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "4_5-textures_exercise3"
 path = "examples/1-getting_started/4_5-textures_exercise3/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "4_6-textures_exercise4"
 path = "examples/1-getting_started/4_6-textures_exercise4/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "5_1-transformations"
 path = "examples/1-getting_started/5_1-transformations/main.rs"
 
-#[[example]]
+#[[example]]  # 1-getting_started
 #name = "5_2-transformations_exercise1"
 #path = "examples/1-getting_started/5_2-transformations_exercise1/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "5_2-transformations_exercise2"
 path = "examples/1-getting_started/5_2-transformations_exercise2/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "6_1-coordinate_systems"
 path = "examples/1-getting_started/6_1-coordinate_systems/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "6_2-coordinate_systems_depth"
 path = "examples/1-getting_started/6_2-coordinate_systems_depth/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "6_3-coordinate_systems_multiple"
 path = "examples/1-getting_started/6_3-coordinate_systems_multiple/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "6_4-coordinate_systems_exercise3"
 path = "examples/1-getting_started/6_4-coordinate_systems_exercise3/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "7_1-camera_circle"
 path = "examples/1-getting_started/7_1-camera_circle/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "7_2-camera_keyboard_dt"
 path = "examples/1-getting_started/7_2-camera_keyboard_dt/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "7_3-camera_mouse_zoom"
 path = "examples/1-getting_started/7_3-camera_mouse_zoom/main.rs"
 
-[[example]]
+[[example]]  # 1-getting_started
 name = "7_4-camera_class"
 path = "examples/1-getting_started/7_4-camera_class/main.rs"
 
-#[[example]]
+#[[example]]  # 1-getting_started
 #name = "7_5-camera_exercise1"
 #path = "examples/1-getting_started/7_5-camera_exercise1/main.rs"
 
-#[[example]]
+#[[example]]  # 1-getting_started
 #name = "7_6-camera_exercise2"
 #path = "examples/1-getting_started/7_6-camera_exercise2/main.rs"
-#
+
+[[example]]  # 2-lighting
+name = "1-colors"
+path = "examples/2-lighting/1-colors/main.rs"
+
+[[example]]  # 2-lighting
+name = "2_1-basic_lighting_diffuse"
+path = "examples/2-lighting/2_1-basic_lighting_diffuse/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "2_2-basic_lighting_specular"
+#path = "examples/2-lighting/2_2-basic_lighting_specular/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "2_3-basic_lighting_exercise1"
+#path = "examples/2-lighting/2_3-basic_lighting_exercise1/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "2_4-basic_lighting_exercise2"
+#path = "examples/2-lighting/2_4-basic_lighting_exercise2/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "2_5-basic_lighting_exercise3"
+#path = "examples/2-lighting/2_5-basic_lighting_exercise3/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "3_1-materials"
+#path = "examples/2-lighting/3_1-materials/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "3_2-materials_exercise1"
+#path = "examples/2-lighting/3_2-materials_exercise1/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "4_1-lighting_maps_diffuse_map"
+#path = "examples/2-lighting/4_1-lighting_maps_diffuse_map/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "4_2-lighting_maps_specular_map"
+#path = "examples/2-lighting/4_2-lighting_maps_specular_map/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "4_3-lighting_maps_exercise2"
+#path = "examples/2-lighting/4_3-lighting_maps_exercise2/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "4_4-lighting_maps_exercise4"
+#path = "examples/2-lighting/4_4-lighting_maps_exercise4/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "5_1-light_casters_directional"
+#path = "examples/2-lighting/5_1-light_casters_directional/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "5_2-light_casters_point"
+#path = "examples/2-lighting/5_2-light_casters_point/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "5_3-light_casters_spot"
+#path = "examples/2-lighting/5_3-light_casters_spot/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "5_4-light_casters_spot_soft"
+#path = "examples/2-lighting/5_4-light_casters_spot_soft/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "6-multiple_lights"
+#path = "examples/2-lighting/6-multiple_lights/main.rs"
+
+#[[example]]  # 2-lighting
+#name = "6-multiple_lights_exercise1"
+#path = "examples/2-lighting/6-multiple_lights_exercise1/main.rs"
+
+#[[example]]  # 3-model_loading
+#name = "1-model_loading"
+#path = "examples/3-model_loading/1-model_loading/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "1_1-depth_testing"
+#path = "examples/4-advanced_opengl/1_1-depth_testing/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "1_2-depth_testing_view"
+#path = "examples/4-advanced_opengl/1_2-depth_testing_view/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "10_1-instancing_quads"
+#path = "examples/4-advanced_opengl/10_1-instancing_quads/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "10_2-asteroids"
+#path = "examples/4-advanced_opengl/10_2-asteroids/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "10_3-asteroids_instanced"
+#path = "examples/4-advanced_opengl/10_3-asteroids_instanced/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "11_1-anti_aliasing_msaa"
+#path = "examples/4-advanced_opengl/11_1-anti_aliasing_msaa/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "11_2-anti_aliasing_offscreen"
+#path = "examples/4-advanced_opengl/11_2-anti_aliasing_offscreen/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "2-stencil_testing"
+#path = "examples/4-advanced_opengl/2-stencil_testing/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "3_1-blending_discard"
+#path = "examples/4-advanced_opengl/3_1-blending_discard/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "3_2-blending_sort"
+#path = "examples/4-advanced_opengl/3_2-blending_sort/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "4-face_culling_exercise1"
+#path = "examples/4-advanced_opengl/4-face_culling_exercise1/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "5_1-framebuffers"
+#path = "examples/4-advanced_opengl/5_1-framebuffers/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "5_2-framebuffers_exercise1"
+#path = "examples/4-advanced_opengl/5_2-framebuffers_exercise1/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "6_1-cubemaps_skybox"
+#path = "examples/4-advanced_opengl/6_1-cubemaps_skybox/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "6_2-cubemaps_environment_mapping"
+#path = "examples/4-advanced_opengl/6_2-cubemaps_environment_mapping/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "8-advanced_glsl_ubo"
+#path = "examples/4-advanced_opengl/8-advanced_glsl_ubo/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "9_1-geometry_shader_houses"
+#path = "examples/4-advanced_opengl/9_1-geometry_shader_houses/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "9_2-geometry_shader_exploding"
+#path = "examples/4-advanced_opengl/9_2-geometry_shader_exploding/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "9_3-geometry_shader_normals"
+#path = "examples/4-advanced_opengl/9_3-geometry_shader_normals/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "1-advanced_lighting"
+#path = "examples/5-advanced_lighting/1-advanced_lighting/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "2-gamma_correction"
+#path = "examples/5-advanced_lighting/2-gamma_correction/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "3_1_1-shadow_mapping_depth"
+#path = "examples/5-advanced_lighting/3_1_1-shadow_mapping_depth/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "3_1_2-shadow_mapping_base"
+#path = "examples/5-advanced_lighting/3_1_2-shadow_mapping_base/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "3_1_3-shadow_mapping"
+#path = "examples/5-advanced_lighting/3_1_3-shadow_mapping/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "3_2_1-point_shadows"
+#path = "examples/5-advanced_lighting/3_2_1-point_shadows/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "3_2_2-point_shadows_soft"
+#path = "examples/5-advanced_lighting/3_2_2-point_shadows_soft/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "3_3-csm"
+#path = "examples/5-advanced_lighting/3_3-csm/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "4-normal_mapping"
+#path = "examples/5-advanced_lighting/4-normal_mapping/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "5_1-parallax_mapping"
+#path = "examples/5-advanced_lighting/5_1-parallax_mapping/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "5_2-steep_parallax_mapping"
+#path = "examples/5-advanced_lighting/5_2-steep_parallax_mapping/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "5_3-parallax_occlusion_mapping"
+#path = "examples/5-advanced_lighting/5_3-parallax_occlusion_mapping/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "6-hdr"
+#path = "examples/5-advanced_lighting/6-hdr/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "7-bloom"
+#path = "examples/5-advanced_lighting/7-bloom/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "8_1-deferred_shading"
+#path = "examples/5-advanced_lighting/8_1-deferred_shading/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "8_2-deferred_shading_volumes"
+#path = "examples/5-advanced_lighting/8_2-deferred_shading_volumes/main.rs"
+
+#[[example]]  # 5-advanced_lighting
+#name = "9-ssao"
+#path = "examples/5-advanced_lighting/9-ssao/main.rs"
+
+#[[example]]  # 6-pbr
+#name = "1_1-lighting"
+#path = "examples/6-pbr/1_1-lighting/main.rs"
+
+#[[example]]  # 6-pbr
+#name = "1_2-lighting_textured"
+#path = "examples/6-pbr/1_2-lighting_textured/main.rs"
+
+#[[example]]  # 6-pbr
+#name = "2_1_1-ibl_irradiance_conversion"
+#path = "examples/6-pbr/2_1_1-ibl_irradiance_conversion/main.rs"
+
+#[[example]]  # 6-pbr
+#name = "2_1_2-ibl_irradiance"
+#path = "examples/6-pbr/2_1_2-ibl_irradiance/main.rs"
+
+#[[example]]  # 6-pbr
+#name = "2_2_1-ibl_specular"
+#path = "examples/6-pbr/2_2_1-ibl_specular/main.rs"
+
+#[[example]]  # 6-pbr
+#name = "2_2_2-ibl_specular_textured"
+#path = "examples/6-pbr/2_2_2-ibl_specular_textured/main.rs"
+
+#[[example]]  # 7-in_practice
+#name = "1-debugging"
+#path = "examples/7-in_practice/1-debugging/main.rs"
+
+#[[example]]  # 7-in_practice
+#name = "2-text_rendering"
+#path = "examples/7-in_practice/2-text_rendering/main.rs"
+
+#[[example]]  # 7-in_practice
+#name = "3-2d_game"
+#path = "examples/7-in_practice/3-2d_game/main.rs"
+
+#[[example]]  # 8-guest
+#name = "2020"
+#path = "examples/8-guest/2020/main.rs"
+
+#[[example]]  # 8-guest
+#name = "2021"
+#path = "examples/8-guest/2021/main.rs"
+
+#[[example]]  # 8-guest
+#name = "2022"
+#path = "examples/8-guest/2022/main.rs"
+
 
