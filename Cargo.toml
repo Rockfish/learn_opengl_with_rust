@@ -167,25 +167,25 @@ path = "examples/2-lighting/2_4-basic_lighting_exercise2/main.rs"
 name = "2_5-basic_lighting_exercise3"
 path = "examples/2-lighting/2_5-basic_lighting_exercise3/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "3_1-materials"
-#path = "examples/2-lighting/3_1-materials/main.rs"
+[[example]]  # 2-lighting
+name = "3_1-materials"
+path = "examples/2-lighting/3_1-materials/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "3_2-materials_exercise1"
-#path = "examples/2-lighting/3_2-materials_exercise1/main.rs"
+[[example]]  # 2-lighting
+name = "3_2-materials_exercise1"
+path = "examples/2-lighting/3_2-materials_exercise1/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "4_1-lighting_maps_diffuse_map"
-#path = "examples/2-lighting/4_1-lighting_maps_diffuse_map/main.rs"
+[[example]]  # 2-lighting
+name = "4_1-lighting_maps_diffuse_map"
+path = "examples/2-lighting/4_1-lighting_maps_diffuse_map/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "4_2-lighting_maps_specular_map"
-#path = "examples/2-lighting/4_2-lighting_maps_specular_map/main.rs"
+[[example]]  # 2-lighting
+name = "4_2-lighting_maps_specular_map"
+path = "examples/2-lighting/4_2-lighting_maps_specular_map/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "4_4-lighting_maps_exercise4"
-#path = "examples/2-lighting/4_4-lighting_maps_exercise4/main.rs"
+[[example]]  # 2-lighting
+name = "4_4-lighting_maps_exercise4"
+path = "examples/2-lighting/4_4-lighting_maps_exercise4/main.rs"
 
 #[[example]]  # 2-lighting
 #name = "5_1-light_casters_directional"
