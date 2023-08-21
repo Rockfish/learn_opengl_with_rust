@@ -16,7 +16,7 @@
 #[macro_export]
 macro_rules! c_string {
     ($a_string:expr) => {
-        CString::new($a_string).unwrap()
+        std::ffi::CString::new($a_string).unwrap()
     };
 }
 
@@ -37,7 +37,7 @@ macro_rules! size_of_uint {
 #[macro_export]
 macro_rules! gl_get_uniform_location {
     ($id: expr, $value:expr) => {{
-        let c_str = CString::new($value).unwrap();
+        let c_str = std::ffi::CString::new($value).unwrap();
         gl::GetUniformLocation($id, c_str.as_ptr())
     }};
 }

@@ -2,6 +2,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 #![allow(unused_assignments)]
+#![allow(clippy::zero_ptr)]
+#![allow(clippy::assign_op_pattern)]
 
 extern crate glfw;
 
@@ -9,7 +11,7 @@ use glad_gl::gl;
 use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use glfw::{Action, Context, Key};
-use learnopengl_lib::camera::{Camera, CameraMovement, PITCH, YAW};
+use learnopengl_lib::camera::{Camera, CameraMovement};
 use learnopengl_lib::shader_m::Shader_M;
 use learnopengl_lib::SIZE_OF_FLOAT;
 
@@ -61,7 +63,7 @@ fn main() {
     // Vertex Buffer Object id
     let mut VBO: GLuint = 0;
 
-    let camera = Camera::camera_vec3(vec3(0.0, 0.0, 3.0), vec3(0.0, 1.0, 0.0), YAW, PITCH);
+    let camera = Camera::camera_vec3(vec3(0.0, 0.0, 3.0));
 
     // Initialize the world state
     let mut state = State {

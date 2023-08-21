@@ -15,4 +15,9 @@ See the examples directory for the examples that follow the book.
 * image - https://docs.rs/image/0.24.7/image/
  
 
+## Notes
 
+* Renamed folders to use dashes and underscores because cargo complains about periods in the package name. 
+  Also changed the files names to have a consistent naming schema. 
+* Kept variable name casing the same as the original code to make porting easier and easier to compare to the original cpp code. 
+* Overrode Clippy warnings for zero_ptr and assign_op_pattern to stay closer to the original cpp code.

@@ -52,7 +52,14 @@ impl Camera {
     }
 
     // constructor with vectors
-    pub fn camera_vec3(position: Vec3, up: Vec3, yaw: f32, pitch: f32) -> Camera {
+    pub fn camera_vec3(position: Vec3) -> Camera {
+        let mut camera = Camera::default();
+        camera.Position = position;
+        camera.updateCameraVectors();
+        camera
+    }
+
+    pub fn camera_vec3_up_yaw_pitch(position: Vec3, up: Vec3, yaw: f32, pitch: f32) -> Camera {
         let mut camera = Camera::default();
         camera.Position = position;
         camera.WorldUp = up;

@@ -2,6 +2,9 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 #![allow(unused_assignments)]
+#![allow(clippy::zero_ptr)]
+#![allow(clippy::assign_op_pattern)]
+
 
 extern crate glfw;
 
@@ -293,7 +296,7 @@ fn main() {
                 let angle = if i % 3 == 0 {
                     (glfw.get_time() * 25.0).to_radians() as f32
                 } else {
-                    (20.0 * i as f32).to_radians() as f32
+                    (20.0 * i as f32).to_radians()
                 };
 
                 model = model * Mat4::from_axis_angle(Vec3::new(1.0, 0.3, 0.5), angle);

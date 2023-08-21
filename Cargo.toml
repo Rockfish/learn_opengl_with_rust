@@ -55,6 +55,18 @@ path = "examples/1-getting_started/3_2-shaders_interpolation/main.rs"
 name = "3_3-shaders_class"
 path = "examples/1-getting_started/3_3-shaders_class/main.rs"
 
+#[[example]]  # 1-getting_started
+#name = "3_4-shaders_exercise1"
+#path = "examples/1-getting_started/3_4-shaders_exercise1/main.rs"
+
+#[[example]]  # 1-getting_started
+#name = "3_5-shaders_exercise2"
+#path = "examples/1-getting_started/3_5-shaders_exercise2/main.rs"
+
+#[[example]]  # 1-getting_started
+#name = "3_6-shaders_exercise3"
+#path = "examples/1-getting_started/3_6-shaders_exercise3/main.rs"
+
 [[example]]  # 1-getting_started
 name = "4_1-textures"
 path = "examples/1-getting_started/4_1-textures/main.rs"
@@ -139,21 +151,21 @@ path = "examples/2-lighting/1-colors/main.rs"
 name = "2_1-basic_lighting_diffuse"
 path = "examples/2-lighting/2_1-basic_lighting_diffuse/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "2_2-basic_lighting_specular"
-#path = "examples/2-lighting/2_2-basic_lighting_specular/main.rs"
+[[example]]  # 2-lighting
+name = "2_2-basic_lighting_specular"
+path = "examples/2-lighting/2_2-basic_lighting_specular/main.rs"
 
 #[[example]]  # 2-lighting
 #name = "2_3-basic_lighting_exercise1"
 #path = "examples/2-lighting/2_3-basic_lighting_exercise1/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "2_4-basic_lighting_exercise2"
-#path = "examples/2-lighting/2_4-basic_lighting_exercise2/main.rs"
+[[example]]  # 2-lighting
+name = "2_4-basic_lighting_exercise2"
+path = "examples/2-lighting/2_4-basic_lighting_exercise2/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "2_5-basic_lighting_exercise3"
-#path = "examples/2-lighting/2_5-basic_lighting_exercise3/main.rs"
+[[example]]  # 2-lighting
+name = "2_5-basic_lighting_exercise3"
+path = "examples/2-lighting/2_5-basic_lighting_exercise3/main.rs"
 
 #[[example]]  # 2-lighting
 #name = "3_1-materials"
@@ -170,10 +182,6 @@ path = "examples/2-lighting/2_1-basic_lighting_diffuse/main.rs"
 #[[example]]  # 2-lighting
 #name = "4_2-lighting_maps_specular_map"
 #path = "examples/2-lighting/4_2-lighting_maps_specular_map/main.rs"
-
-#[[example]]  # 2-lighting
-#name = "4_3-lighting_maps_exercise2"
-#path = "examples/2-lighting/4_3-lighting_maps_exercise2/main.rs"
 
 #[[example]]  # 2-lighting
 #name = "4_4-lighting_maps_exercise4"
@@ -198,10 +206,6 @@ path = "examples/2-lighting/2_1-basic_lighting_diffuse/main.rs"
 #[[example]]  # 2-lighting
 #name = "6-multiple_lights"
 #path = "examples/2-lighting/6-multiple_lights/main.rs"
-
-#[[example]]  # 2-lighting
-#name = "6-multiple_lights_exercise1"
-#path = "examples/2-lighting/6-multiple_lights_exercise1/main.rs"
 
 #[[example]]  # 3-model_loading
 #name = "1-model_loading"
@@ -246,10 +250,6 @@ path = "examples/2-lighting/2_1-basic_lighting_diffuse/main.rs"
 #[[example]]  # 4-advanced_opengl
 #name = "3_2-blending_sort"
 #path = "examples/4-advanced_opengl/3_2-blending_sort/main.rs"
-
-#[[example]]  # 4-advanced_opengl
-#name = "4-face_culling_exercise1"
-#path = "examples/4-advanced_opengl/4-face_culling_exercise1/main.rs"
 
 #[[example]]  # 4-advanced_opengl
 #name = "5_1-framebuffers"
@@ -384,19 +384,49 @@ path = "examples/2-lighting/2_1-basic_lighting_diffuse/main.rs"
 #path = "examples/7-in_practice/2-text_rendering/main.rs"
 
 #[[example]]  # 7-in_practice
-#name = "3-2d_game"
-#path = "examples/7-in_practice/3-2d_game/main.rs"
+#name = "0-full_source"
+#path = "examples/7-in_practice/3-2d_game/0-full_source/main.rs"
 
 #[[example]]  # 8-guest
-#name = "2020"
-#path = "examples/8-guest/2020/main.rs"
+#name = "oit"
+#path = "examples/8-guest/2020/oit/main.rs"
 
 #[[example]]  # 8-guest
-#name = "2021"
-#path = "examples/8-guest/2021/main.rs"
+#name = "skeletal_animation"
+#path = "examples/8-guest/2020/skeletal_animation/main.rs"
 
 #[[example]]  # 8-guest
-#name = "2022"
-#path = "examples/8-guest/2022/main.rs"
+#name = "1-scene_graph"
+#path = "examples/8-guest/2021/1-scene/1-scene_graph/main.rs"
 
+#[[example]]  # 8-guest
+#name = "2-frustum_culling"
+#path = "examples/8-guest/2021/1-scene/2-frustum_culling/main.rs"
 
+#[[example]]  # 8-guest
+#name = "2-csm"
+#path = "examples/8-guest/2021/2-csm/main.rs"
+
+#[[example]]  # 8-guest
+#name = "terrain_cpu_src"
+#path = "examples/8-guest/2021/3-tessellation/terrain_cpu_src/main.rs"
+
+#[[example]]  # 8-guest
+#name = "terrain_gpu_dist"
+#path = "examples/8-guest/2021/3-tessellation/terrain_gpu_dist/main.rs"
+
+#[[example]]  # 8-guest
+#name = "5-computeshader_helloworld"
+#path = "examples/8-guest/2022/5-computeshader_helloworld/main.rs"
+
+#[[example]]  # 8-guest
+#name = "6-physically_based_bloom"
+#path = "examples/8-guest/2022/6-physically_based_bloom/main.rs"
+
+#[[example]]  # 8-guest
+#name = "1-area_light"
+#path = "examples/8-guest/2022/7-area_lights/1-area_light/main.rs"
+
+#[[example]]  # 8-guest
+#name = "2-multiple_area_lights"
+#path = "examples/8-guest/2022/7-area_lights/2-multiple_area_lights/main.rs"

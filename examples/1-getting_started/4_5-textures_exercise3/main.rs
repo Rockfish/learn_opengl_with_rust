@@ -2,6 +2,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 #![allow(unused_assignments)]
+#![allow(clippy::zero_ptr)]
+#![allow(clippy::assign_op_pattern)]
 
 extern crate glfw;
 
@@ -10,7 +12,6 @@ use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glfw::{Action, Context, Key};
 use learnopengl_lib::shader_s::Shader_S;
 use learnopengl_lib::{c_string, size_of_floats, size_of_uint};
-use std::ffi::CString;
 use std::mem;
 
 const SCR_WIDTH: u32 = 800;
