@@ -5,6 +5,7 @@
 
 use glad_gl::gl;
 use glad_gl::gl::{GLchar, GLint};
+use glam::*;
 
 use std::fs::File;
 use std::io::prelude::*;

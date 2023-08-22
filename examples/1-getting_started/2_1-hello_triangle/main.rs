@@ -1,6 +1,9 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
+#![allow(unused_assignments)]
+#![allow(clippy::zero_ptr)]
+#![allow(clippy::assign_op_pattern)]
 
 extern crate glfw;
 

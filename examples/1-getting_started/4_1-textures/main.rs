@@ -2,6 +2,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 #![allow(unused_assignments)]
+#![allow(clippy::zero_ptr)]
+#![allow(clippy::assign_op_pattern)]
 
 extern crate glfw;
 
@@ -9,7 +11,7 @@ use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glfw::{Action, Context, Key};
 use learnopengl_lib::shader_s::Shader_S;
-use learnopengl_lib::{size_of_float, size_of_uint};
+use learnopengl_lib::{size_of_floats, size_of_uint};
 use std::mem;
 
 const SCR_WIDTH: u32 = 800;
@@ -90,7 +92,7 @@ fn main() {
         gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            size_of_float!(vertices.len()) as GLsizeiptr,
+            size_of_floats!(vertices.len()) as GLsizeiptr,
             vertices.as_ptr() as *const GLvoid,
             gl::STATIC_DRAW,
         );
@@ -109,7 +111,7 @@ fn main() {
             3,
             gl::FLOAT,
             gl::FALSE,
-            size_of_float!(8) as GLsizei,
+            size_of_floats!(8) as GLsizei,
             0 as *const GLvoid,
         );
         gl::EnableVertexAttribArray(0);
@@ -120,8 +122,8 @@ fn main() {
             3,
             gl::FLOAT,
             gl::FALSE,
-            size_of_float!(8) as GLsizei,
-            size_of_float!(3) as *const GLvoid,
+            size_of_floats!(8) as GLsizei,
+            size_of_floats!(3) as *const GLvoid,
         );
         gl::EnableVertexAttribArray(1);
 
@@ -131,8 +133,8 @@ fn main() {
             2,
             gl::FLOAT,
             gl::FALSE,
-            size_of_float!(8) as GLsizei,
-            size_of_float!(6) as *const GLvoid,
+            size_of_floats!(8) as GLsizei,
+            size_of_floats!(6) as *const GLvoid,
         );
         gl::EnableVertexAttribArray(2);
 

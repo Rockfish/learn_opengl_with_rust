@@ -2,6 +2,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 #![allow(unused_assignments)]
+#![allow(clippy::zero_ptr)]
+#![allow(clippy::assign_op_pattern)]
 
 extern crate glfw;
 
@@ -9,8 +11,7 @@ use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glfw::{Action, Context, Key};
 use learnopengl_lib::shader_s::Shader_S;
-use learnopengl_lib::{c_string, size_of_float, size_of_uint};
-use std::ffi::CString;
+use learnopengl_lib::{c_string, size_of_floats, size_of_uint};
 use std::mem;
 
 const SCR_WIDTH: u32 = 800;
@@ -92,7 +93,7 @@ fn main() {
         gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            size_of_float!(vertices.len()) as GLsizeiptr,
+            size_of_floats!(vertices.len()) as GLsizeiptr,
             vertices.as_ptr() as *const GLvoid,
             gl::STATIC_DRAW,
         );
@@ -111,7 +112,7 @@ fn main() {
             3,
             gl::FLOAT,
             gl::FALSE,
-            size_of_float!(8) as GLsizei,
+            size_of_floats!(8) as GLsizei,
             0 as *const GLvoid,
         );
         gl::EnableVertexAttribArray(0);
@@ -122,8 +123,8 @@ fn main() {
             3,
             gl::FLOAT,
             gl::FALSE,
-            size_of_float!(8) as GLsizei,
-            size_of_float!(3) as *const GLvoid,
+            size_of_floats!(8) as GLsizei,
+            size_of_floats!(3) as *const GLvoid,
         );
         gl::EnableVertexAttribArray(1);
 
@@ -133,8 +134,8 @@ fn main() {
             2,
             gl::FLOAT,
             gl::FALSE,
-            size_of_float!(8) as GLsizei,
-            size_of_float!(6) as *const GLvoid,
+            size_of_floats!(8) as GLsizei,
+            size_of_floats!(6) as *const GLvoid,
         );
         gl::EnableVertexAttribArray(2);
 
@@ -205,6 +206,7 @@ fn main() {
         // load image, create texture and generate mipmaps
         let img =
             image::open("resources/textures/awesomeface.png").expect("Texture failed to load");
+        let (width, height) = (img.width() as GLsizei, img.height() as GLsizei);
 
         // flip image vertically so that the texture is rendered upright
         // use into_rgba since the image has an alpha transparency
@@ -214,8 +216,8 @@ fn main() {
             gl::TEXTURE_2D,
             0,
             gl::RGB as GLint,
-            img.width() as GLsizei,
-            img.height() as GLsizei,
+            width,
+            height,
             0,
             gl::RGBA, // RGB with Alpha
             gl::UNSIGNED_BYTE,
