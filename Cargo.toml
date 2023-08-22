@@ -187,25 +187,25 @@ path = "examples/2-lighting/4_2-lighting_maps_specular_map/main.rs"
 name = "4_4-lighting_maps_exercise4"
 path = "examples/2-lighting/4_4-lighting_maps_exercise4/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "5_1-light_casters_directional"
-#path = "examples/2-lighting/5_1-light_casters_directional/main.rs"
+[[example]]  # 2-lighting
+name = "5_1-light_casters_directional"
+path = "examples/2-lighting/5_1-light_casters_directional/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "5_2-light_casters_point"
-#path = "examples/2-lighting/5_2-light_casters_point/main.rs"
+[[example]]  # 2-lighting
+name = "5_2-light_casters_point"
+path = "examples/2-lighting/5_2-light_casters_point/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "5_3-light_casters_spot"
-#path = "examples/2-lighting/5_3-light_casters_spot/main.rs"
+[[example]]  # 2-lighting
+name = "5_3-light_casters_spot"
+path = "examples/2-lighting/5_3-light_casters_spot/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "5_4-light_casters_spot_soft"
-#path = "examples/2-lighting/5_4-light_casters_spot_soft/main.rs"
+[[example]]  # 2-lighting
+name = "5_4-light_casters_spot_soft"
+path = "examples/2-lighting/5_4-light_casters_spot_soft/main.rs"
 
-#[[example]]  # 2-lighting
-#name = "6-multiple_lights"
-#path = "examples/2-lighting/6-multiple_lights/main.rs"
+[[example]]  # 2-lighting
+name = "6-multiple_lights"
+path = "examples/2-lighting/6-multiple_lights/main.rs"
 
 #[[example]]  # 3-model_loading
 #name = "1-model_loading"
