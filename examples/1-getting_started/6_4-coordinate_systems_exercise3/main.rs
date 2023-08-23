@@ -5,7 +5,6 @@
 #![allow(clippy::zero_ptr)]
 #![allow(clippy::assign_op_pattern)]
 
-
 extern crate glfw;
 
 use glad_gl::gl;

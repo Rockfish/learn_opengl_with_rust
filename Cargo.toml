@@ -11,6 +11,7 @@ glad-gl = { path = "./glad-gl" }
 glam = "0.24.1"
 image = "0.24.7"
 learnopengl_lib = { path = "./learnopengl_lib" }
+russimp = "2.0.6"
 
 [dependencies.glfw]
 version = "*"
@@ -207,9 +208,9 @@ path = "examples/2-lighting/5_4-light_casters_spot_soft/main.rs"
 name = "6-multiple_lights"
 path = "examples/2-lighting/6-multiple_lights/main.rs"
 
-#[[example]]  # 3-model_loading
-#name = "1-model_loading"
-#path = "examples/3-model_loading/1-model_loading/main.rs"
+[[example]]  # 3-model_loading
+name = "1-model_loading"
+path = "examples/3-model_loading/1-model_loading/main.rs"
 
 #[[example]]  # 4-advanced_opengl
 #name = "1_1-depth_testing"

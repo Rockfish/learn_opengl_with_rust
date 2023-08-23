@@ -12,7 +12,9 @@ See the examples directory for the examples that follow the book.
 * glad generated from https://gen.glad.sh/ 
 
   See https://github.com/Dav1dde/glad/tree/glad2
-* image - https://docs.rs/image/0.24.7/image/
+* image - Image library. https://docs.rs/image/0.24.7/image/
+* glam - Math library. https://docs.rs/glam/latest/glam/
+* For modeling loading using the Assimp library, https://github.com/assimp/assimp, and russimp for rust bindings, https://github.com/jkvargas/russimp
  
 
 ## Notes

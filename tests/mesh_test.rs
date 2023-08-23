@@ -9,14 +9,17 @@ extern crate glfw;
 
 use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
+use glam::vec3;
 use glfw::{Action, Context, Key};
+use learnopengl_lib::mesh::Vertex;
 use learnopengl_lib::shader_s::Shader_S;
-use learnopengl_lib::{c_string, size_of_floats, size_of_uint};
+use learnopengl_lib::{size_of_floats, size_of_uint};
 use std::mem;
 
 const SCR_WIDTH: u32 = 800;
 const SCR_HEIGHT: u32 = 800;
 
+#[test]
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
@@ -51,9 +54,8 @@ fn main() {
     let mut VBO: GLuint = 0;
     // Element Buffer Object id
     let mut EBO: GLuint = 0;
-    // Texture ids
-    let mut texture1: GLuint = 0;
-    let mut texture2: GLuint = 0;
+    // Texture id
+    let mut texture: GLuint = 0;
     // Shader program
     let mut ourShader = Shader_S::new();
 
@@ -62,20 +64,57 @@ fn main() {
         // ------------------------------------
         ourShader
             .build(
-                "examples/1-getting_started/4_2-textures_combined/4_2-texture.vert",
-                "examples/1-getting_started/4_2-textures_combined/4_2-texture.frag",
+                "examples/1-getting_started/4_1-textures/4_1-texture.vert",
+                "examples/1-getting_started/4_1-textures/4_1-texture.frag",
             )
             .unwrap();
 
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
         #[rustfmt::skip]
-        let vertices: [f32; 32] = [
-            // positions      // colors        // texture coordinates
-            0.5,  0.5, 0.0,   1.0, 0.0, 0.0,   1.0, 1.0, // top right
-            0.5, -0.5, 0.0,   0.0, 1.0, 0.0,   1.0, 0.0, // bottom right
-           -0.5, -0.5, 0.0,   0.0, 0.0, 1.0,   0.0, 0.0, // bottom left
-           -0.5,  0.5, 0.0,   1.0, 1.0, 0.0,   0.0, 1.0  // top left
+            let vertices: [f32; 288] = [
+            // positions       // normals        // texture coords
+            -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  0.0,
+            0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  0.0,
+            0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  1.0,
+            0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  1.0,
+            -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  1.0,
+            -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  0.0,
+
+            -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  0.0,
+            0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  0.0,
+            0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  1.0,
+            0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  1.0,
+            -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  1.0,
+            -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  0.0,
+
+            -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0,  0.0,
+            -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0,  1.0,
+            -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0,  1.0,
+            -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0,  1.0,
+            -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0,  0.0,
+            -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0,  0.0,
+
+            0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0,  0.0,
+            0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0,  1.0,
+            0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0,  1.0,
+            0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0,  1.0,
+            0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0,  0.0,
+            0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0,  0.0,
+
+            -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  1.0,
+            0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0,  1.0,
+            0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0,  0.0,
+            0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0,  0.0,
+            -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0,  0.0,
+            -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  1.0,
+
+            -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0,  1.0,
+            0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0,  1.0,
+            0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0,  0.0,
+            0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0,  0.0,
+            -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0,  0.0,
+            -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0,  1.0,
         ];
 
         #[rustfmt::skip]
@@ -84,68 +123,27 @@ fn main() {
             1, 2, 3  // second triangle
         ];
 
-        gl::GenVertexArrays(1, &mut VAO);
-        gl::GenBuffers(1, &mut VBO);
-        gl::GenBuffers(1, &mut EBO);
+        for i in 0..4 {
+            let position = vec3(vertices[0 + i], vertices[1 + 1], vertices[2 + 1]);
+            let n = vec3(vertices[0 + i], vertices[1 + 1], vertices[2 + 1]);
+            let position = vec3(vertices[0 + i], vertices[1 + 1], vertices[2 + 1]);
+        }
 
-        gl::BindVertexArray(VAO);
-
-        gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
-        gl::BufferData(
-            gl::ARRAY_BUFFER,
-            size_of_floats!(vertices.len()) as GLsizeiptr,
-            vertices.as_ptr() as *const GLvoid,
-            gl::STATIC_DRAW,
-        );
-
-        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, EBO);
-        gl::BufferData(
-            gl::ELEMENT_ARRAY_BUFFER,
-            size_of_uint!(indices.len()) as GLsizeiptr,
-            indices.as_ptr() as *const GLvoid,
-            gl::STATIC_DRAW,
-        );
-
-        // position attribute
-        gl::VertexAttribPointer(
-            0,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            size_of_floats!(8) as GLsizei,
-            0 as *const GLvoid,
-        );
-        gl::EnableVertexAttribArray(0);
-
-        // color attribute
-        gl::VertexAttribPointer(
-            1,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            size_of_floats!(8) as GLsizei,
-            size_of_floats!(3) as *const GLvoid,
-        );
-        gl::EnableVertexAttribArray(1);
-
-        // texture coordinate attribute
-        gl::VertexAttribPointer(
-            2,
-            2,
-            gl::FLOAT,
-            gl::FALSE,
-            size_of_floats!(8) as GLsizei,
-            size_of_floats!(6) as *const GLvoid,
-        );
-        gl::EnableVertexAttribArray(2);
+        let vertexes = vertices.map(|v| Vertex {
+            Position: Default::default(),
+            Normal: Default::default(),
+            TexCoords: Default::default(),
+            Tangent: Default::default(),
+            Bitangent: Default::default(),
+            m_BoneIDs: [],
+            m_Weights: [],
+        });
 
         // load and create a texture
         // -------------------------
-        // texture 1
-        // -------------------------
-        gl::GenTextures(1, &mut texture1);
+        gl::GenTextures(1, &mut texture);
         // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-        gl::BindTexture(gl::TEXTURE_2D, texture1);
+        gl::BindTexture(gl::TEXTURE_2D, texture);
         // set the texture wrapping parameters
         // set texture wrapping to gl::REPEAT (default wrapping method)
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as GLint);
@@ -160,6 +158,7 @@ fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
 
         // load image, create texture and generate mipmaps
+
         let img = image::open("resources/textures/container.jpg").expect("Texture failed to load");
         let (width, height) = (img.width() as GLsizei, img.height() as GLsizei);
         let data = img.into_rgb8().into_raw();
@@ -176,58 +175,6 @@ fn main() {
             data.as_ptr() as *const GLvoid,
         );
         gl::GenerateMipmap(gl::TEXTURE_2D);
-
-        // texture 2
-        // -------------------------
-        gl::GenTextures(1, &mut texture2);
-        // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-        gl::BindTexture(gl::TEXTURE_2D, texture2);
-        // set the texture wrapping parameters
-        // set texture wrapping to gl::REPEAT (default wrapping method)
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as GLint);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
-
-        // set texture filtering parameters
-        gl::TexParameteri(
-            gl::TEXTURE_2D,
-            gl::TEXTURE_MIN_FILTER,
-            gl::LINEAR_MIPMAP_LINEAR as GLint,
-        );
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
-
-        // load image, create texture and generate mipmaps
-        let img =
-            image::open("resources/textures/awesomeface.png").expect("Texture failed to load");
-        let (width, height) = (img.width() as GLsizei, img.height() as GLsizei);
-
-        // flip image vertically so that the texture is rendered upright
-        // use into_rgba since the image has an alpha transparency
-        let img_data = img.flipv().into_rgba8().into_raw();
-
-        gl::TexImage2D(
-            gl::TEXTURE_2D,
-            0,
-            gl::RGB as GLint,
-            width,
-            height,
-            0,
-            gl::RGBA, // RGB with Alpha
-            gl::UNSIGNED_BYTE,
-            img_data.as_ptr() as *const GLvoid,
-        );
-        gl::GenerateMipmap(gl::TEXTURE_2D);
-
-        // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-        // -------------------------------------------------------------------------------------------
-        ourShader.use_shader(); // don't forget to activate/use the shader before setting uniforms!
-                                // either set it manually like so:
-        let c_str = c_string!("texture1");
-        gl::Uniform1i(
-            gl::GetUniformLocation(ourShader.programId, c_str.as_ptr()),
-            0,
-        );
-        // or set it via the texture class
-        ourShader.setInt("texture2", 1);
     }
 
     // render loop
@@ -242,11 +189,8 @@ fn main() {
             gl::ClearColor(0.2, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
 
-            // bind textures on corresponding texture units
-            gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(gl::TEXTURE_2D, texture1);
-            gl::ActiveTexture(gl::TEXTURE1);
-            gl::BindTexture(gl::TEXTURE_2D, texture2);
+            // bind Texture
+            gl::BindTexture(gl::TEXTURE_2D, texture);
 
             // render the triangle
             ourShader.use_shader();

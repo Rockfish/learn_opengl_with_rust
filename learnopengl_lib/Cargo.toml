@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 glad-gl = { path = "../glad-gl" }
 glam = "0.24.1"
+russimp = "2.0.6"

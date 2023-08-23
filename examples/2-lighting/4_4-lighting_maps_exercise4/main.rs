@@ -395,7 +395,6 @@ fn scroll_handler(state: &mut State, _xoffset: f64, yoffset: f64) {
 // utility function for loading a 2D texture from file
 // ---------------------------------------------------
 fn loadTexture(path: &str) -> GLuint {
-
     let mut texture_id: GLuint = 0;
 
     let img = image::open(path).expect("Texture failed to load");
@@ -406,31 +405,31 @@ fn loadTexture(path: &str) -> GLuint {
 
     unsafe {
         let format = match color_type {
-            ColorType::L8 => { gl::RED }
+            ColorType::L8 => gl::RED,
             // ColorType::La8 => {}
-            ColorType::Rgb8 => { gl::RGB }
-            ColorType::Rgba8 => { gl::RGBA }
+            ColorType::Rgb8 => gl::RGB,
+            ColorType::Rgba8 => gl::RGBA,
             // ColorType::L16 => {}
             // ColorType::La16 => {}
             // ColorType::Rgb16 => {}
             // ColorType::Rgba16 => {}
             // ColorType::Rgb32F => {}
             // ColorType::Rgba32F => {}
-            _ => panic!("no mapping for color type")
+            _ => panic!("no mapping for color type"),
         };
 
         let data = match color_type {
-            ColorType::L8 => { img.into_rgb8().into_raw() }
+            ColorType::L8 => img.into_rgb8().into_raw(),
             // ColorType::La8 => {}
-            ColorType::Rgb8 => { img.into_rgb8().into_raw() }
-            ColorType::Rgba8 => { img.into_rgba8().into_raw() }
+            ColorType::Rgb8 => img.into_rgb8().into_raw(),
+            ColorType::Rgba8 => img.into_rgba8().into_raw(),
             // ColorType::L16 => {}
             // ColorType::La16 => {}
             // ColorType::Rgb16 => {}
             // ColorType::Rgba16 => {}
             // ColorType::Rgb32F => {}
             // ColorType::Rgba32F => {}
-            _ => panic!("no mapping for color type")
+            _ => panic!("no mapping for color type"),
         };
 
         gl::GenTextures(1, &mut texture_id);
@@ -457,11 +456,7 @@ fn loadTexture(path: &str) -> GLuint {
             gl::TEXTURE_MIN_FILTER,
             gl::LINEAR_MIPMAP_LINEAR as GLint,
         );
-        gl::TexParameteri(
-            gl::TEXTURE_2D,
-            gl::TEXTURE_MAG_FILTER,
-            gl::LINEAR as GLint
-        );
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
     }
 
     texture_id

@@ -275,7 +275,7 @@ fn main() {
             lightingShader.setFloat("material.shininess", 32.0);
 
             /*
-               Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index 
+               Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
                the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
                by defining light types as classes and set their values in there, or by using a more efficient uniform approach
                by using 'Uniform buffer objects', but that is something we'll discuss in the 'Advanced GLSL' tutorial.
@@ -373,7 +373,7 @@ fn main() {
             // we now draw as many light bulbs as we have point lights.
             gl::BindVertexArray(lightCubeVAO);
             for pointPos in pointLightPositions {
-                let mut model =  Mat4::from_translation(pointPos);
+                let mut model = Mat4::from_translation(pointPos);
                 model *= Mat4::from_scale(vec3(0.2, 0.2, 0.2));
                 lightCubeShader.setMat4("model", &model);
                 gl::DrawArrays(gl::TRIANGLES, 0, 36);
@@ -468,7 +468,6 @@ fn scroll_handler(state: &mut State, _xoffset: f64, yoffset: f64) {
 // utility function for loading a 2D texture from file
 // ---------------------------------------------------
 fn loadTexture(path: &str) -> GLuint {
-
     let mut texture_id: GLuint = 0;
 
     let img = image::open(path).expect("Texture failed to load");
@@ -479,31 +478,31 @@ fn loadTexture(path: &str) -> GLuint {
 
     unsafe {
         let format = match color_type {
-            ColorType::L8 => { gl::RED }
+            ColorType::L8 => gl::RED,
             // ColorType::La8 => {}
-            ColorType::Rgb8 => { gl::RGB }
-            ColorType::Rgba8 => { gl::RGBA }
+            ColorType::Rgb8 => gl::RGB,
+            ColorType::Rgba8 => gl::RGBA,
             // ColorType::L16 => {}
             // ColorType::La16 => {}
             // ColorType::Rgb16 => {}
             // ColorType::Rgba16 => {}
             // ColorType::Rgb32F => {}
             // ColorType::Rgba32F => {}
-            _ => panic!("no mapping for color type")
+            _ => panic!("no mapping for color type"),
         };
 
         let data = match color_type {
-            ColorType::L8 => { img.into_rgb8().into_raw() }
+            ColorType::L8 => img.into_rgb8().into_raw(),
             // ColorType::La8 => {}
-            ColorType::Rgb8 => { img.into_rgb8().into_raw() }
-            ColorType::Rgba8 => { img.into_rgba8().into_raw() }
+            ColorType::Rgb8 => img.into_rgb8().into_raw(),
+            ColorType::Rgba8 => img.into_rgba8().into_raw(),
             // ColorType::L16 => {}
             // ColorType::La16 => {}
             // ColorType::Rgb16 => {}
             // ColorType::Rgba16 => {}
             // ColorType::Rgb32F => {}
             // ColorType::Rgba32F => {}
-            _ => panic!("no mapping for color type")
+            _ => panic!("no mapping for color type"),
         };
 
         gl::GenTextures(1, &mut texture_id);
@@ -530,11 +529,7 @@ fn loadTexture(path: &str) -> GLuint {
             gl::TEXTURE_MIN_FILTER,
             gl::LINEAR_MIPMAP_LINEAR as GLint,
         );
-        gl::TexParameteri(
-            gl::TEXTURE_2D,
-            gl::TEXTURE_MAG_FILTER,
-            gl::LINEAR as GLint
-        );
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
     }
 
     texture_id
