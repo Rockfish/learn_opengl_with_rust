@@ -6,7 +6,7 @@
 
 use crate::shader_m::Shader_M;
 use glad_gl::gl;
-use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
+use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use std::ffi::CString;
 use std::mem;
@@ -15,6 +15,7 @@ use crate::SIZE_OF_FLOAT;
 
 const MAX_BONE_INFLUENCE: usize = 4;
 
+#[derive(Debug, Copy, Clone)]
 #[repr(C, packed)]
 pub struct Vertex {
     pub Position: Vec3,
@@ -54,6 +55,7 @@ const OFFSET_OF_BITANGENT: usize = mem::offset_of!(Vertex, Bitangent);
 const OFFSET_OF_BONE_IDS: usize = mem::offset_of!(Vertex, m_BoneIDs);
 const OFFSET_OF_WEIGHTS: usize = mem::offset_of!(Vertex, m_Weights);
 
+#[derive(Debug, Clone)]
 pub struct Texture {
     pub id: u32,
     pub texture_type: String,
@@ -70,6 +72,7 @@ impl Texture {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Mesh {
     pub vertices: Vec<Vertex>,
     pub indices: Vec<u32>,
@@ -83,7 +86,7 @@ impl Mesh {
             vertices,
             indices,
             textures,
-            VAO: 0,
+            VAO: 99999,
         };
         mesh.setupMesh();
         mesh
@@ -132,16 +135,15 @@ impl Mesh {
     }
 
     fn setupMesh(&mut self) {
-        let mut VAO: GLuint = 0;
         let mut VBO: GLuint = 0;
         let mut EBO: GLuint = 0;
 
         unsafe {
-            gl::GenVertexArrays(1, &mut VAO);
+            gl::GenVertexArrays(1, &mut self.VAO);
             gl::GenBuffers(1, &mut VBO);
             gl::GenBuffers(1, &mut EBO);
 
-            gl::BindVertexArray(VAO);
+            gl::BindVertexArray(self.VAO);
             // load data into vertex buffers
             gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
             // A great thing about structs is that their memory layout is sequential for all its items. (original comment from cpp code)

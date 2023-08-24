@@ -15,7 +15,6 @@ use image::ColorType;
 use learnopengl_lib::camera::{Camera, CameraMovement};
 use learnopengl_lib::model::Model;
 use learnopengl_lib::shader_m::Shader_M;
-use learnopengl_lib::SIZE_OF_FLOAT;
 
 const SCR_WIDTH: f32 = 800.0;
 const SCR_HEIGHT: f32 = 800.0;
@@ -81,7 +80,8 @@ fn main() {
         )
         .unwrap();
 
-    let model = Model {};
+    //let ourModel = Model::new("resources/objects/backpack/backpack.obj", false);
+    let ourModel = Model::new("backpack/backpack.obj", false);
 
     // render loop
     while !window.should_close() {
@@ -96,13 +96,11 @@ fn main() {
 
         unsafe {
             // render
-            gl::ClearColor(0.1, 0.1, 0.1, 1.0);
+            gl::ClearColor(0.05, 0.05, 0.05, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT); // also clear the depth buffer now!
 
             // be sure to activate shader when setting uniforms/drawing objects
             ourShader.use_shader();
-            ourShader.setVec3("viewPos", &state.camera.Position);
-            ourShader.setFloat("material.shininess", 32.0);
 
             // view/projection transformations
             let projection = Mat4::perspective_rh_gl(
@@ -114,6 +112,12 @@ fn main() {
             let view = state.camera.GetViewMatrix();
             ourShader.setMat4("projection", &projection);
             ourShader.setMat4("view", &view);
+
+            let mut model =  Mat4::from_translation(vec3(0.0, 0.0, 0.0));
+            model = model * Mat4::from_scale(vec3(1.0, 1.0, 1.0));
+            ourShader.setMat4("model", &model);
+
+            ourModel.Draw(&ourShader);
 
             // world transformation
             let model = Mat4::IDENTITY;
