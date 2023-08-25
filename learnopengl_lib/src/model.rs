@@ -54,8 +54,9 @@ impl Model {
                 PostProcess::GenerateSmoothNormals,
                 PostProcess::FlipUVs,
                 PostProcess::CalculateTangentSpace,
-                PostProcess::JoinIdenticalVertices,
-                PostProcess::SortByPrimitiveType
+                // PostProcess::JoinIdenticalVertices,
+                // PostProcess::SortByPrimitiveType,
+                // PostProcess::EmbedTextures,
             ],
         );
 
@@ -111,7 +112,7 @@ impl Model {
                 vertex.Normal = vec3(
                     scene_mesh.normals[i].x,
                     scene_mesh.normals[i].y,
-                    scene_mesh.normals[i].x,
+                    scene_mesh.normals[i].z,
                 );
             }
             // texture coordinates
@@ -197,6 +198,36 @@ impl Model {
                 self.textures_loaded.push(texture);
             }
         }
+
+        /* hack
+        let texture_name = match texture_type {
+            TextureType::Diffuse => "diffuse.jpg",
+            TextureType::Specular => "specular.jpg",
+            TextureType::Height => "normal.png",
+            _ => ""
+        };
+
+        if !texture_name.is_empty() {
+            let filename = texture_name;
+
+            let loaded_texture = self.textures_loaded.iter().find(|t| t.path == filename);
+
+            if let Some(texture) = loaded_texture {
+                textures.push(texture.clone());
+            } else {
+                let filepath = format!("{}/{}", self.directory, filename);
+                let id = self.textureFromFile(&filepath);
+                let texture = Texture {
+                    id: id,
+                    texture_type: typeName.to_string(),
+                    path: filename.to_string(),
+                };
+                textures.push(texture.clone());
+                self.textures_loaded.push(texture);
+            }
+        }
+         */
+
         textures
     }
 

@@ -80,8 +80,11 @@ fn main() {
         )
         .unwrap();
 
-    //let ourModel = Model::new("resources/objects/backpack/backpack.obj", false);
-    let ourModel = Model::new("backpack/backpack.obj", false);
+    // Todo: revert path
+    //let ourModel = Model::new("/Users/john/Dev_Rust/Repos/LearnOpenGL/resources/objects/planet/planet.obj", false);
+    //let ourModel = Model::new("/Users/john/Dev_Assets/glTF-Sample-Models/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb", false);
+    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/backpack/backpack.obj", false);
+    let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", false);
 
     // render loop
     while !window.should_close() {
@@ -97,7 +100,7 @@ fn main() {
         unsafe {
             // render
             gl::ClearColor(0.05, 0.05, 0.05, 1.0);
-            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT); // also clear the depth buffer now!
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
             // be sure to activate shader when setting uniforms/drawing objects
             ourShader.use_shader();
@@ -118,10 +121,6 @@ fn main() {
             ourShader.setMat4("model", &model);
 
             ourModel.Draw(&ourShader);
-
-            // world transformation
-            let model = Mat4::IDENTITY;
-            ourShader.setMat4("model", &model);
         }
 
         window.swap_buffers();

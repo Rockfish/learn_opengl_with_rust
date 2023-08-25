@@ -9,4 +9,5 @@ edition = "2021"
 glad-gl = { path = "../glad-gl" }
 glam = "0.24.1"
 image = "0.24.7"
-russimp = "2.0.6"
+#russimp = "2.0.6"
+russimp = { path = "/Users/john/Dev_Rust/Repos/russimp" }

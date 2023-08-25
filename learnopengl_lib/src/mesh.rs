@@ -102,8 +102,8 @@ impl Mesh {
         unsafe {
             for (i, texture) in self.textures.iter().enumerate() {
                 gl::ActiveTexture(gl::TEXTURE0 + i as u32); // active proper texture unit before binding
-                                                            // retrieve texture number (the N in diffuse_textureN)
 
+                // retrieve texture number (the N in diffuse_textureN)
                 let number = if texture.texture_type == "texture_diffuse" {
                     diffuseNr += 1;
                     diffuseNr.to_string()
@@ -117,7 +117,7 @@ impl Mesh {
                     heightNr += 1;
                     heightNr.to_string()
                 } else {
-                    panic!("Unknow texture type")
+                    panic!("Unknown texture type")
                 };
 
                 // now set the sampler to the correct texture unit
@@ -131,6 +131,10 @@ impl Mesh {
                 // and finally bind the texture
                 gl::BindTexture(gl::TEXTURE_2D, texture.id);
             }
+
+            gl::BindVertexArray(self.VAO);
+            gl::DrawElements(gl::TRIANGLES, self.indices.len() as i32, gl::UNSIGNED_INT, 0 as *const GLvoid);
+            gl::BindVertexArray(0);
         }
     }
 
@@ -151,7 +155,7 @@ impl Mesh {
             // again translates to 3/2 floats which translates to a byte array.
             gl::BufferData(
                 gl::ARRAY_BUFFER,
-                mem::size_of::<Vertex>() as GLsizeiptr,
+                (self.vertices.len() * mem::size_of::<Vertex>()) as GLsizeiptr,
                 self.vertices.as_ptr() as *const GLvoid,
                 gl::STATIC_DRAW,
             );
@@ -159,7 +163,7 @@ impl Mesh {
             gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, EBO);
             gl::BufferData(
                 gl::ELEMENT_ARRAY_BUFFER,
-                (self.indices.len() * SIZE_OF_FLOAT) as GLsizeiptr,
+                (self.indices.len() *  mem::size_of::<u32>()) as GLsizeiptr,
                 self.indices.as_ptr() as *const GLvoid,
                 gl::STATIC_DRAW,
             );
@@ -224,7 +228,7 @@ impl Mesh {
             gl::EnableVertexAttribArray(5);
             gl::VertexAttribPointer(
                 5,
-                3,
+                4,
                 gl::FLOAT,
                 gl::FALSE,
                 mem::size_of::<Vertex>() as GLsizei,
@@ -235,7 +239,7 @@ impl Mesh {
             gl::EnableVertexAttribArray(6);
             gl::VertexAttribPointer(
                 6,
-                3,
+                4,
                 gl::FLOAT,
                 gl::FALSE,
                 mem::size_of::<Vertex>() as GLsizei,
