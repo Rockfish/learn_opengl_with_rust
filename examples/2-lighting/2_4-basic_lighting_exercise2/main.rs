@@ -33,20 +33,13 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
-    glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-        glfw::OpenGlProfileHint::Core,
-    ));
+    glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
 
     // for Apple
     glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
     let (mut window, events) = glfw
-        .create_window(
-            SCR_WIDTH as u32,
-            SCR_HEIGHT as u32,
-            "LearnOpenGL",
-            glfw::WindowMode::Windowed,
-        )
+        .create_window(SCR_WIDTH as u32, SCR_HEIGHT as u32, "LearnOpenGL", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
     // Turn on all GLFW polling so that we can receive all WindowEvents
@@ -163,14 +156,7 @@ fn main() {
         gl::BindVertexArray(cubeVAO);
 
         // position attribute
-        gl::VertexAttribPointer(
-            0,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            6 * SIZE_OF_FLOAT as GLsizei,
-            0 as *const GLvoid,
-        );
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 6 * SIZE_OF_FLOAT as GLsizei, 0 as *const GLvoid);
         gl::EnableVertexAttribArray(0);
 
         // normal attribute
@@ -194,14 +180,7 @@ fn main() {
         // (it's already bound, but we do it again for educational purposes)
         gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
 
-        gl::VertexAttribPointer(
-            0,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            6 * SIZE_OF_FLOAT as GLsizei,
-            0 as *const GLvoid,
-        );
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 6 * SIZE_OF_FLOAT as GLsizei, 0 as *const GLvoid);
         gl::EnableVertexAttribArray(0);
     }
 
@@ -235,12 +214,7 @@ fn main() {
             lightingShader.setVec3("viewPos", &state.camera.Position);
 
             // view/projection transformations
-            let projection = Mat4::perspective_rh_gl(
-                state.camera.Zoom.to_radians(),
-                SCR_WIDTH / SCR_HEIGHT,
-                0.1,
-                100.0,
-            );
+            let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
             let view = state.camera.GetViewMatrix();
             lightingShader.setMat4("projection", &projection);
             lightingShader.setMat4("view", &view);
@@ -290,24 +264,16 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
             framebuffer_size_event(window, width, height);
         }
         glfw::WindowEvent::Key(Key::W, _, _, _) => {
-            state
-                .camera
-                .ProcessKeyboard(CameraMovement::FORWARD, state.deltaTime);
+            state.camera.ProcessKeyboard(CameraMovement::FORWARD, state.deltaTime);
         }
         glfw::WindowEvent::Key(Key::S, _, _, _) => {
-            state
-                .camera
-                .ProcessKeyboard(CameraMovement::BACKWARD, state.deltaTime);
+            state.camera.ProcessKeyboard(CameraMovement::BACKWARD, state.deltaTime);
         }
         glfw::WindowEvent::Key(Key::A, _, _, _) => {
-            state
-                .camera
-                .ProcessKeyboard(CameraMovement::LEFT, state.deltaTime);
+            state.camera.ProcessKeyboard(CameraMovement::LEFT, state.deltaTime);
         }
         glfw::WindowEvent::Key(Key::D, _, _, _) => {
-            state
-                .camera
-                .ProcessKeyboard(CameraMovement::RIGHT, state.deltaTime);
+            state.camera.ProcessKeyboard(CameraMovement::RIGHT, state.deltaTime);
         }
         glfw::WindowEvent::CursorPos(xpos, ypos) => mouse_handler(state, xpos, ypos),
         glfw::WindowEvent::Scroll(xoffset, ysoffset) => scroll_handler(state, xoffset, ysoffset),

@@ -5,11 +5,9 @@
 #![allow(unused_assignments)]
 #![allow(unused_variables)]
 
+use std::ffi::{CStr, CString};
 use std::mem::MaybeUninit;
 use std::os::raw::c_uint;
-use std::{
-    ffi::{CStr, CString},
-};
 
 use russimp::scene::*;
 use russimp::sys::*;
@@ -45,9 +43,7 @@ impl AiScene<'_> {
             return Err(AiScene::get_error());
         }
 
-        Ok(AiScene {
-            assimp_scene: raw_scene,
-        })
+        Ok(AiScene { assimp_scene: raw_scene })
     }
 
     #[inline]
@@ -77,11 +73,7 @@ impl Drop for AiScene<'_> {
     }
 }
 
-pub fn get_material_texture_filename(
-    material: *mut aiMaterial,
-    texture_type: c_uint,
-    index: u32,
-) -> Result<String, String> {
+pub fn get_material_texture_filename(material: *mut aiMaterial, texture_type: c_uint, index: u32) -> Result<String, String> {
     let mut path = MaybeUninit::uninit();
     let mut texture_mapping = MaybeUninit::uninit();
     let mut uv_index = MaybeUninit::uninit();

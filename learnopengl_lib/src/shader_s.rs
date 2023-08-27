@@ -90,10 +90,7 @@ impl Shader_S {
     pub fn setInt(&self, name: &str, value: i32) {
         unsafe {
             let c_string = c_string!(name);
-            gl::Uniform1i(
-                gl::GetUniformLocation(self.programId, c_string.as_ptr()),
-                value,
-            );
+            gl::Uniform1i(gl::GetUniformLocation(self.programId, c_string.as_ptr()), value);
         }
     }
 
@@ -101,10 +98,7 @@ impl Shader_S {
     pub fn setFloat(&self, name: &str, value: f32) {
         unsafe {
             let c_string = c_string!(name);
-            gl::Uniform1f(
-                gl::GetUniformLocation(self.programId, c_string.as_ptr()),
-                value,
-            );
+            gl::Uniform1f(gl::GetUniformLocation(self.programId, c_string.as_ptr()), value);
         }
     }
 }
@@ -120,16 +114,8 @@ fn checkCompileErrors(shaderId: u32, checkType: &str) {
                 gl::GetShaderiv(shaderId, gl::INFO_LOG_LENGTH, &mut len);
                 // Subtract 1 to skip the trailing null character.
                 let mut infoLog = vec![0; len as usize - 1];
-                gl::GetProgramInfoLog(
-                    shaderId,
-                    1024,
-                    ptr::null_mut(),
-                    infoLog.as_mut_ptr() as *mut GLchar,
-                );
-                panic!(
-                    "Shader compilation failed.\n{}",
-                    String::from_utf8_lossy(&infoLog)
-                );
+                gl::GetProgramInfoLog(shaderId, 1024, ptr::null_mut(), infoLog.as_mut_ptr() as *mut GLchar);
+                panic!("Shader compilation failed.\n{}", String::from_utf8_lossy(&infoLog));
             }
         } else {
             gl::GetProgramiv(shaderId, gl::LINK_STATUS, &mut status);
@@ -138,16 +124,8 @@ fn checkCompileErrors(shaderId: u32, checkType: &str) {
                 gl::GetProgramiv(shaderId, gl::INFO_LOG_LENGTH, &mut len);
                 // Subtract 1 to skip the trailing null character.
                 let mut infoLog = vec![0; len as usize - 1];
-                gl::GetProgramInfoLog(
-                    shaderId,
-                    1024,
-                    ptr::null_mut(),
-                    infoLog.as_mut_ptr() as *mut GLchar,
-                );
-                panic!(
-                    "Shader program linking failed.\n{}",
-                    String::from_utf8_lossy(&infoLog)
-                );
+                gl::GetProgramInfoLog(shaderId, 1024, ptr::null_mut(), infoLog.as_mut_ptr() as *mut GLchar);
+                panic!("Shader program linking failed.\n{}", String::from_utf8_lossy(&infoLog));
             }
         }
     }

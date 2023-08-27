@@ -8,13 +8,11 @@
 extern crate glfw;
 
 use glad_gl::gl;
-use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
+use glad_gl::gl::{GLint, GLsizei, GLuint, GLvoid};
 use glam::vec3;
 use glfw::{Action, Context, Key};
 use learnopengl_lib::mesh::Vertex;
 use learnopengl_lib::shader_s::Shader_S;
-use learnopengl_lib::{size_of_floats, size_of_uint};
-use std::mem;
 
 const SCR_WIDTH: u32 = 800;
 const SCR_HEIGHT: u32 = 800;
@@ -24,20 +22,13 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
-    glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-        glfw::OpenGlProfileHint::Core,
-    ));
+    glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
 
     // for Apple
     glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
     let (mut window, events) = glfw
-        .create_window(
-            SCR_WIDTH,
-            SCR_HEIGHT,
-            "LearnOpenGL",
-            glfw::WindowMode::Windowed,
-        )
+        .create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
     // Turn on all GLFW polling so that we can receive all WindowEvents
@@ -135,8 +126,8 @@ fn main() {
             TexCoords: Default::default(),
             Tangent: Default::default(),
             Bitangent: Default::default(),
-            m_BoneIDs: [],
-            m_Weights: [],
+            m_BoneIDs: [0; 4],
+            m_Weights: [0.0; 4],
         });
 
         // load and create a texture
@@ -150,11 +141,7 @@ fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
 
         // set texture filtering parameters
-        gl::TexParameteri(
-            gl::TEXTURE_2D,
-            gl::TEXTURE_MIN_FILTER,
-            gl::LINEAR_MIPMAP_LINEAR as GLint,
-        );
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
 
         // load image, create texture and generate mipmaps

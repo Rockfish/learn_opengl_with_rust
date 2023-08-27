@@ -70,16 +70,7 @@ impl Camera {
     }
 
     // constructor with scalar values
-    pub fn camera_scalar(
-        posX: f32,
-        posY: f32,
-        posZ: f32,
-        upX: f32,
-        upY: f32,
-        upZ: f32,
-        yaw: f32,
-        pitch: f32,
-    ) -> Camera {
+    pub fn camera_scalar(posX: f32, posY: f32, posZ: f32, upX: f32, upY: f32, upZ: f32, yaw: f32, pitch: f32) -> Camera {
         let mut camera = Camera::default();
         camera.Position = vec3(posX, posY, posZ);
         camera.WorldUp = vec3(upX, upY, upZ);
@@ -111,12 +102,7 @@ impl Camera {
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    pub fn ProcessMouseMovement(
-        &mut self,
-        mut xoffset: f32,
-        mut yoffset: f32,
-        constrainPitch: bool,
-    ) {
+    pub fn ProcessMouseMovement(&mut self, mut xoffset: f32, mut yoffset: f32, constrainPitch: bool) {
         xoffset *= self.MouseSensitivity;
         yoffset *= self.MouseSensitivity;
 

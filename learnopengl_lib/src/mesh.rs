@@ -88,28 +88,16 @@ impl Mesh {
 
         println!("size vertex: {}", mem::size_of::<Vertex>());
         println!("OFFSET_OF_NORMAL: {}", mem::offset_of!(Vertex, Normal));
-        println!(
-            "OFFSET_OF_TEXCOORDS: {}",
-            mem::offset_of!(Vertex, TexCoords)
-        );
+        println!("OFFSET_OF_TEXCOORDS: {}", mem::offset_of!(Vertex, TexCoords));
         println!("OFFSET_OF_TANGENT: {}", mem::offset_of!(Vertex, Tangent));
-        println!(
-            "OFFSET_OF_BITANGENT: {}",
-            mem::offset_of!(Vertex, Bitangent)
-        );
+        println!("OFFSET_OF_BITANGENT: {}", mem::offset_of!(Vertex, Bitangent));
         println!("OFFSET_OF_BONE_IDS: {}", mem::offset_of!(Vertex, m_BoneIDs));
         println!("OFFSET_OF_WEIGHTS: {}", mem::offset_of!(Vertex, m_Weights));
 
         println!("size of Vec3: {}", mem::size_of::<Vec3>());
         println!("size of Vec2: {}", mem::size_of::<Vec2>());
-        println!(
-            "size of [i32;4]: {}",
-            mem::size_of::<[i32; MAX_BONE_INFLUENCE]>()
-        );
-        println!(
-            "size of [f32;4]: {}",
-            mem::size_of::<[f32; MAX_BONE_INFLUENCE]>()
-        );
+        println!("size of [i32;4]: {}", mem::size_of::<[i32; MAX_BONE_INFLUENCE]>());
+        println!("size of [f32;4]: {}", mem::size_of::<[f32; MAX_BONE_INFLUENCE]>());
 
         println!(
             "size of vertex parts: {}",
@@ -152,21 +140,13 @@ impl Mesh {
                 let mut name = texture.texture_type.clone();
                 name.push_str(&number);
                 let c_string = CString::new(name).unwrap();
-                gl::Uniform1i(
-                    gl::GetUniformLocation(shader.programId, c_string.as_ptr()),
-                    i as i32,
-                );
+                gl::Uniform1i(gl::GetUniformLocation(shader.programId, c_string.as_ptr()), i as i32);
                 // and finally bind the texture
                 gl::BindTexture(gl::TEXTURE_2D, texture.id);
             }
 
             gl::BindVertexArray(self.VAO);
-            gl::DrawElements(
-                gl::TRIANGLES,
-                self.indices.len() as i32,
-                gl::UNSIGNED_INT,
-                0 as *const GLvoid,
-            );
+            gl::DrawElements(gl::TRIANGLES, self.indices.len() as i32, gl::UNSIGNED_INT, 0 as *const GLvoid);
             gl::BindVertexArray(0);
         }
     }
@@ -204,14 +184,7 @@ impl Mesh {
             // set the vertex attribute pointers
             // vertex Positions
             gl::EnableVertexAttribArray(0);
-            gl::VertexAttribPointer(
-                0,
-                3,
-                gl::FLOAT,
-                gl::FALSE,
-                mem::size_of::<Vertex>() as GLsizei,
-                0 as *const GLvoid,
-            );
+            gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, mem::size_of::<Vertex>() as GLsizei, 0 as *const GLvoid);
 
             // vertex normals
             gl::EnableVertexAttribArray(1);

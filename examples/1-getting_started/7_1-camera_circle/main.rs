@@ -21,20 +21,13 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
-    glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-        glfw::OpenGlProfileHint::Core,
-    ));
+    glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
 
     // for Apple
     glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
     let (mut window, events) = glfw
-        .create_window(
-            SCR_WIDTH,
-            SCR_HEIGHT,
-            "LearnOpenGL",
-            glfw::WindowMode::Windowed,
-        )
+        .create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
     // Turn on all GLFW polling so that we can receive all WindowEvents
@@ -144,14 +137,7 @@ fn main() {
         );
 
         // position attribute
-        gl::VertexAttribPointer(
-            0,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            5 * SIZE_OF_FLOAT as GLsizei,
-            0 as *const GLvoid,
-        );
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 5 * SIZE_OF_FLOAT as GLsizei, 0 as *const GLvoid);
         gl::EnableVertexAttribArray(0);
 
         // texture coordinate attribute
@@ -178,11 +164,7 @@ fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
 
         // set texture filtering parameters
-        gl::TexParameteri(
-            gl::TEXTURE_2D,
-            gl::TEXTURE_MIN_FILTER,
-            gl::LINEAR_MIPMAP_LINEAR as GLint,
-        );
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
 
         // load image, create texture and generate mipmaps
@@ -218,8 +200,7 @@ fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
 
         // load image, create texture and generate mipmaps
-        let img =
-            image::open("resources/textures/awesomeface.png").expect("Texture failed to load");
+        let img = image::open("resources/textures/awesomeface.png").expect("Texture failed to load");
         let (width, height) = (img.width() as GLsizei, img.height() as GLsizei);
 
         // flip image vertically so that the texture is rendered upright
@@ -247,12 +228,7 @@ fn main() {
 
         // pass projection matrix to shader (as projection matrix rarely changes there's no need to do this per frame)
         // -----------------------------------------------------------------------------------------------------------
-        let projection = Mat4::perspective_rh_gl(
-            45.0f32.to_radians(),
-            (SCR_WIDTH / SCR_HEIGHT) as f32,
-            0.1,
-            100.0,
-        );
+        let projection = Mat4::perspective_rh_gl(45.0f32.to_radians(), (SCR_WIDTH / SCR_HEIGHT) as f32, 0.1, 100.0);
         ourShader.setMat4("projection", &projection);
     }
 
@@ -286,11 +262,7 @@ fn main() {
             // eye: Position of the camera
             // center: Position where the camera is looking at
             // up: Normalized up vector, how the camera is oriented.
-            let view = Mat4::look_at_rh(
-                vec3(camX, 0.0, camZ),
-                vec3(0.0, 0.0, 0.0),
-                vec3(0.0, 1.0, 0.0),
-            );
+            let view = Mat4::look_at_rh(vec3(camX, 0.0, camZ), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
 
             ourShader.setMat4("view", &view);
 

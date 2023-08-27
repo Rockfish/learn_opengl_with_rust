@@ -35,20 +35,13 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
-    glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-        glfw::OpenGlProfileHint::Core,
-    ));
+    glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
 
     // for Apple
     glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
     let (mut window, events) = glfw
-        .create_window(
-            SCR_WIDTH,
-            SCR_HEIGHT,
-            "LearnOpenGL",
-            glfw::WindowMode::Windowed,
-        )
+        .create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
     // Turn on all GLFW polling so that we can receive all WindowEvents
@@ -121,14 +114,7 @@ fn main() {
             gl::STATIC_DRAW,
         );
 
-        gl::VertexAttribPointer(
-            0,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            (3 * mem::size_of::<f32>()) as GLsizei,
-            ptr::null(),
-        );
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, (3 * mem::size_of::<f32>()) as GLsizei, ptr::null());
 
         gl::EnableVertexAttribArray(0);
 

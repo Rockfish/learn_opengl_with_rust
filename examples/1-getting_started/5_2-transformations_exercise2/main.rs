@@ -23,20 +23,13 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
-    glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-        glfw::OpenGlProfileHint::Core,
-    ));
+    glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
 
     // for Apple
     glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
     let (mut window, events) = glfw
-        .create_window(
-            SCR_WIDTH,
-            SCR_HEIGHT,
-            "LearnOpenGL",
-            glfw::WindowMode::Windowed,
-        )
+        .create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
     // Turn on all GLFW polling so that we can receive all WindowEvents
@@ -109,14 +102,7 @@ fn main() {
         );
 
         // position attribute
-        gl::VertexAttribPointer(
-            0,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            5 * SIZE_OF_FLOAT as GLsizei,
-            0 as *const GLvoid,
-        );
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 5 * SIZE_OF_FLOAT as GLsizei, 0 as *const GLvoid);
         gl::EnableVertexAttribArray(0);
 
         // texture coordinate attribute
@@ -143,11 +129,7 @@ fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
 
         // set texture filtering parameters
-        gl::TexParameteri(
-            gl::TEXTURE_2D,
-            gl::TEXTURE_MIN_FILTER,
-            gl::LINEAR_MIPMAP_LINEAR as GLint,
-        );
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
 
         // load image, create texture and generate mipmaps
@@ -179,16 +161,11 @@ fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
 
         // set texture filtering parameters
-        gl::TexParameteri(
-            gl::TEXTURE_2D,
-            gl::TEXTURE_MIN_FILTER,
-            gl::LINEAR_MIPMAP_LINEAR as GLint,
-        );
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
 
         // load image, create texture and generate mipmaps
-        let img =
-            image::open("resources/textures/awesomeface.png").expect("Texture failed to load");
+        let img = image::open("resources/textures/awesomeface.png").expect("Texture failed to load");
         let (width, height) = (img.width() as GLsizei, img.height() as GLsizei);
 
         // flip image vertically so that the texture is rendered upright
@@ -213,10 +190,7 @@ fn main() {
         ourShader.use_shader(); // don't forget to activate/use the shader before setting uniforms!
                                 // either set it manually like so:
         let c_str = c_string!("texture1");
-        gl::Uniform1i(
-            gl::GetUniformLocation(ourShader.programId, c_str.as_ptr()),
-            0,
-        );
+        gl::Uniform1i(gl::GetUniformLocation(ourShader.programId, c_str.as_ptr()), 0);
         // or set it via the texture class
         ourShader.setInt("texture2", 1);
     }
@@ -242,18 +216,12 @@ fn main() {
             // create transformations using glam
             let mut transform = Mat4::IDENTITY;
             transform = transform * Mat4::from_translation(Vec3::new(0.5, -0.5, 0.0));
-            transform =
-                transform * Mat4::from_axis_angle(Vec3::new(0.0, 0.0, 1.0), glfw.get_time() as f32);
+            transform = transform * Mat4::from_axis_angle(Vec3::new(0.0, 0.0, 1.0), glfw.get_time() as f32);
 
             // get matrix's uniform location and set matrix
             let c_str = c_string!("transform");
             let transformLoc = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
-            gl::UniformMatrix4fv(
-                transformLoc,
-                1,
-                gl::FALSE,
-                transform.to_cols_array().as_ptr(),
-            );
+            gl::UniformMatrix4fv(transformLoc, 1, gl::FALSE, transform.to_cols_array().as_ptr());
 
             // render the triangle
             ourShader.use_shader();
@@ -264,18 +232,12 @@ fn main() {
             let mut transform = Mat4::IDENTITY;
             transform = transform * Mat4::from_translation(Vec3::new(-0.5, 0.5, 0.0));
             let scaleAmount = glfw.get_time().sin() as f32;
-            transform =
-                transform * Mat4::from_scale(Vec3::new(scaleAmount, scaleAmount, scaleAmount));
+            transform = transform * Mat4::from_scale(Vec3::new(scaleAmount, scaleAmount, scaleAmount));
 
             // get matrix's uniform location and set matrix
             let c_str = c_string!("transform");
             let transformLoc = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
-            gl::UniformMatrix4fv(
-                transformLoc,
-                1,
-                gl::FALSE,
-                transform.to_cols_array().as_ptr(),
-            );
+            gl::UniformMatrix4fv(transformLoc, 1, gl::FALSE, transform.to_cols_array().as_ptr());
 
             // now with the uniform matrix being replaced with new transformations, draw it again.
             gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, 0 as *const GLvoid);

@@ -62,12 +62,7 @@ impl Model {
 
         match scene {
             Ok(scene) => {
-                self.directory = Path::new(path)
-                    .parent()
-                    .expect("path error")
-                    .to_str()
-                    .unwrap()
-                    .to_string();
+                self.directory = Path::new(path).parent().expect("path error").to_str().unwrap().to_string();
 
                 if let Some(aiscene) = scene.assimp_scene {
                     self.process_node(aiscene.mRootNode, aiscene);
@@ -91,8 +86,7 @@ impl Model {
         }
 
         // Process childern nodes
-        let slice =
-            unsafe { slice_from_raw_parts((*node).mChildren, (*node).mNumChildren as usize) };
+        let slice = unsafe { slice_from_raw_parts((*node).mChildren, (*node).mNumChildren as usize) };
 
         if let Some(child_nodes) = unsafe { slice.as_ref() } {
             for i in 0..child_nodes.len() {
@@ -107,29 +101,10 @@ impl Model {
         let mut indices: Vec<u32> = vec![];
         let mut textures: Vec<Texture> = vec![];
 
-        let ai_vertices = unsafe {
-            slice_from_raw_parts((*scene_mesh).mVertices, (*scene_mesh).mNumVertices as usize)
-                .as_ref()
-        }
-        .unwrap();
-        let ai_normals = unsafe {
-            slice_from_raw_parts((*scene_mesh).mNormals, (*scene_mesh).mNumVertices as usize)
-                .as_ref()
-        }
-        .unwrap();
-        let ai_tangents = unsafe {
-            slice_from_raw_parts((*scene_mesh).mTangents, (*scene_mesh).mNumVertices as usize)
-                .as_ref()
-        }
-        .unwrap();
-        let ai_bitangents = unsafe {
-            slice_from_raw_parts(
-                (*scene_mesh).mBitangents,
-                (*scene_mesh).mNumVertices as usize,
-            )
-            .as_ref()
-        }
-        .unwrap();
+        let ai_vertices = unsafe { slice_from_raw_parts((*scene_mesh).mVertices, (*scene_mesh).mNumVertices as usize).as_ref() }.unwrap();
+        let ai_normals = unsafe { slice_from_raw_parts((*scene_mesh).mNormals, (*scene_mesh).mNumVertices as usize).as_ref() }.unwrap();
+        let ai_tangents = unsafe { slice_from_raw_parts((*scene_mesh).mTangents, (*scene_mesh).mNumVertices as usize).as_ref() }.unwrap();
+        let ai_bitangents = unsafe { slice_from_raw_parts((*scene_mesh).mBitangents, (*scene_mesh).mNumVertices as usize).as_ref() }.unwrap();
         let ai_texture_coords = unsafe { (*scene_mesh).mTextureCoords };
 
         for i in 0..ai_vertices.len() {
@@ -161,23 +136,15 @@ impl Model {
             vertices.push(vertex);
         }
         // now walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
-        let ai_faces = unsafe {
-            slice_from_raw_parts((*scene_mesh).mFaces, (*scene_mesh).mNumFaces as usize).as_ref()
-        }
-        .unwrap();
+        let ai_faces = unsafe { slice_from_raw_parts((*scene_mesh).mFaces, (*scene_mesh).mNumFaces as usize).as_ref() }.unwrap();
         for i in 0..ai_faces.len() {
             let face = ai_faces[i];
-            let ai_indices =
-                unsafe { slice_from_raw_parts(face.mIndices, face.mNumIndices as usize).as_ref() }
-                    .unwrap();
+            let ai_indices = unsafe { slice_from_raw_parts(face.mIndices, face.mNumIndices as usize).as_ref() }.unwrap();
             indices.extend(ai_indices.iter());
         }
 
         // process materials
-        let ai_materials = unsafe {
-            slice_from_raw_parts((*scene).mMaterials, (*scene).mNumMaterials as usize).as_ref()
-        }
-        .unwrap();
+        let ai_materials = unsafe { slice_from_raw_parts((*scene).mMaterials, (*scene).mNumMaterials as usize).as_ref() }.unwrap();
         let material_index = unsafe { (*scene_mesh).mMaterialIndex } as usize;
         let ai_material = ai_materials[material_index];
 
@@ -189,20 +156,16 @@ impl Model {
         // normal: texture_normalN
 
         // 1. diffuse maps
-        let diffuseMaps =
-            self.loadMaterialTextures(ai_material, aiTextureType_DIFFUSE, "texture_diffuse");
+        let diffuseMaps = self.loadMaterialTextures(ai_material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.extend(diffuseMaps);
         // 2. specular maps
-        let specularMaps =
-            self.loadMaterialTextures(ai_material, aiTextureType_SPECULAR, "texture_specular");
+        let specularMaps = self.loadMaterialTextures(ai_material, aiTextureType_SPECULAR, "texture_specular");
         textures.extend(specularMaps);
         // 3. normal maps
-        let normalMaps =
-            self.loadMaterialTextures(ai_material, aiTextureType_HEIGHT, "texture_normal");
+        let normalMaps = self.loadMaterialTextures(ai_material, aiTextureType_HEIGHT, "texture_normal");
         textures.extend(normalMaps);
         // 4. height maps
-        let heightMaps =
-            self.loadMaterialTextures(ai_material, aiTextureType_AMBIENT, "texture_height");
+        let heightMaps = self.loadMaterialTextures(ai_material, aiTextureType_AMBIENT, "texture_height");
         textures.extend(heightMaps);
 
         let mesh = Mesh::new(vertices, indices, textures);
@@ -210,19 +173,13 @@ impl Model {
         mesh
     }
 
-    fn loadMaterialTextures(
-        &mut self,
-        ai_material: *mut aiMaterial,
-        ai_texture_type: c_uint,
-        typeName: &str,
-    ) -> Vec<Texture> {
+    fn loadMaterialTextures(&mut self, ai_material: *mut aiMaterial, ai_texture_type: c_uint, typeName: &str) -> Vec<Texture> {
         let mut textures: Vec<Texture> = vec![];
 
         let texture_count = unsafe { aiGetMaterialTextureCount(ai_material, ai_texture_type) };
 
         for i in 0..texture_count {
-            let texture_file =
-                get_material_texture_filename(ai_material, ai_texture_type, i as u32);
+            let texture_file = get_material_texture_filename(ai_material, ai_texture_type, i as u32);
             if let Ok(filename) = texture_file {
                 let loaded_texture = self.textures_loaded.iter().find(|t| t.path == filename);
                 if let Some(texture) = loaded_texture {
@@ -299,11 +256,7 @@ impl Model {
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as GLint);
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
 
-            gl::TexParameteri(
-                gl::TEXTURE_2D,
-                gl::TEXTURE_MIN_FILTER,
-                gl::LINEAR_MIPMAP_LINEAR as GLint,
-            );
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
         }
 

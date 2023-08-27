@@ -34,20 +34,13 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
-    glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-        glfw::OpenGlProfileHint::Core,
-    ));
+    glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
 
     // for Apple
     glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
     let (mut window, events) = glfw
-        .create_window(
-            SCR_WIDTH,
-            SCR_HEIGHT,
-            "LearnOpenGL",
-            glfw::WindowMode::Windowed,
-        )
+        .create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window.");
 
     // Turn on all GLFW polling so that we can receive all WindowEvents
@@ -113,12 +106,7 @@ fn main() {
             gl::GetProgramiv(shaderProgram, gl::INFO_LOG_LENGTH, &mut len);
             // Subtract 1 to skip the trailing null character.
             let mut infoLog = vec![0; len as usize - 1];
-            gl::GetProgramInfoLog(
-                shaderProgram,
-                512,
-                ptr::null_mut(),
-                infoLog.as_mut_ptr() as *mut GLchar,
-            );
+            gl::GetProgramInfoLog(shaderProgram, 512, ptr::null_mut(), infoLog.as_mut_ptr() as *mut GLchar);
             panic!("Shader program linking failed: {:?}", infoLog);
         }
 
@@ -171,14 +159,7 @@ fn main() {
             gl::STATIC_DRAW,
         );
 
-        gl::VertexAttribPointer(
-            0,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            (3 * mem::size_of::<f32>()) as GLsizei,
-            ptr::null(),
-        );
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, (3 * mem::size_of::<f32>()) as GLsizei, ptr::null());
 
         gl::EnableVertexAttribArray(0);
 
