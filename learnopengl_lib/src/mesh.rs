@@ -11,8 +11,6 @@ use glam::*;
 use std::ffi::CString;
 use std::mem;
 
-use crate::SIZE_OF_FLOAT;
-
 const MAX_BONE_INFLUENCE: usize = 4;
 
 #[derive(Debug, Copy, Clone)]
@@ -40,13 +38,6 @@ impl Vertex {
         }
     }
 }
-
-// const OFFSET_OF_NORMAL: usize = mem::size_of::<Vec3>();
-// const OFFSET_OF_TEXCOORDS: usize = OFFSET_OF_NORMAL + mem::size_of::<Vec3>();
-// const OFFSET_OF_TANGENT: usize = OFFSET_OF_TEXCOORDS + mem::size_of::<Vec2>();
-// const OFFSET_OF_BITANGENT: usize = OFFSET_OF_TANGENT + mem::size_of::<Vec3>();
-// const OFFSET_OF_BONE_IDS: usize = OFFSET_OF_BITANGENT + mem::size_of::<Vec3>();
-// const OFFSET_OF_WEIGHTS: usize = OFFSET_OF_BONE_IDS + mem::size_of::<i32>()  * MAX_BONE_INFLUENCE;
 
 const OFFSET_OF_NORMAL: usize = mem::offset_of!(Vertex, Normal);
 const OFFSET_OF_TEXCOORDS: usize = mem::offset_of!(Vertex, TexCoords);
@@ -92,6 +83,43 @@ impl Mesh {
         mesh
     }
 
+    pub fn debug(&self) {
+        println!("mesh: {:#?}", self);
+
+        println!("size vertex: {}", mem::size_of::<Vertex>());
+        println!("OFFSET_OF_NORMAL: {}", mem::offset_of!(Vertex, Normal));
+        println!(
+            "OFFSET_OF_TEXCOORDS: {}",
+            mem::offset_of!(Vertex, TexCoords)
+        );
+        println!("OFFSET_OF_TANGENT: {}", mem::offset_of!(Vertex, Tangent));
+        println!(
+            "OFFSET_OF_BITANGENT: {}",
+            mem::offset_of!(Vertex, Bitangent)
+        );
+        println!("OFFSET_OF_BONE_IDS: {}", mem::offset_of!(Vertex, m_BoneIDs));
+        println!("OFFSET_OF_WEIGHTS: {}", mem::offset_of!(Vertex, m_Weights));
+
+        println!("size of Vec3: {}", mem::size_of::<Vec3>());
+        println!("size of Vec2: {}", mem::size_of::<Vec2>());
+        println!(
+            "size of [i32;4]: {}",
+            mem::size_of::<[i32; MAX_BONE_INFLUENCE]>()
+        );
+        println!(
+            "size of [f32;4]: {}",
+            mem::size_of::<[f32; MAX_BONE_INFLUENCE]>()
+        );
+
+        println!(
+            "size of vertex parts: {}",
+            mem::size_of::<Vec3>() * 4
+                + mem::size_of::<Vec2>()
+                + mem::size_of::<[i32; MAX_BONE_INFLUENCE]>()
+                + mem::size_of::<[f32; MAX_BONE_INFLUENCE]>()
+        );
+    }
+
     pub fn Draw(&self, shader: &Shader_M) {
         // bind appropriate textures
         let mut diffuseNr: u32 = 0;
@@ -133,7 +161,12 @@ impl Mesh {
             }
 
             gl::BindVertexArray(self.VAO);
-            gl::DrawElements(gl::TRIANGLES, self.indices.len() as i32, gl::UNSIGNED_INT, 0 as *const GLvoid);
+            gl::DrawElements(
+                gl::TRIANGLES,
+                self.indices.len() as i32,
+                gl::UNSIGNED_INT,
+                0 as *const GLvoid,
+            );
             gl::BindVertexArray(0);
         }
     }
@@ -163,7 +196,7 @@ impl Mesh {
             gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, EBO);
             gl::BufferData(
                 gl::ELEMENT_ARRAY_BUFFER,
-                (self.indices.len() *  mem::size_of::<u32>()) as GLsizeiptr,
+                (self.indices.len() * mem::size_of::<u32>()) as GLsizeiptr,
                 self.indices.as_ptr() as *const GLvoid,
                 gl::STATIC_DRAW,
             );

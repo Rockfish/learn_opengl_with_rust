@@ -71,6 +71,12 @@ fn main() {
         lastY: SCR_HEIGHT / 2.0,
     };
 
+    // configure global opengl state
+    // -----------------------------
+    unsafe {
+        gl::Enable(gl::DEPTH_TEST);
+    }
+
     // build and compile our shaders
     let mut ourShader = Shader_M::new();
     ourShader
@@ -81,10 +87,13 @@ fn main() {
         .unwrap();
 
     // Todo: revert path
-    //let ourModel = Model::new("/Users/john/Dev_Rust/Repos/LearnOpenGL/resources/objects/planet/planet.obj", false);
-    //let ourModel = Model::new("/Users/john/Dev_Assets/glTF-Sample-Models/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb", false);
+    let ourModel = Model::new(
+        "/Users/john/Dev_Rust/Repos/LearnOpenGL/resources/objects/cyborg/cyborg.obj",
+        false,
+    );
     // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/backpack/backpack.obj", false);
-    let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", false);
+    // let ourModel = Model::new("/Users/john/Dev_Rust/Repos/russimp/models/OBJ/cube.obj", false);
+    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", false);
 
     // render loop
     while !window.should_close() {
@@ -116,7 +125,7 @@ fn main() {
             ourShader.setMat4("projection", &projection);
             ourShader.setMat4("view", &view);
 
-            let mut model =  Mat4::from_translation(vec3(0.0, 0.0, 0.0));
+            let mut model = Mat4::from_translation(vec3(0.0, 0.0, 0.0));
             model = model * Mat4::from_scale(vec3(1.0, 1.0, 1.0));
             ourShader.setMat4("model", &model);
 
@@ -164,8 +173,8 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
         }
         glfw::WindowEvent::CursorPos(xpos, ypos) => mouse_handler(state, xpos, ypos),
         glfw::WindowEvent::Scroll(xoffset, ysoffset) => scroll_handler(state, xoffset, ysoffset),
-        evt => {
-            println!("WindowEvent: {:?}", evt);
+        _evt => {
+            // println!("WindowEvent: {:?}", evt);
         }
     }
 }
@@ -175,7 +184,6 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
 fn framebuffer_size_event(_window: &mut glfw::Window, width: i32, height: i32) {
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
-    println!("Framebuffer size: {}, {}", width, height);
     unsafe {
         gl::Viewport(0, 0, width, height);
     }

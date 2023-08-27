@@ -1,5 +1,6 @@
 #![feature(offset_of)]
 
+pub mod aiscene;
 pub mod camera;
 pub mod macros;
 pub mod mesh;
