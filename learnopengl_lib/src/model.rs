@@ -101,11 +101,13 @@ impl Model {
         let mut indices: Vec<u32> = vec![];
         let mut textures: Vec<Texture> = vec![];
 
-        let ai_vertices = unsafe { slice_from_raw_parts((*scene_mesh).mVertices, (*scene_mesh).mNumVertices as usize).as_ref() }.unwrap();
-        let ai_normals = unsafe { slice_from_raw_parts((*scene_mesh).mNormals, (*scene_mesh).mNumVertices as usize).as_ref() }.unwrap();
-        let ai_tangents = unsafe { slice_from_raw_parts((*scene_mesh).mTangents, (*scene_mesh).mNumVertices as usize).as_ref() }.unwrap();
-        let ai_bitangents = unsafe { slice_from_raw_parts((*scene_mesh).mBitangents, (*scene_mesh).mNumVertices as usize).as_ref() }.unwrap();
-        let ai_texture_coords = unsafe { (*scene_mesh).mTextureCoords };
+        let scene_mesh = unsafe { *scene_mesh };
+
+        let ai_vertices = get_vec_from_parts(scene_mesh.mVertices, scene_mesh.mNumVertices);
+        let ai_normals = get_vec_from_parts(scene_mesh.mNormals, scene_mesh.mNumVertices);
+        let ai_tangents = get_vec_from_parts(scene_mesh.mTangents, scene_mesh.mNumVertices);
+        let ai_bitangents = get_vec_from_parts(scene_mesh.mBitangents, scene_mesh.mNumVertices);
+        let ai_texture_coords = scene_mesh.mTextureCoords;
 
         for i in 0..ai_vertices.len() {
             let mut vertex = Vertex::new();
@@ -132,11 +134,10 @@ impl Model {
             } else {
                 vertex.TexCoords = vec2(0.0, 0.0);
             }
-
             vertices.push(vertex);
         }
         // now walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
-        let ai_faces = unsafe { slice_from_raw_parts((*scene_mesh).mFaces, (*scene_mesh).mNumFaces as usize).as_ref() }.unwrap();
+        let ai_faces = unsafe { slice_from_raw_parts(scene_mesh.mFaces, scene_mesh.mNumFaces as usize).as_ref() }.unwrap();
         for i in 0..ai_faces.len() {
             let face = ai_faces[i];
             let ai_indices = unsafe { slice_from_raw_parts(face.mIndices, face.mNumIndices as usize).as_ref() }.unwrap();
@@ -145,7 +146,7 @@ impl Model {
 
         // process materials
         let ai_materials = unsafe { slice_from_raw_parts((*scene).mMaterials, (*scene).mNumMaterials as usize).as_ref() }.unwrap();
-        let material_index = unsafe { (*scene_mesh).mMaterialIndex } as usize;
+        let material_index = scene_mesh.mMaterialIndex as usize;
         let ai_material = ai_materials[material_index];
 
         // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
@@ -262,4 +263,14 @@ impl Model {
 
         texture_id
     }
+}
+
+fn get_vec_from_parts(raw_data: *mut aiVector3D, size: c_uint) -> Vec<Vec3> {
+    let slice = slice_from_raw_parts(raw_data, size as usize);
+    if slice.is_null() {
+        return vec![];
+    }
+
+    let raw_array = unsafe { slice.as_ref() }.unwrap();
+    raw_array.iter().map(|aiv| vec3(aiv.x, aiv.y, aiv.z)).collect()
 }
