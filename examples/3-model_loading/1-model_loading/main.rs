@@ -79,11 +79,10 @@ fn main() {
         )
         .unwrap();
 
-    // Todo: revert path
-    let ourModel = Model::new("/Users/john/Dev_Rust/Repos/LearnOpenGL/resources/objects/cyborg/cyborg.obj", false);
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/backpack/backpack.obj", false);
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Repos/russimp/models/OBJ/cube.obj", false);
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", false);
+    // let ourModel = Model::new("/Users/john/Dev_Rust/Repos/LearnOpenGL/resources/objects/cyborg/cyborg.obj", false, false);
+    let ourModel = Model::new("resources/objects/backpack/backpack.obj", false, true);
+    // let ourModel = Model::new("/Users/john/Dev_Rust/Repos/russimp/models/OBJ/cube.obj", false, false);
+    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", false, false);
 
     // render loop
     while !window.should_close() {

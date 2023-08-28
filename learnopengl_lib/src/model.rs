@@ -25,15 +25,17 @@ pub struct Model {
     pub meshes: Vec<Mesh>,
     pub directory: String,
     pub gammaCorrection: bool,
+    pub flipv: bool,
 }
 
 impl Model {
-    pub fn new(path: &str, gamma: bool) -> Model {
+    pub fn new(path: &str, gamma: bool, flipv: bool) -> Model {
         let mut model = Model {
             textures_loaded: vec![],
             meshes: vec![],
             directory: "".to_string(),
             gammaCorrection: gamma,
+            flipv,
         };
         model.load_model(path);
         model
@@ -97,40 +99,44 @@ impl Model {
     }
 
     fn process_mesh(&mut self, scene_mesh: *mut aiMesh, scene: &aiScene) -> Mesh {
+        let scene_mesh = unsafe { *scene_mesh };
+
         let mut vertices: Vec<Vertex> = vec![];
         let mut indices: Vec<u32> = vec![];
         let mut textures: Vec<Texture> = vec![];
-
-        let scene_mesh = unsafe { *scene_mesh };
 
         let ai_vertices = get_vec_from_parts(scene_mesh.mVertices, scene_mesh.mNumVertices);
         let ai_normals = get_vec_from_parts(scene_mesh.mNormals, scene_mesh.mNumVertices);
         let ai_tangents = get_vec_from_parts(scene_mesh.mTangents, scene_mesh.mNumVertices);
         let ai_bitangents = get_vec_from_parts(scene_mesh.mBitangents, scene_mesh.mNumVertices);
-        let ai_texture_coords = scene_mesh.mTextureCoords;
+
+        // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't
+        // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
+        let texture_coords = if !scene_mesh.mTextureCoords.is_empty() {
+            get_vec_from_parts(scene_mesh.mTextureCoords[0], ai_vertices.len() as u32)
+        } else {
+            vec![]
+        };
 
         for i in 0..ai_vertices.len() {
             let mut vertex = Vertex::new();
 
             // positions
-            vertex.Position = vec3(ai_vertices[i].x, ai_vertices[i].y, ai_vertices[i].z);
+            vertex.Position = ai_vertices[i]; // Vec3 has Copy trait
+
             // normals
             if !ai_normals.is_empty() {
-                vertex.Normal = vec3(ai_normals[i].x, ai_normals[i].y, ai_normals[i].z);
+                vertex.Normal = ai_normals[i];
             }
+
             // texture coordinates
-            if !ai_texture_coords.is_empty() {
-                // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't
-                // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
-                let coord = ai_texture_coords[0];
-                // if let Some(coord) = &scene_mesh.texture_coords[0] {
-                unsafe {
-                    vertex.TexCoords = vec2((*coord.wrapping_add(i)).x, (*coord.wrapping_add(i)).y);
-                }
+            if !texture_coords.is_empty() {
+                // texture coordinates
+                vertex.TexCoords = vec2(texture_coords[i].x, texture_coords[i].y);
                 // tangent
-                vertex.Tangent = vec3(ai_tangents[i].x, ai_tangents[i].y, ai_tangents[i].z);
+                vertex.Tangent = ai_tangents[i];
                 // bitangent
-                vertex.Bitangent = vec3(ai_bitangents[i].x, ai_bitangents[i].y, ai_bitangents[i].z);
+                vertex.Bitangent = ai_bitangents[i];
             } else {
                 vertex.TexCoords = vec2(0.0, 0.0);
             }
@@ -170,7 +176,6 @@ impl Model {
         textures.extend(heightMaps);
 
         let mesh = Mesh::new(vertices, indices, textures);
-        // mesh.debug();
         mesh
     }
 
@@ -208,6 +213,8 @@ impl Model {
         let (width, height) = (img.width() as GLsizei, img.height() as GLsizei);
 
         let color_type = img.color();
+
+        let img = if self.flipv { img.flipv() } else { img };
 
         unsafe {
             let format = match color_type {
