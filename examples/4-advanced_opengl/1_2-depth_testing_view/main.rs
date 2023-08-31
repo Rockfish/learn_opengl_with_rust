@@ -8,21 +8,20 @@
 extern crate glfw;
 
 use glad_gl::gl;
-use glad_gl::gl::{GLint, GLsizei, GLuint, GLvoid};
-use glam::*;
+use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
+use glam::{vec3, Mat4};
 use glfw::{Action, Context, Key};
 use image::ColorType;
 use learnopengl_lib::camera::{Camera, CameraMovement};
-use learnopengl_lib::model::Model;
 use learnopengl_lib::shader_m::Shader_M;
+use learnopengl_lib::{size_of_floats, SIZE_OF_FLOAT};
+use std::mem;
 
 const SCR_WIDTH: f32 = 800.0;
 const SCR_HEIGHT: f32 = 800.0;
 
-// Struct for passing state between the window loop and the event handler.
 struct State {
     camera: Camera,
-    lightPos: Vec3,
     deltaTime: f32,
     lastFrame: f32,
     firstMouse: bool,
@@ -51,12 +50,24 @@ fn main() {
     // --------------------------------------------------
     gl::load(|e| glfw.get_proc_address_raw(e) as *const std::os::raw::c_void);
 
+    // Vertex Array Object id
+    let mut cubeVAO: GLuint = 0;
+    let mut cubeVBO: GLuint = 0;
+    let mut planeVAO: GLuint = 0;
+    let mut planeVBO: GLuint = 0;
+
+    // Texture ids
+    let mut cubeTexture: GLuint = 0;
+    let mut floorTexture: GLuint = 0;
+
+    // Shader program
+    let mut ourShader = Shader_M::new();
+
     let camera = Camera::camera_vec3(vec3(0.0, 0.5, 4.0));
 
     // Initialize the world state
     let mut state = State {
         camera,
-        lightPos: vec3(1.2, 1.0, 2.0),
         deltaTime: 0.0,
         lastFrame: 0.0,
         firstMouse: true,
@@ -64,25 +75,137 @@ fn main() {
         lastY: SCR_HEIGHT / 2.0,
     };
 
-    // configure global opengl state
-    // -----------------------------
     unsafe {
+        // configure global opengl state
+        // -----------------------------
         gl::Enable(gl::DEPTH_TEST);
+        gl::DepthFunc(gl::LESS); // Use LESS to enable depth test
+
+        // build and compile our shader program
+        // ------------------------------------
+        ourShader
+            .build(
+                "examples/4-advanced_opengl/1_2-depth_testing_view/1_2-depth_testing.vert",
+                "examples/4-advanced_opengl/1_2-depth_testing_view/1_2-depth_testing.frag",
+            )
+            .unwrap();
+
+        // set up vertex data (and buffer(s)) and configure vertex attributes
+        // ------------------------------------------------------------------
+        #[rustfmt::skip]
+        let cubeVertices: [f32; 180] = [
+            // positions       // texture Coords
+            -0.5, -0.5, -0.5,  0.0, 0.0,
+             0.5, -0.5, -0.5,  1.0, 0.0,
+             0.5,  0.5, -0.5,  1.0, 1.0,
+             0.5,  0.5, -0.5,  1.0, 1.0,
+            -0.5,  0.5, -0.5,  0.0, 1.0,
+            -0.5, -0.5, -0.5,  0.0, 0.0,
+
+            -0.5, -0.5,  0.5,  0.0, 0.0,
+             0.5, -0.5,  0.5,  1.0, 0.0,
+             0.5,  0.5,  0.5,  1.0, 1.0,
+             0.5,  0.5,  0.5,  1.0, 1.0,
+            -0.5,  0.5,  0.5,  0.0, 1.0,
+            -0.5, -0.5,  0.5,  0.0, 0.0,
+
+            -0.5,  0.5,  0.5,  1.0, 0.0,
+            -0.5,  0.5, -0.5,  1.0, 1.0,
+            -0.5, -0.5, -0.5,  0.0, 1.0,
+            -0.5, -0.5, -0.5,  0.0, 1.0,
+            -0.5, -0.5,  0.5,  0.0, 0.0,
+            -0.5,  0.5,  0.5,  1.0, 0.0,
+
+             0.5,  0.5,  0.5,  1.0, 0.0,
+             0.5,  0.5, -0.5,  1.0, 1.0,
+             0.5, -0.5, -0.5,  0.0, 1.0,
+             0.5, -0.5, -0.5,  0.0, 1.0,
+             0.5, -0.5,  0.5,  0.0, 0.0,
+             0.5,  0.5,  0.5,  1.0, 0.0,
+
+            -0.5, -0.5, -0.5,  0.0, 1.0,
+             0.5, -0.5, -0.5,  1.0, 1.0,
+             0.5, -0.5,  0.5,  1.0, 0.0,
+             0.5, -0.5,  0.5,  1.0, 0.0,
+            -0.5, -0.5,  0.5,  0.0, 0.0,
+            -0.5, -0.5, -0.5,  0.0, 1.0,
+
+            -0.5,  0.5, -0.5,  0.0, 1.0,
+             0.5,  0.5, -0.5,  1.0, 1.0,
+             0.5,  0.5,  0.5,  1.0, 0.0,
+             0.5,  0.5,  0.5,  1.0, 0.0,
+            -0.5,  0.5,  0.5,  0.0, 0.0,
+            -0.5,  0.5, -0.5,  0.0, 1.0
+        ];
+
+        #[rustfmt::skip]
+        let planeVertices: [f32; 30] = [
+            // positions       // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+             5.0, -0.5,  5.0,  2.0, 0.0,
+            -5.0, -0.5,  5.0,  0.0, 0.0,
+            -5.0, -0.5, -5.0,  0.0, 2.0,
+
+             5.0, -0.5,  5.0,  2.0, 0.0,
+            -5.0, -0.5, -5.0,  0.0, 2.0,
+             5.0, -0.5, -5.0,  2.0, 2.0
+        ];
+
+        // cube VAO
+        gl::GenVertexArrays(1, &mut cubeVAO);
+        gl::GenBuffers(1, &mut cubeVBO);
+        gl::BindVertexArray(cubeVAO);
+        gl::BindBuffer(gl::ARRAY_BUFFER, cubeVBO);
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            size_of_floats!(cubeVertices.len()) as GLsizeiptr,
+            cubeVertices.as_ptr() as *const GLvoid,
+            gl::STATIC_DRAW,
+        );
+        gl::EnableVertexAttribArray(0);
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, size_of_floats!(5) as GLsizei, 0 as *const GLvoid);
+        gl::EnableVertexAttribArray(1);
+        gl::VertexAttribPointer(
+            1,
+            2,
+            gl::FLOAT,
+            gl::FALSE,
+            size_of_floats!(5) as GLsizei,
+            (3 * SIZE_OF_FLOAT) as *const GLvoid,
+        );
+        gl::BindVertexArray(0);
+
+        // plane VAO
+        gl::GenVertexArrays(1, &mut planeVAO);
+        gl::GenBuffers(1, &mut planeVBO);
+        gl::BindVertexArray(planeVAO);
+        gl::BindBuffer(gl::ARRAY_BUFFER, planeVAO);
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            size_of_floats!(planeVertices.len()) as GLsizeiptr,
+            planeVertices.as_ptr() as *const GLvoid,
+            gl::STATIC_DRAW,
+        );
+        gl::EnableVertexAttribArray(0);
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, size_of_floats!(5) as GLsizei, 0 as *const GLvoid);
+        gl::EnableVertexAttribArray(1);
+        gl::VertexAttribPointer(
+            1,
+            2,
+            gl::FLOAT,
+            gl::FALSE,
+            size_of_floats!(5) as GLsizei,
+            (3 * SIZE_OF_FLOAT) as *const GLvoid,
+        );
+        gl::BindVertexArray(0);
+
+        // load textures
+        cubeTexture = loadTexture("resources/textures/marble.jpg");
+        floorTexture = loadTexture("resources/textures/metal.png");
+
+        // shader configuration
+        ourShader.use_shader();
+        ourShader.setInt("texture1", 0);
     }
-
-    // build and compile our shaders
-    let mut ourShader = Shader_M::new();
-    ourShader
-        .build(
-            "examples/3-model_loading/1-model_loading/1-model_loading.vert",
-            "examples/3-model_loading/1-model_loading/1-model_loading.frag",
-        )
-        .unwrap();
-
-    let ourModel = Model::new("resources/objects/cyborg/cyborg.obj", false, false);
-    // let ourModel = Model::new("resources/objects/backpack/backpack.obj", false, true);
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Repos/russimp/models/OBJ/cube.obj", false, false);
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", false, false);
 
     // render loop
     while !window.should_close() {
@@ -97,10 +220,9 @@ fn main() {
 
         unsafe {
             // render
-            gl::ClearColor(0.05, 0.05, 0.05, 1.0);
+            gl::ClearColor(0.1, 0.1, 0.1, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-            // be sure to activate shader when setting uniforms/drawing objects
             ourShader.use_shader();
 
             // view/projection transformations
@@ -109,11 +231,26 @@ fn main() {
             ourShader.setMat4("projection", &projection);
             ourShader.setMat4("view", &view);
 
-            let mut model = Mat4::from_translation(vec3(0.0, 0.0, 0.0));
-            model = model * Mat4::from_scale(vec3(1.0, 1.0, 1.0));
-            ourShader.setMat4("model", &model);
+            // cubes
+            gl::BindVertexArray(cubeVAO);
+            gl::ActiveTexture(gl::TEXTURE0);
+            gl::BindTexture(gl::TEXTURE_2D, cubeTexture);
 
-            ourModel.Draw(&ourShader);
+            let model = Mat4::from_translation(vec3(-1.0, 0.0, -1.0));
+            ourShader.setMat4("model", &model);
+            gl::DrawArrays(gl::TRIANGLES, 0, 36);
+            let model = Mat4::from_translation(vec3(2.0, 0.0, 0.0));
+            ourShader.setMat4("model", &model);
+            gl::DrawArrays(gl::TRIANGLES, 0, 36);
+
+            // floor
+            gl::BindVertexArray(planeVAO);
+            gl::BindTexture(gl::TEXTURE_2D, floorTexture);
+            gl::ActiveTexture(gl::TEXTURE0);
+
+            ourShader.setMat4("model", &Mat4::IDENTITY);
+            gl::DrawArrays(gl::TRIANGLES, 0, 36);
+            gl::BindVertexArray(0);
         }
 
         window.swap_buffers();
@@ -122,7 +259,11 @@ fn main() {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     unsafe {
-        gl::DeleteProgram(ourShader.programId);
+        gl::DeleteVertexArrays(1, &cubeVAO);
+        gl::DeleteVertexArrays(1, &planeVAO);
+        gl::DeleteBuffers(1, &cubeVBO);
+        gl::DeleteBuffers(1, &planeVBO);
+        gl::DeleteShader(ourShader.programId);
     }
 }
 
@@ -160,6 +301,7 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
 fn framebuffer_size_event(_window: &mut glfw::Window, width: i32, height: i32) {
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
+    println!("Framebuffer size: {}, {}", width, height);
     unsafe {
         gl::Viewport(0, 0, width, height);
     }

@@ -212,37 +212,17 @@ path = "examples/2-lighting/6-multiple_lights/main.rs"
 name = "1-model_loading"
 path = "examples/3-model_loading/1-model_loading/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "1_1-depth_testing"
-#path = "examples/4-advanced_opengl/1_1-depth_testing/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "1_1-depth_testing"
+path = "examples/4-advanced_opengl/1_1-depth_testing/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "1_2-depth_testing_view"
-#path = "examples/4-advanced_opengl/1_2-depth_testing_view/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "1_2-depth_testing_view"
+path = "examples/4-advanced_opengl/1_2-depth_testing_view/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "10_1-instancing_quads"
-#path = "examples/4-advanced_opengl/10_1-instancing_quads/main.rs"
-
-#[[example]]  # 4-advanced_opengl
-#name = "10_2-asteroids"
-#path = "examples/4-advanced_opengl/10_2-asteroids/main.rs"
-
-#[[example]]  # 4-advanced_opengl
-#name = "10_3-asteroids_instanced"
-#path = "examples/4-advanced_opengl/10_3-asteroids_instanced/main.rs"
-
-#[[example]]  # 4-advanced_opengl
-#name = "11_1-anti_aliasing_msaa"
-#path = "examples/4-advanced_opengl/11_1-anti_aliasing_msaa/main.rs"
-
-#[[example]]  # 4-advanced_opengl
-#name = "11_2-anti_aliasing_offscreen"
-#path = "examples/4-advanced_opengl/11_2-anti_aliasing_offscreen/main.rs"
-
-#[[example]]  # 4-advanced_opengl
-#name = "2-stencil_testing"
-#path = "examples/4-advanced_opengl/2-stencil_testing/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "2-stencil_testing"
+path = "examples/4-advanced_opengl/2-stencil_testing/main.rs"
 
 #[[example]]  # 4-advanced_opengl
 #name = "3_1-blending_discard"
@@ -283,6 +263,26 @@ path = "examples/3-model_loading/1-model_loading/main.rs"
 #[[example]]  # 4-advanced_opengl
 #name = "9_3-geometry_shader_normals"
 #path = "examples/4-advanced_opengl/9_3-geometry_shader_normals/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "10_1-instancing_quads"
+#path = "examples/4-advanced_opengl/10_1-instancing_quads/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "10_2-asteroids"
+#path = "examples/4-advanced_opengl/10_2-asteroids/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "10_3-asteroids_instanced"
+#path = "examples/4-advanced_opengl/10_3-asteroids_instanced/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "11_1-anti_aliasing_msaa"
+#path = "examples/4-advanced_opengl/11_1-anti_aliasing_msaa/main.rs"
+
+#[[example]]  # 4-advanced_opengl
+#name = "11_2-anti_aliasing_offscreen"
+#path = "examples/4-advanced_opengl/11_2-anti_aliasing_offscreen/main.rs"
 
 #[[example]]  # 5-advanced_lighting
 #name = "1-advanced_lighting"

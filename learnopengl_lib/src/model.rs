@@ -14,7 +14,7 @@ use image::ColorType;
 use russimp::scene::*;
 use russimp::sys::*;
 use std::os::raw::c_uint;
-use std::path::{Path, PathBuf };
+use std::path::{Path, PathBuf};
 use std::ptr::*;
 
 // model data
