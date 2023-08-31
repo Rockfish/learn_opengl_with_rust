@@ -14,7 +14,7 @@ use image::ColorType;
 use russimp::scene::*;
 use russimp::sys::*;
 use std::os::raw::c_uint;
-use std::path::Path;
+use std::path::{Path, PathBuf };
 use std::ptr::*;
 
 // model data
@@ -191,7 +191,8 @@ impl Model {
                 if let Some(texture) = loaded_texture {
                     textures.push(texture.clone());
                 } else {
-                    let filepath = format!("{}/{}", self.directory, filename);
+                    let mut filepath = PathBuf::from(&self.directory);
+                    filepath.push(&filename);
                     let id = self.textureFromFile(&filepath);
                     let texture = Texture {
                         id: id,
@@ -206,7 +207,7 @@ impl Model {
         textures
     }
 
-    fn textureFromFile(&self, filepath: &str) -> u32 {
+    fn textureFromFile(&self, filepath: &Path) -> u32 {
         let mut texture_id: GLuint = 0;
 
         let img = image::open(filepath).expect("Texture failed to load");

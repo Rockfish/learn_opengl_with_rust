@@ -10,6 +10,7 @@ use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use std::ffi::CString;
 use std::mem;
+use std::ops::Add;
 
 const MAX_BONE_INFLUENCE: usize = 4;
 
@@ -120,25 +121,29 @@ impl Mesh {
                 gl::ActiveTexture(gl::TEXTURE0 + i as u32); // active proper texture unit before binding
 
                 // retrieve texture number (the N in diffuse_textureN)
-                let number = if texture.texture_type == "texture_diffuse" {
-                    diffuseNr += 1;
-                    diffuseNr.to_string()
-                } else if texture.texture_type == "texture_specular" {
-                    specularNr += 1;
-                    specularNr.to_string()
-                } else if texture.texture_type == "texture_normal" {
-                    normalNr += 1;
-                    normalNr.to_string()
-                } else if texture.texture_type == "texture_height" {
-                    heightNr += 1;
-                    heightNr.to_string()
-                } else {
-                    panic!("Unknown texture type")
+                let num = match texture.texture_type.as_str() {
+                    "texture_diffuse" => {
+                        diffuseNr += 1;
+                        diffuseNr
+                    }
+                    "texture_specular" => {
+                        specularNr += 1;
+                        specularNr
+                    }
+                    "texture_normal" => {
+                        normalNr += 1;
+                        normalNr
+                    }
+                    "texture_height" => {
+                        heightNr += 1;
+                        heightNr
+                    }
+                    _ => panic!("Unknown texture type"),
                 };
 
                 // now set the sampler to the correct texture unit
-                let mut name = texture.texture_type.clone();
-                name.push_str(&number);
+                let name = texture.texture_type.clone().add(&num.to_string());
+
                 let c_string = CString::new(name).unwrap();
                 gl::Uniform1i(gl::GetUniformLocation(shader.programId, c_string.as_ptr()), i as i32);
                 // and finally bind the texture
