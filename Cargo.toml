@@ -12,6 +12,8 @@ glam = "0.24.1"
 image = "0.24.7"
 learnopengl_lib = { path = "./learnopengl_lib" }
 russimp = "2.0.6"
+ordered-float = { version = "3.0", default-features = false }
+itertools = "0.11.0"
 
 [dependencies.glfw]
 version = "*"
@@ -224,13 +226,13 @@ path = "examples/4-advanced_opengl/1_2-depth_testing_view/main.rs"
 name = "2-stencil_testing"
 path = "examples/4-advanced_opengl/2-stencil_testing/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "3_1-blending_discard"
-#path = "examples/4-advanced_opengl/3_1-blending_discard/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "3_1-blending_discard"
+path = "examples/4-advanced_opengl/3_1-blending_discard/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "3_2-blending_sort"
-#path = "examples/4-advanced_opengl/3_2-blending_sort/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "3_2-blending_sort"
+path = "examples/4-advanced_opengl/3_2-blending_sort/main.rs"
 
 #[[example]]  # 4-advanced_opengl
 #name = "5_1-framebuffers"
