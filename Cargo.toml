@@ -234,13 +234,17 @@ path = "examples/4-advanced_opengl/3_1-blending_discard/main.rs"
 name = "3_2-blending_sort"
 path = "examples/4-advanced_opengl/3_2-blending_sort/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "5_1-framebuffers"
-#path = "examples/4-advanced_opengl/5_1-framebuffers/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "4-face_culling_exercise1"
+path = "examples/4-advanced_opengl/4-face_culling_exercise1/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "5_2-framebuffers_exercise1"
-#path = "examples/4-advanced_opengl/5_2-framebuffers_exercise1/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "5_1-framebuffers"
+path = "examples/4-advanced_opengl/5_1-framebuffers/main.rs"
+
+[[example]]  # 4-advanced_opengl
+name = "5_2-framebuffers_exercise1"
+path = "examples/4-advanced_opengl/5_2-framebuffers_exercise1/main.rs"
 
 #[[example]]  # 4-advanced_opengl
 #name = "6_1-cubemaps_skybox"
