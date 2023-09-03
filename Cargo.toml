@@ -10,8 +10,9 @@ edition = "2021"
 glad-gl = { path = "./glad-gl" }
 glam = "0.24.1"
 image = "0.24.7"
-learnopengl_lib = { path = "./learnopengl_lib" }
+#learn_opengl_with_rust = { path = "./learn_opengl_with_rust" }
 russimp = "2.0.6"
+#russimp = { path = "/Users/john/Dev_Rust/Repos/russimp" }
 ordered-float = { version = "3.0", default-features = false }
 itertools = "0.11.0"
 

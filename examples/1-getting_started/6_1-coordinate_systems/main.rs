@@ -11,8 +11,8 @@ use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use glfw::{Action, Context, Key};
-use learnopengl_lib::shader_m::Shader_M;
-use learnopengl_lib::{gl_get_uniform_location, size_of_floats, size_of_uint};
+use learn_opengl_with_rust::shader_m::Shader_M;
+use learn_opengl_with_rust::{gl_get_uniform_location, size_of_floats, size_of_uint};
 use std::mem;
 
 const SCR_WIDTH: u32 = 800;

@@ -13,9 +13,9 @@ use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::{vec3, Mat4};
 use glfw::{Action, Context, Key};
 use image::ColorType;
-use learnopengl_lib::camera::{Camera, CameraMovement};
-use learnopengl_lib::shader_m::Shader_M;
-use learnopengl_lib::{size_of_floats, SIZE_OF_FLOAT};
+use learn_opengl_with_rust::camera::{Camera, CameraMovement};
+use learn_opengl_with_rust::shader_m::Shader_M;
+use learn_opengl_with_rust::{size_of_floats, SIZE_OF_FLOAT};
 use std::{mem, ptr};
 
 const SCR_WIDTH: f32 = 800.0;

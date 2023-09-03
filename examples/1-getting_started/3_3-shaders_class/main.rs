@@ -10,7 +10,7 @@ extern crate glfw;
 use glad_gl::gl;
 use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glfw::{Action, Context, Key};
-use learnopengl_lib::shader_s::Shader_S;
+use learn_opengl_with_rust::shader_s::Shader_S;
 use std::{mem, ptr};
 
 const SCR_WIDTH: u32 = 800;

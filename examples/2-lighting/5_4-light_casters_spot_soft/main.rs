@@ -12,9 +12,9 @@ use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use glfw::{Action, Context, Key};
 use image::ColorType;
-use learnopengl_lib::camera::{Camera, CameraMovement};
-use learnopengl_lib::shader_m::Shader_M;
-use learnopengl_lib::SIZE_OF_FLOAT;
+use learn_opengl_with_rust::camera::{Camera, CameraMovement};
+use learn_opengl_with_rust::shader_m::Shader_M;
+use learn_opengl_with_rust::SIZE_OF_FLOAT;
 
 const SCR_WIDTH: f32 = 800.0;
 const SCR_HEIGHT: f32 = 800.0;

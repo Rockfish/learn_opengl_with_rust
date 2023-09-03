@@ -1,4 +1,4 @@
 /target
 Cargo.lock
 glad-gl/target
-learnopengl_lib/target
+learn_opengl_with_rust/target
