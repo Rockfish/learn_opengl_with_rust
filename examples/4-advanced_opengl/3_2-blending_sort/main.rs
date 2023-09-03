@@ -67,8 +67,14 @@ fn main() {
     let mut floorTexture: GLuint = 0;
     let mut transparentTexture: GLuint = 0;
 
+    // build and compile our shader program
+    // ------------------------------------
     // Shader program
-    let mut shader = Shader_M::new();
+    let shader = Shader_M::new(
+        "examples/4-advanced_opengl/3_2-blending_sort/3_2-blending.vert",
+        "examples/4-advanced_opengl/3_2-blending_sort/3_2-blending.frag",
+    )
+    .unwrap();
 
     let camera = Camera::camera_vec3(vec3(0.0, 0.5, 4.0));
 
@@ -88,15 +94,6 @@ fn main() {
         gl::Enable(gl::DEPTH_TEST);
         gl::Enable(gl::BLEND);
         gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-
-        // build and compile our shader program
-        // ------------------------------------
-        shader
-            .build(
-                "examples/4-advanced_opengl/3_2-blending_sort/3_2-blending.vert",
-                "examples/4-advanced_opengl/3_2-blending_sort/3_2-blending.frag",
-            )
-            .unwrap();
 
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------

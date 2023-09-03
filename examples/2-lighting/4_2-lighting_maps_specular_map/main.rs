@@ -72,22 +72,17 @@ fn main() {
 
     // build and compile our shader programs
     // ------------------------------------
-    // create shaders
-    let mut lightingShader = Shader_M::new();
-    lightingShader
-        .build(
-            "examples/2-lighting/4_2-lighting_maps_specular_map/4_2-lighting_maps.vert",
-            "examples/2-lighting/4_2-lighting_maps_specular_map/4_2-lighting_maps.frag",
-        )
-        .unwrap();
+    let lightingShader = Shader_M::new(
+        "examples/2-lighting/4_2-lighting_maps_specular_map/4_2-lighting_maps.vert",
+        "examples/2-lighting/4_2-lighting_maps_specular_map/4_2-lighting_maps.frag",
+    )
+    .unwrap();
 
-    let mut lightCubeShader = Shader_M::new();
-    lightCubeShader
-        .build(
-            "examples/2-lighting/4_2-lighting_maps_specular_map/4_2-light_cube.vert",
-            "examples/2-lighting/4_2-lighting_maps_specular_map/4_2-light_cube.frag",
-        )
-        .unwrap();
+    let lightCubeShader = Shader_M::new(
+        "examples/2-lighting/4_2-lighting_maps_specular_map/4_2-light_cube.vert",
+        "examples/2-lighting/4_2-lighting_maps_specular_map/4_2-light_cube.frag",
+    )
+    .unwrap();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------

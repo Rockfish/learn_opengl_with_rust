@@ -60,9 +60,19 @@ fn main() {
     let mut cubeTexture: GLuint = 0;
     let mut floorTexture: GLuint = 0;
 
-    // Shader program
-    let mut shader = Shader_M::new();
-    let mut shaderSingleColor = Shader_M::new();
+    // build and compile our shader program
+    // ------------------------------------
+    let shader = Shader_M::new(
+        "examples/4-advanced_opengl/2-stencil_testing/2-stencil_testing.vert",
+        "examples/4-advanced_opengl/2-stencil_testing/2-stencil_testing.frag",
+    )
+    .unwrap();
+
+    let shaderSingleColor = Shader_M::new(
+        "examples/4-advanced_opengl/2-stencil_testing/2-stencil_testing.vert",
+        "examples/4-advanced_opengl/2-stencil_testing/2-stencil_single_color.frag",
+    )
+    .unwrap();
 
     let camera = Camera::camera_vec3(vec3(0.0, 0.5, 4.0));
 
@@ -76,6 +86,66 @@ fn main() {
         lastY: SCR_HEIGHT / 2.0,
     };
 
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
+    #[rustfmt::skip]
+    let cubeVertices: [f32; 180] = [
+        // positions       // texture Coords
+        -0.5, -0.5, -0.5,  0.0, 0.0,
+         0.5, -0.5, -0.5,  1.0, 0.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+        -0.5,  0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, 0.0,
+
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+         0.5, -0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5,  0.5,  1.0, 1.0,
+         0.5,  0.5,  0.5,  1.0, 1.0,
+        -0.5,  0.5,  0.5,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+
+        -0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5,  0.5, -0.5,  1.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+        -0.5,  0.5,  0.5,  1.0, 0.0,
+
+         0.5,  0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+         0.5, -0.5, -0.5,  0.0, 1.0,
+         0.5, -0.5, -0.5,  0.0, 1.0,
+         0.5, -0.5,  0.5,  0.0, 0.0,
+         0.5,  0.5,  0.5,  1.0, 0.0,
+
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+         0.5, -0.5, -0.5,  1.0, 1.0,
+         0.5, -0.5,  0.5,  1.0, 0.0,
+         0.5, -0.5,  0.5,  1.0, 0.0,
+        -0.5, -0.5,  0.5,  0.0, 0.0,
+        -0.5, -0.5, -0.5,  0.0, 1.0,
+
+        -0.5,  0.5, -0.5,  0.0, 1.0,
+         0.5,  0.5, -0.5,  1.0, 1.0,
+         0.5,  0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5,  0.5,  0.5,  0.0, 0.0,
+        -0.5,  0.5, -0.5,  0.0, 1.0
+    ];
+
+    #[rustfmt::skip]
+    let planeVertices: [f32; 30] = [
+        // positions       // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+         5.0, -0.5,  5.0,  2.0, 0.0,
+        -5.0, -0.5,  5.0,  0.0, 0.0,
+        -5.0, -0.5, -5.0,  0.0, 2.0,
+
+         5.0, -0.5,  5.0,  2.0, 0.0,
+        -5.0, -0.5, -5.0,  0.0, 2.0,
+         5.0, -0.5, -5.0,  2.0, 2.0
+    ];
+
     unsafe {
         // configure global opengl state
         // -----------------------------
@@ -84,82 +154,6 @@ fn main() {
         gl::Enable(gl::STENCIL_TEST);
         gl::StencilFunc(gl::NOTEQUAL, 1, 0xFF);
         gl::StencilOp(gl::KEEP, gl::KEEP, gl::REPLACE);
-
-        // build and compile our shader program
-        // ------------------------------------
-        shader
-            .build(
-                "examples/4-advanced_opengl/2-stencil_testing/2-stencil_testing.vert",
-                "examples/4-advanced_opengl/2-stencil_testing/2-stencil_testing.frag",
-            )
-            .unwrap();
-
-        shaderSingleColor
-            .build(
-                "examples/4-advanced_opengl/2-stencil_testing/2-stencil_testing.vert",
-                "examples/4-advanced_opengl/2-stencil_testing/2-stencil_single_color.frag",
-            )
-            .unwrap();
-
-        // set up vertex data (and buffer(s)) and configure vertex attributes
-        // ------------------------------------------------------------------
-        #[rustfmt::skip]
-        let cubeVertices: [f32; 180] = [
-            // positions       // texture Coords
-            -0.5, -0.5, -0.5,  0.0, 0.0,
-             0.5, -0.5, -0.5,  1.0, 0.0,
-             0.5,  0.5, -0.5,  1.0, 1.0,
-             0.5,  0.5, -0.5,  1.0, 1.0,
-            -0.5,  0.5, -0.5,  0.0, 1.0,
-            -0.5, -0.5, -0.5,  0.0, 0.0,
-
-            -0.5, -0.5,  0.5,  0.0, 0.0,
-             0.5, -0.5,  0.5,  1.0, 0.0,
-             0.5,  0.5,  0.5,  1.0, 1.0,
-             0.5,  0.5,  0.5,  1.0, 1.0,
-            -0.5,  0.5,  0.5,  0.0, 1.0,
-            -0.5, -0.5,  0.5,  0.0, 0.0,
-
-            -0.5,  0.5,  0.5,  1.0, 0.0,
-            -0.5,  0.5, -0.5,  1.0, 1.0,
-            -0.5, -0.5, -0.5,  0.0, 1.0,
-            -0.5, -0.5, -0.5,  0.0, 1.0,
-            -0.5, -0.5,  0.5,  0.0, 0.0,
-            -0.5,  0.5,  0.5,  1.0, 0.0,
-
-             0.5,  0.5,  0.5,  1.0, 0.0,
-             0.5,  0.5, -0.5,  1.0, 1.0,
-             0.5, -0.5, -0.5,  0.0, 1.0,
-             0.5, -0.5, -0.5,  0.0, 1.0,
-             0.5, -0.5,  0.5,  0.0, 0.0,
-             0.5,  0.5,  0.5,  1.0, 0.0,
-
-            -0.5, -0.5, -0.5,  0.0, 1.0,
-             0.5, -0.5, -0.5,  1.0, 1.0,
-             0.5, -0.5,  0.5,  1.0, 0.0,
-             0.5, -0.5,  0.5,  1.0, 0.0,
-            -0.5, -0.5,  0.5,  0.0, 0.0,
-            -0.5, -0.5, -0.5,  0.0, 1.0,
-
-            -0.5,  0.5, -0.5,  0.0, 1.0,
-             0.5,  0.5, -0.5,  1.0, 1.0,
-             0.5,  0.5,  0.5,  1.0, 0.0,
-             0.5,  0.5,  0.5,  1.0, 0.0,
-            -0.5,  0.5,  0.5,  0.0, 0.0,
-            -0.5,  0.5, -0.5,  0.0, 1.0
-        ];
-
-        #[rustfmt::skip]
-        let planeVertices: [f32; 30] = [
-            // positions       // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-             5.0, -0.5,  5.0,  2.0, 0.0,
-            -5.0, -0.5,  5.0,  0.0, 0.0,
-            -5.0, -0.5, -5.0,  0.0, 2.0,
-
-             5.0, -0.5,  5.0,  2.0, 0.0,
-            -5.0, -0.5, -5.0,  0.0, 2.0,
-             5.0, -0.5, -5.0,  2.0, 2.0
-        ];
 
         // cube VAO
         gl::GenVertexArrays(1, &mut cubeVAO);

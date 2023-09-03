@@ -36,7 +36,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn default() -> Camera {
+    pub fn new() -> Camera {
         Camera {
             Position: vec3(0.0, 0.0, 3.0),
             Front: vec3(0.0, 0.0, -1.0),
@@ -53,14 +53,14 @@ impl Camera {
 
     // constructor with vectors
     pub fn camera_vec3(position: Vec3) -> Camera {
-        let mut camera = Camera::default();
+        let mut camera = Camera::new();
         camera.Position = position;
         camera.updateCameraVectors();
         camera
     }
 
     pub fn camera_vec3_up_yaw_pitch(position: Vec3, up: Vec3, yaw: f32, pitch: f32) -> Camera {
-        let mut camera = Camera::default();
+        let mut camera = Camera::new();
         camera.Position = position;
         camera.WorldUp = up;
         camera.Yaw = yaw;
@@ -71,7 +71,7 @@ impl Camera {
 
     // constructor with scalar values
     pub fn camera_scalar(posX: f32, posY: f32, posZ: f32, upX: f32, upY: f32, upZ: f32, yaw: f32, pitch: f32) -> Camera {
-        let mut camera = Camera::default();
+        let mut camera = Camera::new();
         camera.Position = vec3(posX, posY, posZ);
         camera.WorldUp = vec3(upX, upY, upZ);
         camera.Yaw = yaw;

@@ -53,6 +53,13 @@ fn main() {
 
     let camera = Camera::camera_vec3(vec3(0.0, 0.5, 4.0));
 
+    // build and compile our shaders
+    let ourShader = Shader_M::new(
+        "examples/3-model_loading/1-model_loading/1-model_loading.vert",
+        "examples/3-model_loading/1-model_loading/1-model_loading.frag",
+    )
+    .unwrap();
+
     // Initialize the world state
     let mut state = State {
         camera,
@@ -69,15 +76,6 @@ fn main() {
     unsafe {
         gl::Enable(gl::DEPTH_TEST);
     }
-
-    // build and compile our shaders
-    let mut ourShader = Shader_M::new();
-    ourShader
-        .build(
-            "examples/3-model_loading/1-model_loading/1-model_loading.vert",
-            "examples/3-model_loading/1-model_loading/1-model_loading.frag",
-        )
-        .unwrap();
 
     let ourModel = Model::new("resources/objects/cyborg/cyborg.obj", false, false);
     // let ourModel = Model::new("resources/objects/backpack/backpack.obj", false, true);

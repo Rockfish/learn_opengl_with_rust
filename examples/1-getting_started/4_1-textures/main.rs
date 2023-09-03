@@ -46,36 +46,33 @@ fn main() {
     let mut EBO: GLuint = 0;
     // Texture id
     let mut texture: GLuint = 0;
-    // Shader program
-    let mut ourShader = Shader_S::new();
+
+    // build and compile our shader program
+    // ------------------------------------
+    let ourShader = Shader_S::new(
+            "examples/1-getting_started/4_1-textures/4_1-texture.vert",
+            "examples/1-getting_started/4_1-textures/4_1-texture.frag",
+        )
+        .unwrap();
+
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
+    #[rustfmt::skip]
+    let vertices: [f32; 32] = [
+        // positions      // colors        // texture coordinates
+        0.5,  0.5, 0.0,   1.0, 0.0, 0.0,   1.0, 1.0, // top right
+        0.5, -0.5, 0.0,   0.0, 1.0, 0.0,   1.0, 0.0, // bottom right
+       -0.5, -0.5, 0.0,   0.0, 0.0, 1.0,   0.0, 0.0, // bottom left
+       -0.5,  0.5, 0.0,   1.0, 1.0, 0.0,   0.0, 1.0  // top left
+    ];
+
+    #[rustfmt::skip]
+    let indices: [u32; 6] = [
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    ];
 
     unsafe {
-        // build and compile our shader program
-        // ------------------------------------
-        ourShader
-            .build(
-                "examples/1-getting_started/4_1-textures/4_1-texture.vert",
-                "examples/1-getting_started/4_1-textures/4_1-texture.frag",
-            )
-            .unwrap();
-
-        // set up vertex data (and buffer(s)) and configure vertex attributes
-        // ------------------------------------------------------------------
-        #[rustfmt::skip]
-        let vertices: [f32; 32] = [
-            // positions      // colors        // texture coordinates
-            0.5,  0.5, 0.0,   1.0, 0.0, 0.0,   1.0, 1.0, // top right
-            0.5, -0.5, 0.0,   0.0, 1.0, 0.0,   1.0, 0.0, // bottom right
-           -0.5, -0.5, 0.0,   0.0, 0.0, 1.0,   0.0, 0.0, // bottom left
-           -0.5,  0.5, 0.0,   1.0, 1.0, 0.0,   0.0, 1.0  // top left
-        ];
-
-        #[rustfmt::skip]
-        let indices: [u32; 6] = [
-            0, 1, 3, // first triangle
-            1, 2, 3  // second triangle
-        ];
-
         gl::GenVertexArrays(1, &mut VAO);
         gl::GenBuffers(1, &mut VBO);
         gl::GenBuffers(1, &mut EBO);

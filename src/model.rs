@@ -50,7 +50,7 @@ impl Model {
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     fn load_model(&mut self, path: &str) {
         let scene = AiScene::from_file(
-            &path,
+            path,
             vec![
                 PostProcess::Triangulate,
                 PostProcess::GenerateSmoothNormals,
@@ -195,7 +195,7 @@ impl Model {
                     filepath.push(&filename);
                     let id = self.textureFromFile(&filepath);
                     let texture = Texture {
-                        id: id,
+                        id,
                         texture_type: typeName.to_string(),
                         path: filename,
                     };

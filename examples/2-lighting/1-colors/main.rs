@@ -69,9 +69,18 @@ fn main() {
         lastY: SCR_HEIGHT / 2.0,
     };
 
-    // create shaders
-    let mut lightingShader = Shader_M::new();
-    let mut lightCubeShader = Shader_M::new();
+    // build and compile our shader programs
+    // ------------------------------------
+    let lightingShader = Shader_M::new(
+        "examples/2-lighting/1-colors/1-colors.vert",
+        "examples/2-lighting/1-colors/1-colors.frag"
+    ).unwrap();
+
+    let lightCubeShader = Shader_M::new(
+        "examples/2-lighting/1-colors/1-light_cube.vert",
+        "examples/2-lighting/1-colors/1-light_cube.frag",
+    )
+    .unwrap();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -123,19 +132,6 @@ fn main() {
 
     unsafe {
         gl::Enable(gl::DEPTH_TEST);
-
-        // build and compile our shader programs
-        // ------------------------------------
-        lightingShader
-            .build("examples/2-lighting/1-colors/1-colors.vert", "examples/2-lighting/1-colors/1-colors.frag")
-            .unwrap();
-
-        lightCubeShader
-            .build(
-                "examples/2-lighting/1-colors/1-light_cube.vert",
-                "examples/2-lighting/1-colors/1-light_cube.frag",
-            )
-            .unwrap();
 
         // first, configure the cube's VAO (and VBO)
         gl::GenVertexArrays(1, &mut cubeVAO);

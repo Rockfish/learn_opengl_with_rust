@@ -46,8 +46,13 @@ fn main() {
     let mut texture1: GLuint = 0;
     let mut texture2: GLuint = 0;
 
-    // Shader program
-    let mut ourShader = Shader_M::new();
+    // build and compile our shader program
+    // ------------------------------------
+    let ourShader = Shader_M::new(
+        "examples/1-getting_started/6_2-coordinate_systems_depth/6_2-coordinate_systems.vert",
+        "examples/1-getting_started/6_2-coordinate_systems_depth/6_2-coordinate_systems.frag",
+    )
+    .unwrap();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -113,15 +118,6 @@ fn main() {
 
     unsafe {
         gl::Enable(gl::DEPTH_TEST);
-
-        // build and compile our shader program
-        // ------------------------------------
-        ourShader
-            .build(
-                "examples/1-getting_started/6_2-coordinate_systems_depth/6_2-coordinate_systems.vert",
-                "examples/1-getting_started/6_2-coordinate_systems_depth/6_2-coordinate_systems.frag",
-            )
-            .unwrap();
 
         gl::GenVertexArrays(1, &mut VAO);
         gl::GenBuffers(1, &mut VBO);

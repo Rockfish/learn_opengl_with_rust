@@ -69,25 +69,19 @@ fn main() {
         lastY: SCR_HEIGHT / 2.0,
     };
 
-    // create shaders
-    let mut lightingShader = Shader_M::new();
-    let mut lightCubeShader = Shader_M::new();
-
     // build and compile our shader programs
     // ------------------------------------
-    lightingShader
-        .build(
-            "examples/2-lighting/2_1-basic_lighting_diffuse/2_1-basic_lighting.vert",
-            "examples/2-lighting/2_1-basic_lighting_diffuse/2_1-basic_lighting.frag",
-        )
-        .unwrap();
+    let lightingShader = Shader_M::new(
+        "examples/2-lighting/2_1-basic_lighting_diffuse/2_1-basic_lighting.vert",
+        "examples/2-lighting/2_1-basic_lighting_diffuse/2_1-basic_lighting.frag",
+    )
+    .unwrap();
 
-    lightCubeShader
-        .build(
-            "examples/2-lighting/2_1-basic_lighting_diffuse/2_1-light_cube.vert",
-            "examples/2-lighting/2_1-basic_lighting_diffuse/2_1-light_cube.frag",
-        )
-        .unwrap();
+    let lightCubeShader = Shader_M::new(
+        "examples/2-lighting/2_1-basic_lighting_diffuse/2_1-light_cube.vert",
+        "examples/2-lighting/2_1-basic_lighting_diffuse/2_1-light_cube.frag",
+    )
+    .unwrap();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------

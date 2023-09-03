@@ -22,52 +22,61 @@ pub struct Shader_M {
 }
 
 impl Shader_M {
-    pub fn new() -> Shader_M {
-        Shader_M { programId: 0 }
-    }
-
-    pub fn build(&mut self, vertexPath: &str, fragmentPath: &str) -> Result<ID, Error> {
+    pub fn new(vertexPath: &str, fragmentPath: &str) -> Result<Self, String> {
+        let mut shader = Shader_M { programId: 0 };
         let mut vertexCode: String = Default::default();
         let mut fragmentCode: String = Default::default();
 
-        // open files
-        let vertexPath = Path::new(vertexPath);
-        let fragmentPath = Path::new(fragmentPath);
+        match read_file(vertexPath) {
+            Ok(content) => vertexCode = content,
+            Err(error) => return Err(error.to_string()),
+        }
 
-        let mut vShaderFile = File::open(vertexPath)?;
-        let mut fShaderFile = File::open(fragmentPath)?;
-
-        vShaderFile.read_to_string(&mut vertexCode)?;
-        fShaderFile.read_to_string(&mut fragmentCode)?;
+        match read_file(fragmentPath) {
+            Ok(content) => fragmentCode = content,
+            Err(error) => return Err(error.to_string()),
+        }
 
         unsafe {
             // vertex shader
             let vertexShader = gl::CreateShader(gl::VERTEX_SHADER);
             let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
-            self.programId = gl::CreateProgram();
+            shader.programId = gl::CreateProgram();
 
             let c_string = c_string!(vertexCode);
             gl::ShaderSource(vertexShader, 1, &c_string.as_ptr(), ptr::null());
             gl::CompileShader(vertexShader);
-            checkCompileErrors(vertexShader, "VERTEX");
+
+            match checkCompileErrors(vertexShader, "VERTEX") {
+                Ok(_) => {}
+                Err(error) => return Err(error),
+            }
 
             let c_string = c_string!(fragmentCode);
             gl::ShaderSource(fragmentShader, 1, &c_string.as_ptr(), ptr::null());
             gl::CompileShader(fragmentShader);
-            checkCompileErrors(fragmentShader, "VERTEX");
+
+            match checkCompileErrors(fragmentShader, "VERTEX") {
+                Ok(_) => {}
+                Err(error) => return Err(error),
+            }
 
             // link the first program object
-            gl::AttachShader(self.programId, vertexShader);
-            gl::AttachShader(self.programId, fragmentShader);
-            gl::LinkProgram(self.programId);
-            checkCompileErrors(self.programId, "PROGRAM");
+            gl::AttachShader(shader.programId, vertexShader);
+            gl::AttachShader(shader.programId, fragmentShader);
+            gl::LinkProgram(shader.programId);
+
+            match checkCompileErrors(shader.programId, "PROGRAM") {
+                Ok(_) => {}
+                Err(error) => return Err(error),
+            }
 
             // Now that the shader programs have been built we can free up memory by deleting the shaders.
             gl::DeleteShader(vertexShader);
             gl::DeleteShader(fragmentShader);
         }
 
-        Ok(self.programId)
+        Ok(shader)
     }
 
     pub fn use_shader(&self) {
@@ -187,7 +196,14 @@ impl Shader_M {
     }
 }
 
-fn checkCompileErrors(shaderId: u32, checkType: &str) {
+fn read_file(filename: &str) -> Result<String, Error> {
+    let mut content: String = Default::default();
+    let mut file = File::open(Path::new(filename))?;
+    file.read_to_string(&mut content)?;
+    Ok(content)
+}
+
+fn checkCompileErrors(shaderId: u32, checkType: &str) -> Result<(), String> {
     unsafe {
         let mut status = gl::FALSE as GLint;
 
@@ -199,7 +215,7 @@ fn checkCompileErrors(shaderId: u32, checkType: &str) {
                 // Subtract 1 to skip the trailing null character.
                 let mut infoLog = vec![0; len as usize - 1];
                 gl::GetProgramInfoLog(shaderId, 1024, ptr::null_mut(), infoLog.as_mut_ptr() as *mut GLchar);
-                panic!("Shader compilation failed.\n{}", String::from_utf8_lossy(&infoLog));
+                return Err(String::from_utf8_lossy(&infoLog).to_string());
             }
         } else {
             gl::GetProgramiv(shaderId, gl::LINK_STATUS, &mut status);
@@ -209,8 +225,10 @@ fn checkCompileErrors(shaderId: u32, checkType: &str) {
                 // Subtract 1 to skip the trailing null character.
                 let mut infoLog = vec![0; len as usize - 1];
                 gl::GetProgramInfoLog(shaderId, 1024, ptr::null_mut(), infoLog.as_mut_ptr() as *mut GLchar);
-                panic!("Shader program linking failed.\n{}", String::from_utf8_lossy(&infoLog));
+                let error_msg = String::from_utf8_lossy(&infoLog).to_string();
+                return Err(error_msg);
             }
         }
     }
+    Ok(())
 }

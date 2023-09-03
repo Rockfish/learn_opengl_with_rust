@@ -61,8 +61,12 @@ fn main() {
     let mut texture1: GLuint = 0;
     let mut texture2: GLuint = 0;
 
-    // Shader program
-    let mut ourShader = Shader_M::new();
+    // build and compile our shader program
+    let ourShader = Shader_M::new(
+        "examples/1-getting_started/7_3-camera_mouse_zoom/7_3-camera.vert",
+        "examples/1-getting_started/7_3-camera_mouse_zoom/7_3-camera.frag",
+    )
+    .unwrap();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -128,15 +132,6 @@ fn main() {
 
     unsafe {
         gl::Enable(gl::DEPTH_TEST);
-
-        // build and compile our shader program
-        // ------------------------------------
-        ourShader
-            .build(
-                "examples/1-getting_started/7_3-camera_mouse_zoom/7_3-camera.vert",
-                "examples/1-getting_started/7_3-camera_mouse_zoom/7_3-camera.frag",
-            )
-            .unwrap();
 
         gl::GenVertexArrays(1, &mut VAO);
         gl::GenBuffers(1, &mut VBO);

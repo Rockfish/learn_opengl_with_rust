@@ -44,29 +44,26 @@ fn main() {
     let mut VAO: GLuint = 0;
     // Vertex Buffer Object id
     let mut VBO: GLuint = 0;
-    // Shader program
-    let mut ourShader = Shader_S::new();
+
+    // build and compile our shader program
+    // ------------------------------------
+    let ourShader = Shader_S::new(
+        "examples/1-getting_started/3_3-shaders_class/3_3-shader.vert",
+        "examples/1-getting_started/3_3-shaders_class/3_3-shader.frag",
+    )
+    .unwrap();
+
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
+    #[rustfmt::skip]
+    let vertices: [f32; 18] = [
+        // positions         // colors
+         0.5, -0.5, 0.0,  1.0, 0.0, 0.0,  // bottom right
+        -0.5, -0.5, 0.0,  0.0, 1.0, 0.0,  // bottom left
+         0.0,  0.5, 0.0,  0.0, 0.0, 1.0   // top
+    ];
 
     unsafe {
-        // build and compile our shader program
-        // ------------------------------------
-        ourShader
-            .build(
-                "examples/1-getting_started/3_3-shaders_class/3_3-shader.vert",
-                "examples/1-getting_started/3_3-shaders_class/3_3-shader.frag",
-            )
-            .unwrap();
-
-        // set up vertex data (and buffer(s)) and configure vertex attributes
-        // ------------------------------------------------------------------
-        #[rustfmt::skip]
-        let vertices: [f32; 18] = [
-            // positions         // colors
-             0.5, -0.5, 0.0,  1.0, 0.0, 0.0,  // bottom right
-            -0.5, -0.5, 0.0,  0.0, 1.0, 0.0,  // bottom left
-             0.0,  0.5, 0.0,  0.0, 0.0, 1.0   // top
-        ];
-
         gl::GenVertexArrays(1, &mut VAO);
         gl::GenBuffers(1, &mut VBO);
 
