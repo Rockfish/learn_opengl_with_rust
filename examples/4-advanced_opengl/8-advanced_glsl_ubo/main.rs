@@ -9,13 +9,13 @@
 extern crate glfw;
 
 use glad_gl::gl;
-use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
-use glam::{vec3, Mat3, Mat4};
+use glad_gl::gl::{GLint, GLintptr, GLsizei, GLsizeiptr, GLuint, GLvoid};
+use glam::{vec3, Mat4};
 use glfw::{Action, Context, Key};
 use image::ColorType;
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
 use learn_opengl_with_rust::shader_m::Shader_M;
-use learn_opengl_with_rust::{size_of_floats, SIZE_OF_FLOAT};
+use learn_opengl_with_rust::{c_string, size_of_floats, SIZE_OF_FLOAT};
 use std::mem;
 
 const SCR_WIDTH: f32 = 800.0;
@@ -51,15 +51,6 @@ fn main() {
     // --------------------------------------------------
     gl::load(|e| glfw.get_proc_address_raw(e) as *const std::os::raw::c_void);
 
-    // Vertex Array Object id
-    let mut cubeVAO: GLuint = 0;
-    let mut cubeVBO: GLuint = 0;
-    let mut skyboxVAO: GLuint = 0;
-    let mut skyboxVBO: GLuint = 0;
-
-    // Texture ids
-    let mut cubeTexture: GLuint = 0;
-
     let camera = Camera::camera_vec3(vec3(0.0, 0.0, 3.0));
 
     // Initialize the world state
@@ -74,110 +65,81 @@ fn main() {
 
     // build and compile our shader program
     // ------------------------------------
-    let shader = Shader_M::new(
-        "examples/4-advanced_opengl/6_1-cubemaps_skybox/6_1-cubemaps.vert",
-        "examples/4-advanced_opengl/6_1-cubemaps_skybox/6_1-cubemaps.frag",
+    let shaderRed = Shader_M::new(
+        "examples/4-advanced_opengl/8-advanced_glsl_ubo/8-advanced_glsl.vert",
+        "examples/4-advanced_opengl/8-advanced_glsl_ubo/8-red.frag",
     )
     .unwrap();
-    let skyboxShader = Shader_M::new(
-        "examples/4-advanced_opengl/6_1-cubemaps_skybox/6_1-skybox.vert",
-        "examples/4-advanced_opengl/6_1-cubemaps_skybox/6_1-skybox.frag",
+    let shaderGreen = Shader_M::new(
+        "examples/4-advanced_opengl/8-advanced_glsl_ubo/8-advanced_glsl.vert",
+        "examples/4-advanced_opengl/8-advanced_glsl_ubo/8-green.frag",
+    )
+    .unwrap();
+    let shaderBlue = Shader_M::new(
+        "examples/4-advanced_opengl/8-advanced_glsl_ubo/8-advanced_glsl.vert",
+        "examples/4-advanced_opengl/8-advanced_glsl_ubo/8-blue.frag",
+    )
+    .unwrap();
+    let shaderYellow = Shader_M::new(
+        "examples/4-advanced_opengl/8-advanced_glsl_ubo/8-advanced_glsl.vert",
+        "examples/4-advanced_opengl/8-advanced_glsl_ubo/8-yellow.frag",
     )
     .unwrap();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     #[rustfmt::skip]
-    let cubeVertices: [f32; 180] = [
-        // positions       // texture Coords
-        -0.5, -0.5, -0.5,  0.0, 0.0,
-         0.5, -0.5, -0.5,  1.0, 0.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-        -0.5,  0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 0.0,
+    let cubeVertices: [f32; 108] = [
+        // positions         
+        -0.5, -0.5, -0.5,
+         0.5, -0.5, -0.5,
+         0.5,  0.5, -0.5,
+         0.5,  0.5, -0.5,
+        -0.5,  0.5, -0.5,
+        -0.5, -0.5, -0.5,
 
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 1.0,
-         0.5,  0.5,  0.5,  1.0, 1.0,
-        -0.5,  0.5,  0.5,  0.0, 1.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
+        -0.5, -0.5,  0.5,
+         0.5, -0.5,  0.5,
+         0.5,  0.5,  0.5,
+         0.5,  0.5,  0.5,
+        -0.5,  0.5,  0.5,
+        -0.5, -0.5,  0.5,
 
-        -0.5,  0.5,  0.5,  1.0, 0.0,
-        -0.5,  0.5, -0.5,  1.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-        -0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5,  0.5,  0.5,
+        -0.5,  0.5, -0.5,
+        -0.5, -0.5, -0.5,
+        -0.5, -0.5, -0.5,
+        -0.5, -0.5,  0.5,
+        -0.5,  0.5,  0.5,
 
-         0.5,  0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5,  0.5,  0.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5,  0.5,
+         0.5,  0.5, -0.5,
+         0.5, -0.5, -0.5,
+         0.5, -0.5, -0.5,
+         0.5, -0.5,  0.5,
+         0.5,  0.5,  0.5,
 
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5, -0.5,  1.0, 1.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5, -0.5,
+         0.5, -0.5, -0.5,
+         0.5, -0.5,  0.5,
+         0.5, -0.5,  0.5,
+        -0.5, -0.5,  0.5,
+        -0.5, -0.5, -0.5,
 
-        -0.5,  0.5, -0.5,  0.0, 1.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
-        -0.5,  0.5,  0.5,  0.0, 0.0,
-        -0.5,  0.5, -0.5,  0.0, 1.0
+        -0.5,  0.5, -0.5,
+         0.5,  0.5, -0.5,
+         0.5,  0.5,  0.5,
+         0.5,  0.5,  0.5,
+        -0.5,  0.5,  0.5,
+        -0.5,  0.5, -0.5,
     ];
 
-    #[rustfmt::skip]
-    let skyboxVertices: [f32; 108] = [
-        // positions          
-        -1.0,  1.0, -1.0,
-        -1.0, -1.0, -1.0,
-         1.0, -1.0, -1.0,
-         1.0, -1.0, -1.0,
-         1.0,  1.0, -1.0,
-        -1.0,  1.0, -1.0,
+    // Vertex Array Object id
+    let mut cubeVAO: GLuint = 0;
+    let mut cubeVBO: GLuint = 0;
+    let mut uboMatrices: GLuint = 0;
 
-        -1.0, -1.0,  1.0,
-        -1.0, -1.0, -1.0,
-        -1.0,  1.0, -1.0,
-        -1.0,  1.0, -1.0,
-        -1.0,  1.0,  1.0,
-        -1.0, -1.0,  1.0,
-
-         1.0, -1.0, -1.0,
-         1.0, -1.0,  1.0,
-         1.0,  1.0,  1.0,
-         1.0,  1.0,  1.0,
-         1.0,  1.0, -1.0,
-         1.0, -1.0, -1.0,
-
-        -1.0, -1.0,  1.0,
-        -1.0,  1.0,  1.0,
-         1.0,  1.0,  1.0,
-         1.0,  1.0,  1.0,
-         1.0, -1.0,  1.0,
-        -1.0, -1.0,  1.0,
-
-        -1.0,  1.0, -1.0,
-         1.0,  1.0, -1.0,
-         1.0,  1.0,  1.0,
-         1.0,  1.0,  1.0,
-        -1.0,  1.0,  1.0,
-        -1.0,  1.0, -1.0,
-
-        -1.0, -1.0, -1.0,
-        -1.0, -1.0,  1.0,
-         1.0, -1.0, -1.0,
-         1.0, -1.0, -1.0,
-        -1.0, -1.0,  1.0,
-         1.0, -1.0,  1.0,
-    ];
+    let size_of_mat4 = mem::size_of::<[f32; 16]>();
 
     unsafe {
         // configure global opengl state
@@ -196,50 +158,43 @@ fn main() {
             gl::STATIC_DRAW,
         );
         gl::EnableVertexAttribArray(0);
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, size_of_floats!(5) as GLsizei, 0 as *const GLvoid);
-        gl::EnableVertexAttribArray(1);
-        gl::VertexAttribPointer(
-            1,
-            2,
-            gl::FLOAT,
-            gl::FALSE,
-            size_of_floats!(5) as GLsizei,
-            (3 * SIZE_OF_FLOAT) as *const GLvoid,
-        );
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, (3 * SIZE_OF_FLOAT) as GLsizei, 0 as *const GLvoid);
 
-        // skybox VAO
-        gl::GenVertexArrays(1, &mut skyboxVAO);
-        gl::GenBuffers(1, &mut skyboxVBO);
-        gl::BindVertexArray(skyboxVAO);
-        gl::BindBuffer(gl::ARRAY_BUFFER, skyboxVAO);
-        gl::BufferData(
-            gl::ARRAY_BUFFER,
-            size_of_floats!(skyboxVertices.len()) as GLsizeiptr,
-            skyboxVertices.as_ptr() as *const GLvoid,
-            gl::STATIC_DRAW,
+        // configure a uniform buffer object
+        // ---------------------------------
+        // first. We get the relevant block indices
+        let c_string = c_string!("Matrices");
+        let uniformBlockIndexRed = gl::GetUniformBlockIndex(shaderRed.programId, c_string.as_ptr());
+        let uniformBlockIndexGreen = gl::GetUniformBlockIndex(shaderGreen.programId, c_string.as_ptr());
+        let uniformBlockIndexBlue = gl::GetUniformBlockIndex(shaderBlue.programId, c_string.as_ptr());
+        let uniformBlockIndexYellow = gl::GetUniformBlockIndex(shaderYellow.programId, c_string.as_ptr());
+
+        // then we link each shader's uniform block to this uniform binding point
+        gl::UniformBlockBinding(shaderRed.programId, uniformBlockIndexRed, 0);
+        gl::UniformBlockBinding(shaderGreen.programId, uniformBlockIndexGreen, 0);
+        gl::UniformBlockBinding(shaderBlue.programId, uniformBlockIndexBlue, 0);
+        gl::UniformBlockBinding(shaderYellow.programId, uniformBlockIndexYellow, 0);
+
+        // Now actually create the buffer
+        gl::GenBuffers(1, &mut uboMatrices);
+        gl::BindBuffer(gl::UNIFORM_BUFFER, uboMatrices);
+        gl::BufferData(gl::UNIFORM_BUFFER, (2 * size_of_mat4) as GLsizeiptr, std::ptr::null(), gl::STATIC_DRAW);
+        gl::BindBuffer(gl::UNIFORM_BUFFER, 0);
+
+        // define the range of the buffer that links to a uniform binding point
+        gl::BindBufferRange(gl::UNIFORM_BUFFER, 0, uboMatrices, 0, (2 * size_of_mat4) as GLsizeiptr);
+
+        // store the projection matrix (we only do this once now) (note: we're not using zoom anymore by changing the FoV)
+        let projection = Mat4::perspective_rh_gl(45.0, SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
+        gl::BindBuffer(gl::UNIFORM_BUFFER, uboMatrices);
+        gl::BufferSubData(
+            gl::UNIFORM_BUFFER,
+            0,
+            size_of_mat4 as GLsizeiptr,
+            projection.to_cols_array().as_ptr() as *const GLvoid,
         );
-        gl::EnableVertexAttribArray(0);
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, size_of_floats!(3) as GLsizei, 0 as *const GLvoid);
+        gl::BindBuffer(gl::UNIFORM_BUFFER, 0);
     }
-
-    cubeTexture = loadTexture("resources/textures/container.jpg");
-
-    let faces = vec![
-        "resources/textures/skybox/right.jpg",
-        "resources/textures/skybox/left.jpg",
-        "resources/textures/skybox/top.jpg",
-        "resources/textures/skybox/bottom.jpg",
-        "resources/textures/skybox/front.jpg",
-        "resources/textures/skybox/back.jpg",
-    ];
-    let cubemapTexture = loadCubemap(faces);
-
-    // shader configuration
-    shader.use_shader();
-    shader.setInt("texture1", 0);
-
-    skyboxShader.use_shader();
-    skyboxShader.setInt("skybox", 0);
 
     // render loop
     while !window.should_close() {
@@ -257,38 +212,45 @@ fn main() {
             gl::ClearColor(0.1, 0.1, 0.1, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-            // draw scene as normal
-            shader.use_shader();
+            // set the view matrix in the sub data block - we only have to do this once per loop iteration.
             let view = state.camera.GetViewMatrix();
-            let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
-            shader.setMat4("model", &Mat4::IDENTITY);
-            shader.setMat4("view", &view);
-            shader.setMat4("projection", &projection);
+            gl::BindBuffer(gl::UNIFORM_BUFFER, uboMatrices);
+            gl::BufferSubData(
+                gl::UNIFORM_BUFFER,
+                size_of_mat4 as GLintptr,
+                size_of_mat4 as GLsizeiptr,
+                view.to_cols_array().as_ptr() as *const GLvoid,
+            );
+            gl::BindBuffer(gl::UNIFORM_BUFFER, 0);
 
-            // cubes
+            // draw 4 cubes
+            // RED
             gl::BindVertexArray(cubeVAO);
-            gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(gl::TEXTURE_2D, cubeTexture);
+            shaderRed.use_shader();
+            let model = Mat4::from_translation(vec3(-0.75, 0.75, 0.0)); // move top-left
+            shaderRed.setMat4("model", &model);
             gl::DrawArrays(gl::TRIANGLES, 0, 36);
-            gl::BindVertexArray(0);
 
-            // draw skybox as last
-            gl::DepthFunc(gl::LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
-            skyboxShader.use_shader();
-            // remove translation from the view matrix
-            let view = state.camera.GetViewMatrix();
-            let view = Mat3::from_mat4(view);
-            let view = Mat4::from_mat3(view);
-            skyboxShader.setMat4("view", &view);
-            skyboxShader.setMat4("projection", &projection);
-
-            // skybox cube
-            gl::BindVertexArray(skyboxVAO);
-            gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(gl::TEXTURE_CUBE_MAP, cubemapTexture);
+            // GREEN
+            gl::BindVertexArray(cubeVAO);
+            shaderGreen.use_shader();
+            let model = Mat4::from_translation(vec3(0.75, 0.75, 0.0)); // move top-left
+            shaderGreen.setMat4("model", &model);
             gl::DrawArrays(gl::TRIANGLES, 0, 36);
-            gl::BindVertexArray(0);
-            gl::DepthFunc(gl::LESS);
+
+            // YELLOW
+            gl::BindVertexArray(cubeVAO);
+            shaderYellow.use_shader();
+            let model = Mat4::from_translation(vec3(-0.75, -0.75, 0.0)); // move top-left
+            shaderYellow.setMat4("model", &model);
+            gl::DrawArrays(gl::TRIANGLES, 0, 36);
+
+            // BLUE
+            gl::BindVertexArray(cubeVAO);
+            shaderBlue.use_shader();
+            let model = Mat4::from_translation(vec3(0.75, -0.75, 0.0)); // move top-left
+            shaderBlue.setMat4("model", &model);
+            gl::DrawArrays(gl::TRIANGLES, 0, 36);
         }
 
         window.swap_buffers();
@@ -298,10 +260,11 @@ fn main() {
     // ------------------------------------------------------------------------
     unsafe {
         gl::DeleteVertexArrays(1, &cubeVAO);
-        gl::DeleteVertexArrays(1, &skyboxVAO);
         gl::DeleteBuffers(1, &cubeVBO);
-        gl::DeleteBuffers(1, &skyboxVBO);
-        gl::DeleteShader(shader.programId);
+        gl::DeleteShader(shaderRed.programId);
+        gl::DeleteShader(shaderGreen.programId);
+        gl::DeleteShader(shaderYellow.programId);
+        gl::DeleteShader(shaderBlue.programId);
     }
 }
 

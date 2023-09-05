@@ -53,10 +53,10 @@ fn main() {
     // build and compile our shader program
     // ------------------------------------
     let ourShader = Shader_S::new(
-            "examples/1-getting_started/5_1-transformations/5_1-transform.vert",
-            "examples/1-getting_started/5_1-transformations/5_1-transform.frag",
-        )
-        .unwrap();
+        "examples/1-getting_started/5_1-transformations/5_1-transform.vert",
+        "examples/1-getting_started/5_1-transformations/5_1-transform.frag",
+    )
+    .unwrap();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------

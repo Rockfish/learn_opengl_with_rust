@@ -71,10 +71,7 @@ fn main() {
 
     // build and compile our shader programs
     // ------------------------------------
-    let lightingShader = Shader_M::new(
-        "examples/2-lighting/1-colors/1-colors.vert",
-        "examples/2-lighting/1-colors/1-colors.frag"
-    ).unwrap();
+    let lightingShader = Shader_M::new("examples/2-lighting/1-colors/1-colors.vert", "examples/2-lighting/1-colors/1-colors.frag").unwrap();
 
     let lightCubeShader = Shader_M::new(
         "examples/2-lighting/1-colors/1-light_cube.vert",

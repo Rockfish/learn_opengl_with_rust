@@ -13,7 +13,7 @@ use glam::*;
 use glfw::{Action, Context, Key};
 use image::ColorType;
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
-use learn_opengl_with_rust::model::Model;
+use learn_opengl_with_rust::model::{FlipV, Gamma, Model};
 use learn_opengl_with_rust::shader_m::Shader_M;
 
 const SCR_WIDTH: f32 = 800.0;
@@ -77,10 +77,10 @@ fn main() {
         gl::Enable(gl::DEPTH_TEST);
     }
 
-    let ourModel = Model::new("resources/objects/cyborg/cyborg.obj", false, false);
-    // let ourModel = Model::new("resources/objects/backpack/backpack.obj", false, true);
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Repos/russimp/models/OBJ/cube.obj", false, false);
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", false, false);
+    let ourModel = Model::new("resources/objects/cyborg/cyborg.obj", Gamma(false), FlipV(false));
+    // let ourModel = Model::new("resources/objects/backpack/backpack.obj", Gamma(false), FlipV(true));
+    // let ourModel = Model::new("/Users/john/Dev_Rust/Repos/russimp/models/OBJ/cube.obj", Gamma(false), FlipV(false));
+    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", Gamma(false), FlipV(false));
 
     // render loop
     while !window.should_close() {

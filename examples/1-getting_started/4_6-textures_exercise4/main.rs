@@ -57,10 +57,10 @@ fn main() {
     // build and compile our shader program
     // ------------------------------------
     let ourShader = Shader_S::new(
-            "examples/1-getting_started/4_6-textures_exercise4/4_6-texture.vert",
-            "examples/1-getting_started/4_6-textures_exercise4/4_6-texture.frag",
-        )
-        .unwrap();
+        "examples/1-getting_started/4_6-textures_exercise4/4_6-texture.vert",
+        "examples/1-getting_started/4_6-textures_exercise4/4_6-texture.frag",
+    )
+    .unwrap();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------

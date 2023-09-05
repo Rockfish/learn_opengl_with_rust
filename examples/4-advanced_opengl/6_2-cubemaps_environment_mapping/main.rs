@@ -57,9 +57,6 @@ fn main() {
     let mut skyboxVAO: GLuint = 0;
     let mut skyboxVBO: GLuint = 0;
 
-    // Texture ids
-    let mut cubeTexture: GLuint = 0;
-
     let camera = Camera::camera_vec3(vec3(0.0, 0.0, 3.0));
 
     // Initialize the world state
@@ -75,62 +72,62 @@ fn main() {
     // build and compile our shader program
     // ------------------------------------
     let shader = Shader_M::new(
-        "examples/4-advanced_opengl/6_1-cubemaps_skybox/6_1-cubemaps.vert",
-        "examples/4-advanced_opengl/6_1-cubemaps_skybox/6_1-cubemaps.frag",
+        "examples/4-advanced_opengl/6_2-cubemaps_environment_mapping/6_2-cubemaps.vert",
+        "examples/4-advanced_opengl/6_2-cubemaps_environment_mapping/6_2-cubemaps.frag",
     )
     .unwrap();
     let skyboxShader = Shader_M::new(
-        "examples/4-advanced_opengl/6_1-cubemaps_skybox/6_1-skybox.vert",
-        "examples/4-advanced_opengl/6_1-cubemaps_skybox/6_1-skybox.frag",
+        "examples/4-advanced_opengl/6_2-cubemaps_environment_mapping/6_2-skybox.vert",
+        "examples/4-advanced_opengl/6_2-cubemaps_environment_mapping/6_2-skybox.frag",
     )
     .unwrap();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     #[rustfmt::skip]
-    let cubeVertices: [f32; 180] = [
-        // positions       // texture Coords
-        -0.5, -0.5, -0.5,  0.0, 0.0,
-         0.5, -0.5, -0.5,  1.0, 0.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-        -0.5,  0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 0.0,
+    let cubeVertices: [f32; 216] = [
+        // positions       // normals
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
+         0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
+        -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
 
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 1.0,
-         0.5,  0.5,  0.5,  1.0, 1.0,
-        -0.5,  0.5,  0.5,  0.0, 1.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
+         0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
+         0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
+         0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
+        -0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
 
-        -0.5,  0.5,  0.5,  1.0, 0.0,
-        -0.5,  0.5, -0.5,  1.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-        -0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
+        -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
+        -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
 
-         0.5,  0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5,  0.5,  0.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
+         0.5,  0.5, -0.5,  1.0,  0.0,  0.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
+         0.5, -0.5,  0.5,  1.0,  0.0,  0.0,
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
 
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5, -0.5,  1.0, 1.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+         0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+        -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
 
-        -0.5,  0.5, -0.5,  0.0, 1.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
-        -0.5,  0.5,  0.5,  0.0, 0.0,
-        -0.5,  0.5, -0.5,  0.0, 1.0
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
+         0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+        -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0
     ];
 
     #[rustfmt::skip]
@@ -196,14 +193,14 @@ fn main() {
             gl::STATIC_DRAW,
         );
         gl::EnableVertexAttribArray(0);
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, size_of_floats!(5) as GLsizei, 0 as *const GLvoid);
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, (6 * SIZE_OF_FLOAT) as GLsizei, 0 as *const GLvoid);
         gl::EnableVertexAttribArray(1);
         gl::VertexAttribPointer(
             1,
-            2,
+            3,
             gl::FLOAT,
             gl::FALSE,
-            size_of_floats!(5) as GLsizei,
+            (6 * SIZE_OF_FLOAT) as GLsizei,
             (3 * SIZE_OF_FLOAT) as *const GLvoid,
         );
 
@@ -219,10 +216,8 @@ fn main() {
             gl::STATIC_DRAW,
         );
         gl::EnableVertexAttribArray(0);
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, size_of_floats!(3) as GLsizei, 0 as *const GLvoid);
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, (3 * SIZE_OF_FLOAT) as GLsizei, 0 as *const GLvoid);
     }
-
-    cubeTexture = loadTexture("resources/textures/container.jpg");
 
     let faces = vec![
         "resources/textures/skybox/right.jpg",
@@ -232,11 +227,12 @@ fn main() {
         "resources/textures/skybox/front.jpg",
         "resources/textures/skybox/back.jpg",
     ];
+
     let cubemapTexture = loadCubemap(faces);
 
     // shader configuration
     shader.use_shader();
-    shader.setInt("texture1", 0);
+    shader.setInt("skybox", 0);
 
     skyboxShader.use_shader();
     skyboxShader.setInt("skybox", 0);
@@ -264,11 +260,12 @@ fn main() {
             shader.setMat4("model", &Mat4::IDENTITY);
             shader.setMat4("view", &view);
             shader.setMat4("projection", &projection);
+            shader.setVec3("cameraPos", &state.camera.Position);
 
             // cubes
             gl::BindVertexArray(cubeVAO);
             gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(gl::TEXTURE_2D, cubeTexture);
+            gl::BindTexture(gl::TEXTURE_CUBE_MAP, cubemapTexture);
             gl::DrawArrays(gl::TRIANGLES, 0, 36);
             gl::BindVertexArray(0);
 

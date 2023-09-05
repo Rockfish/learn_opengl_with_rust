@@ -28,14 +28,17 @@ pub struct Model {
     pub flipv: bool,
 }
 
+pub struct Gamma(pub bool);
+pub struct FlipV(pub bool);
+
 impl Model {
-    pub fn new(path: &str, gamma: bool, flipv: bool) -> Model {
+    pub fn new(path: &str, gamma: Gamma, flipv: FlipV) -> Model {
         let mut model = Model {
             textures_loaded: vec![],
             meshes: vec![],
             directory: "".to_string(),
-            gammaCorrection: gamma,
-            flipv,
+            gammaCorrection: gamma.0,
+            flipv: flipv.0,
         };
         model.load_model(path);
         model

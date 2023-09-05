@@ -40,9 +40,9 @@ impl Vertex {
     }
 }
 impl Default for Vertex {
-     fn default() -> Self {
-         Self::new()
-     }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 const OFFSET_OF_NORMAL: usize = mem::offset_of!(Vertex, Normal);
