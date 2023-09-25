@@ -55,7 +55,7 @@ impl Shader_S {
             gl::ShaderSource(fragmentShader, 1, &c_string.as_ptr(), ptr::null());
             gl::CompileShader(fragmentShader);
 
-            match checkCompileErrors(fragmentShader, "VERTEX") {
+            match checkCompileErrors(fragmentShader, "FRAGMENT") {
                 Ok(_) => {}
                 Err(error) => return Err(error),
             }

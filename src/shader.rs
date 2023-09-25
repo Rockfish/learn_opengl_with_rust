@@ -4,7 +4,7 @@
 #![allow(unused_assignments)]
 
 use glad_gl::gl;
-use glad_gl::gl::{GLchar, GLint};
+use glad_gl::gl::{GLchar, GLint, GLuint};
 use glam::*;
 
 use std::fs::File;
@@ -17,15 +17,16 @@ use crate::*;
 
 type ID = u32;
 
-pub struct Shader_M {
+pub struct Shader {
     pub programId: ID,
 }
 
-impl Shader_M {
-    pub fn new(vertexPath: &str, fragmentPath: &str) -> Result<Self, String> {
-        let mut shader = Shader_M { programId: 0 };
+impl Shader {
+    pub fn new(vertexPath: &str, fragmentPath: &str, geometryPath: Option<&str>) -> Result<Self, String> {
+        let mut shader = Shader { programId: 0 };
         let mut vertexCode: String = Default::default();
         let mut fragmentCode: String = Default::default();
+        let mut geometryCode: String = Default::default();
 
         match read_file(vertexPath) {
             Ok(content) => vertexCode = content,
@@ -37,43 +38,67 @@ impl Shader_M {
             Err(error) => return Err(error.to_string()),
         }
 
+        if let Some(geometryPath) = geometryPath {
+            match read_file(geometryPath) {
+                Ok(content) => geometryCode = content,
+                Err(error) => return Err(error.to_string()),
+            }
+        }
+
         unsafe {
             // vertex shader
             let vertexShader = gl::CreateShader(gl::VERTEX_SHADER);
-            let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
-            shader.programId = gl::CreateProgram();
-
             let c_string = c_string!(vertexCode);
             gl::ShaderSource(vertexShader, 1, &c_string.as_ptr(), ptr::null());
             gl::CompileShader(vertexShader);
 
-            match checkCompileErrors(vertexShader, "VERTEX") {
-                Ok(_) => {}
-                Err(error) => return Err(error),
+            if let Err(error) = checkCompileErrors(vertexShader, "VERTEX") {
+                return Err(error);
             }
 
+            // fragment shader
+            let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
             let c_string = c_string!(fragmentCode);
             gl::ShaderSource(fragmentShader, 1, &c_string.as_ptr(), ptr::null());
             gl::CompileShader(fragmentShader);
 
-            match checkCompileErrors(fragmentShader, "FRAGMENT") {
-                Ok(_) => {}
-                Err(error) => return Err(error),
+            if let Err(error) = checkCompileErrors(fragmentShader, "FRAGMENT") {
+                return Err(error);
             }
 
+            // geometry shader
+            let mut geometryShader: GLuint = 0;
+            if let Some(_geometryPath) = geometryPath {
+                geometryShader = gl::CreateShader(gl::GEOMETRY_SHADER);
+                let c_string = c_string!(geometryCode);
+                gl::ShaderSource(geometryShader, 1, &c_string.as_ptr(), ptr::null());
+                gl::CompileShader(geometryShader);
+
+                if let Err(error) = checkCompileErrors(geometryShader, "GEOMETRY") {
+                    return Err(error);
+                }
+            }
+
+            // shader program
+            shader.programId = gl::CreateProgram();
             // link the first program object
             gl::AttachShader(shader.programId, vertexShader);
             gl::AttachShader(shader.programId, fragmentShader);
+            if let Some(_geometryPath) = geometryPath {
+                gl::AttachShader(shader.programId, geometryShader);
+            }
             gl::LinkProgram(shader.programId);
 
-            match checkCompileErrors(shader.programId, "PROGRAM") {
-                Ok(_) => {}
-                Err(error) => return Err(error),
+            if let Err(error) = checkCompileErrors(shader.programId, "PROGRAM") {
+                return Err(error);
             }
 
-            // Now that the shader programs have been built we can free up memory by deleting the shaders.
+            // delete the shaders as they're linked into our program now and no longer necessary
             gl::DeleteShader(vertexShader);
             gl::DeleteShader(fragmentShader);
+            if let Some(_geometryPath) = geometryPath {
+                gl::DeleteShader(geometryShader);
+            }
         }
 
         Ok(shader)

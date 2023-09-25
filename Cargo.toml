@@ -259,9 +259,9 @@ path = "examples/4-advanced_opengl/6_2-cubemaps_environment_mapping/main.rs"
 name = "8-advanced_glsl_ubo"
 path = "examples/4-advanced_opengl/8-advanced_glsl_ubo/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "9_1-geometry_shader_houses"
-#path = "examples/4-advanced_opengl/9_1-geometry_shader_houses/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "9_1-geometry_shader_houses"
+path = "examples/4-advanced_opengl/9_1-geometry_shader_houses/main.rs"
 
 #[[example]]  # 4-advanced_opengl
 #name = "9_2-geometry_shader_exploding"
