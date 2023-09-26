@@ -6,6 +6,7 @@
 
 use crate::aiscene::*;
 use crate::mesh::{Mesh, Texture, Vertex};
+use crate::ShaderId;
 use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLuint, GLvoid};
 use glam::*;
@@ -15,7 +16,6 @@ use russimp::sys::*;
 use std::os::raw::c_uint;
 use std::path::{Path, PathBuf};
 use std::ptr::*;
-use crate::ShaderId;
 
 // model data
 #[derive(Debug)]

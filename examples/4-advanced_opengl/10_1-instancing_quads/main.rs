@@ -9,12 +9,11 @@
 extern crate glfw;
 
 use glad_gl::gl;
-use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
-use glam::vec3;
+use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
+use glam::{vec3, Vec2};
 use glfw::{Action, Context, Key};
-use image::ColorType;
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
-use learn_opengl_with_rust::shader::Shader;
+use learn_opengl_with_rust::shader_m::Shader_M;
 use learn_opengl_with_rust::{size_of_floats, SIZE_OF_FLOAT};
 use std::mem;
 
@@ -51,19 +50,6 @@ fn main() {
     // --------------------------------------------------
     gl::load(|e| glfw.get_proc_address_raw(e) as *const std::os::raw::c_void);
 
-    // Vertex Array Object id
-    let mut VAO: GLuint = 0;
-    let mut VBO: GLuint = 0;
-
-    // build and compile our shader program
-    // ------------------------------------
-    let shader = Shader::new(
-        "examples/4-advanced_opengl/9_1-geometry_shader_houses/9_1-geometry_shader.vert",
-        "examples/4-advanced_opengl/9_1-geometry_shader_houses/9_1-geometry_shader.frag",
-        Some("examples/4-advanced_opengl/9_1-geometry_shader_houses/9_1-geometry_shader.geom"),
-    )
-    .unwrap();
-
     let camera = Camera::camera_vec3(vec3(0.0, 0.5, 4.0));
 
     // Initialize the world state
@@ -76,30 +62,73 @@ fn main() {
         lastY: SCR_HEIGHT / 2.0,
     };
 
+    // Vertex Array Object id
+    let mut instanceVBO: GLuint = 0;
+    let mut quadVAO: GLuint = 0;
+    let mut quadVBO: GLuint = 0;
+
+    // build and compile our shader program
+    // ------------------------------------
+    // Shader program
+    let shader = Shader_M::new(
+        "examples/4-advanced_opengl/10_1-instancing_quads/10_1-instancing.vert",
+        "examples/4-advanced_opengl/10_1-instancing_quads/10_1-instancing.frag",
+    )
+    .unwrap();
+
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     #[rustfmt::skip]
-    let points: [f32; 20] = [
-        -0.5,  0.5, 1.0, 0.0, 0.0, // top-left
-         0.5,  0.5, 0.0, 1.0, 0.0, // top-right
-         0.5, -0.5, 0.0, 0.0, 1.0, // bottom-right
-        -0.5, -0.5, 1.0, 1.0, 0.0  // bottom-left
+        let quadVertices: [f32; 30] = [
+        // positions     // colors
+        -0.05,  0.05,  1.0, 0.0, 0.0,
+         0.05, -0.05,  0.0, 1.0, 0.0,
+        -0.05, -0.05,  0.0, 0.0, 1.0,
+
+        -0.05,  0.05,  1.0, 0.0, 0.0,
+         0.05, -0.05,  0.0, 1.0, 0.0,
+         0.05,  0.05,  0.0, 1.0, 1.0
     ];
+
+    let mut translations: Vec<Vec2> = vec![];
+    let offset: f32 = 0.1;
+
+    for y in (-10..10).step_by(2) {
+        for x in (-10..10).step_by(2) {
+            let translation = Vec2 {
+                x: (x as f32 / 10.0f32) + offset,
+                y: (y as f32 / 10.0f32) + offset,
+            };
+            translations.push(translation);
+        }
+    }
 
     unsafe {
         // configure global opengl state
         // -----------------------------
         gl::Enable(gl::DEPTH_TEST);
 
-        // VAO
-        gl::GenBuffers(1, &mut VBO);
-        gl::GenVertexArrays(1, &mut VAO);
-        gl::BindVertexArray(VAO);
-        gl::BindBuffer(gl::ARRAY_BUFFER, VBO);
+        // store instance data in an array buffer
+        // --------------------------------------
+        gl::GenBuffers(1, &mut instanceVBO);
+        gl::BindBuffer(gl::ARRAY_BUFFER, instanceVBO);
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            size_of_floats!(points.len()) as GLsizeiptr,
-            points.as_ptr() as *const GLvoid,
+            (mem::size_of::<Vec2>() * 100) as GLsizeiptr,
+            translations.as_ptr() as *const GLvoid,
+            gl::STATIC_DRAW,
+        );
+        gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+
+        // quad VAO
+        gl::GenVertexArrays(1, &mut quadVAO);
+        gl::GenBuffers(1, &mut quadVBO);
+        gl::BindVertexArray(quadVAO);
+        gl::BindBuffer(gl::ARRAY_BUFFER, quadVBO);
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            size_of_floats!(quadVertices.len()) as GLsizeiptr,
+            quadVertices.as_ptr() as *const GLvoid,
             gl::STATIC_DRAW,
         );
         gl::EnableVertexAttribArray(0);
@@ -111,14 +140,17 @@ fn main() {
             gl::FLOAT,
             gl::FALSE,
             size_of_floats!(5) as GLsizei,
-            (3 * SIZE_OF_FLOAT) as *const GLvoid,
+            (2 * SIZE_OF_FLOAT) as *const GLvoid,
         );
-        gl::BindVertexArray(0);
+        // also set instance data
+        gl::EnableVertexAttribArray(2);
+        gl::BindBuffer(gl::ARRAY_BUFFER, instanceVBO);
+        // this attribute comes from a different vertex buffer
+        gl::VertexAttribPointer(2, 2, gl::FLOAT, gl::FALSE, size_of_floats!(2) as GLsizei, 0 as *const GLvoid);
+        gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+        // tell OpenGL this is an instanced vertex attribute.
+        gl::VertexAttribDivisor(2, 1);
     }
-
-    // shader configuration
-    shader.use_shader();
-    shader.setInt("texture1", 0);
 
     // render loop
     while !window.should_close() {
@@ -136,10 +168,11 @@ fn main() {
             gl::ClearColor(0.1, 0.1, 0.1, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-            // draw points
+            // draw 100 instanced quads
             shader.use_shader();
-            gl::BindVertexArray(VAO);
-            gl::DrawArrays(gl::POINTS, 0, 4);
+            gl::BindVertexArray(quadVAO);
+            gl::DrawArraysInstanced(gl::TRIANGLES, 0, 6, 100); // 100 triangles of 6 vertices each
+            gl::BindVertexArray(0);
         }
 
         window.swap_buffers();
@@ -148,8 +181,9 @@ fn main() {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     unsafe {
-        gl::DeleteVertexArrays(1, &VAO);
-        gl::DeleteBuffers(1, &VBO);
+        gl::DeleteBuffers(1, &instanceVBO);
+        gl::DeleteVertexArrays(1, &quadVAO);
+        gl::DeleteBuffers(1, &quadVBO);
         gl::DeleteShader(shader.programId);
     }
 }
@@ -174,6 +208,12 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
         }
         glfw::WindowEvent::Key(Key::D, _, _, _) => {
             state.camera.ProcessKeyboard(CameraMovement::RIGHT, state.deltaTime);
+        }
+        glfw::WindowEvent::Key(Key::Q, _, _, _) => {
+            state.camera.ProcessKeyboard(CameraMovement::UP, state.deltaTime);
+        }
+        glfw::WindowEvent::Key(Key::Z, _, _, _) => {
+            state.camera.ProcessKeyboard(CameraMovement::DOWN, state.deltaTime);
         }
         glfw::WindowEvent::CursorPos(xpos, ypos) => mouse_handler(state, xpos, ypos),
         glfw::WindowEvent::Scroll(xoffset, ysoffset) => scroll_handler(state, xoffset, ysoffset),
@@ -217,70 +257,3 @@ fn scroll_handler(state: &mut State, _xoffset: f64, yoffset: f64) {
     state.camera.ProcessMouseScroll(yoffset as f32);
 }
 
-// utility function for loading a 2D texture from file
-// ---------------------------------------------------
-fn loadTexture(path: &str) -> GLuint {
-    let mut texture_id: GLuint = 0;
-
-    let img = image::open(path).expect("Texture failed to load");
-    let (width, height) = (img.width() as GLsizei, img.height() as GLsizei);
-
-    let color_type = img.color();
-    // let data = img.into_rgb8().into_raw();
-
-    unsafe {
-        let format = match color_type {
-            ColorType::L8 => gl::RED,
-            // ColorType::La8 => {}
-            ColorType::Rgb8 => gl::RGB,
-            ColorType::Rgba8 => gl::RGBA,
-            // ColorType::L16 => {}
-            // ColorType::La16 => {}
-            // ColorType::Rgb16 => {}
-            // ColorType::Rgba16 => {}
-            // ColorType::Rgb32F => {}
-            // ColorType::Rgba32F => {}
-            _ => panic!("no mapping for color type"),
-        };
-
-        let data = match color_type {
-            ColorType::L8 => img.into_rgb8().into_raw(),
-            // ColorType::La8 => {}
-            ColorType::Rgb8 => img.into_rgb8().into_raw(),
-            ColorType::Rgba8 => img.into_rgba8().into_raw(),
-            // ColorType::L16 => {}
-            // ColorType::La16 => {}
-            // ColorType::Rgb16 => {}
-            // ColorType::Rgba16 => {}
-            // ColorType::Rgb32F => {}
-            // ColorType::Rgba32F => {}
-            _ => panic!("no mapping for color type"),
-        };
-
-        gl::GenTextures(1, &mut texture_id);
-        gl::BindTexture(gl::TEXTURE_2D, texture_id);
-
-        gl::TexImage2D(
-            gl::TEXTURE_2D,
-            0,
-            format as GLint,
-            width,
-            height,
-            0,
-            format,
-            gl::UNSIGNED_BYTE,
-            data.as_ptr() as *const GLvoid,
-        );
-        gl::GenerateMipmap(gl::TEXTURE_2D);
-
-        // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat
-        let param = if format == gl::RGBA { gl::CLAMP_TO_EDGE } else { gl::REPEAT };
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, param as GLint);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, param as GLint);
-
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
-    }
-
-    texture_id
-}

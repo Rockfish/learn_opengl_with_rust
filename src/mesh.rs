@@ -4,13 +4,13 @@
 #![allow(unused_assignments)]
 #![allow(unused_variables)]
 
+use crate::ShaderId;
 use glad_gl::gl;
 use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use std::ffi::CString;
 use std::mem;
 use std::ops::Add;
-use crate::ShaderId;
 
 const MAX_BONE_INFLUENCE: usize = 4;
 

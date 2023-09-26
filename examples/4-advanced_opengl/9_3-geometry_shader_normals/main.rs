@@ -10,12 +10,12 @@ extern crate glfw;
 
 use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLuint, GLvoid};
-use glam::{Mat4, vec3};
+use glam::{vec3, Mat4};
 use glfw::{Action, Context, Key};
 use image::ColorType;
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
-use learn_opengl_with_rust::shader::Shader;
 use learn_opengl_with_rust::model::{FlipV, Gamma, Model};
+use learn_opengl_with_rust::shader::Shader;
 
 const SCR_WIDTH: f32 = 800.0;
 const SCR_HEIGHT: f32 = 800.0;
@@ -64,7 +64,9 @@ fn main() {
 
     // configure global opengl state
     // -----------------------------
-    unsafe { gl::Enable(gl::DEPTH_TEST); }
+    unsafe {
+        gl::Enable(gl::DEPTH_TEST);
+    }
 
     // build and compile our shader program
     // ------------------------------------
@@ -78,9 +80,9 @@ fn main() {
     let normalShader = Shader::new(
         "examples/4-advanced_opengl/9_3-geometry_shader_normals/9_3-normal_visualization.vert",
         "examples/4-advanced_opengl/9_3-geometry_shader_normals/9_3-normal_visualization.frag",
-        Some("examples/4-advanced_opengl/9_3-geometry_shader_normals/9_3-normal_visualization.geom")
+        Some("examples/4-advanced_opengl/9_3-geometry_shader_normals/9_3-normal_visualization.geom"),
     )
-   .unwrap();
+    .unwrap();
 
     let backpack = Model::new("resources/objects/backpack/backpack.obj", Gamma(false), FlipV(true));
 

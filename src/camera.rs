@@ -98,7 +98,7 @@ impl Camera {
             CameraMovement::LEFT => self.Position -= self.Right * velocity,
             CameraMovement::RIGHT => self.Position += self.Right * velocity,
             CameraMovement::UP => self.Position += self.Up * velocity,
-            CameraMovement::DOWN => self.Position -= self.Up *velocity,
+            CameraMovement::DOWN => self.Position -= self.Up * velocity,
         }
 
         // For FPS: make sure the user stays at the ground level
