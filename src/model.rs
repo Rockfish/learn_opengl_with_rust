@@ -6,7 +6,6 @@
 
 use crate::aiscene::*;
 use crate::mesh::{Mesh, Texture, Vertex};
-use crate::shader_m::Shader_M;
 use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLuint, GLvoid};
 use glam::*;
@@ -16,6 +15,7 @@ use russimp::sys::*;
 use std::os::raw::c_uint;
 use std::path::{Path, PathBuf};
 use std::ptr::*;
+use crate::ShaderId;
 
 // model data
 #[derive(Debug)]
@@ -44,9 +44,9 @@ impl Model {
         model
     }
 
-    pub fn Draw(&self, shader: &Shader_M) {
+    pub fn Draw(&self, shader_id: ShaderId) {
         for mesh in &self.meshes {
-            mesh.Draw(shader);
+            mesh.Draw(shader_id);
         }
     }
 

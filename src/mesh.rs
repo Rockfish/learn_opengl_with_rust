@@ -4,13 +4,13 @@
 #![allow(unused_assignments)]
 #![allow(unused_variables)]
 
-use crate::shader_m::Shader_M;
 use glad_gl::gl;
 use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::*;
 use std::ffi::CString;
 use std::mem;
 use std::ops::Add;
+use crate::ShaderId;
 
 const MAX_BONE_INFLUENCE: usize = 4;
 
@@ -114,7 +114,7 @@ impl Mesh {
         );
     }
 
-    pub fn Draw(&self, shader: &Shader_M) {
+    pub fn Draw(&self, shader_id: ShaderId) {
         // bind appropriate textures
         let mut diffuseNr: u32 = 0;
         let mut specularNr: u32 = 0;
@@ -150,7 +150,7 @@ impl Mesh {
                 let name = texture.texture_type.clone().add(&num.to_string());
 
                 let c_string = CString::new(name).unwrap();
-                gl::Uniform1i(gl::GetUniformLocation(shader.programId, c_string.as_ptr()), i as i32);
+                gl::Uniform1i(gl::GetUniformLocation(shader_id, c_string.as_ptr()), i as i32);
                 // and finally bind the texture
                 gl::BindTexture(gl::TEXTURE_2D, texture.id);
             }

@@ -15,10 +15,8 @@ use std::ptr;
 
 use crate::*;
 
-type ID = u32;
-
 pub struct Shader {
-    pub programId: ID,
+    pub programId: ShaderId,
 }
 
 impl Shader {

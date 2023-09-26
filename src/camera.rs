@@ -16,6 +16,8 @@ pub enum CameraMovement {
     BACKWARD,
     LEFT,
     RIGHT,
+    UP,
+    DOWN,
 }
 
 #[derive(Default)]
@@ -95,6 +97,8 @@ impl Camera {
             CameraMovement::BACKWARD => self.Position -= self.Front * velocity,
             CameraMovement::LEFT => self.Position -= self.Right * velocity,
             CameraMovement::RIGHT => self.Position += self.Right * velocity,
+            CameraMovement::UP => self.Position += self.Up * velocity,
+            CameraMovement::DOWN => self.Position -= self.Up *velocity,
         }
 
         // For FPS: make sure the user stays at the ground level

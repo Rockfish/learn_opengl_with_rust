@@ -1,3 +1,4 @@
+#![feature(is_sorted)]
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
@@ -9,20 +10,18 @@ extern crate glfw;
 
 use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLuint, GLvoid};
-use glam::*;
+use glam::{Mat4, vec3};
 use glfw::{Action, Context, Key};
 use image::ColorType;
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
+use learn_opengl_with_rust::shader::Shader;
 use learn_opengl_with_rust::model::{FlipV, Gamma, Model};
-use learn_opengl_with_rust::shader_m::Shader_M;
 
 const SCR_WIDTH: f32 = 800.0;
 const SCR_HEIGHT: f32 = 800.0;
 
-// Struct for passing state between the window loop and the event handler.
 struct State {
     camera: Camera,
-    lightPos: Vec3,
     deltaTime: f32,
     lastFrame: f32,
     firstMouse: bool,
@@ -53,17 +52,9 @@ fn main() {
 
     let camera = Camera::camera_vec3(vec3(0.0, 0.5, 4.0));
 
-    // build and compile our shaders
-    let ourShader = Shader_M::new(
-        "examples/3-model_loading/1-model_loading/1-model_loading.vert",
-        "examples/3-model_loading/1-model_loading/1-model_loading.frag",
-    )
-    .unwrap();
-
     // Initialize the world state
     let mut state = State {
         camera,
-        lightPos: vec3(1.2, 1.0, 2.0),
         deltaTime: 0.0,
         lastFrame: 0.0,
         firstMouse: true,
@@ -73,20 +64,24 @@ fn main() {
 
     // configure global opengl state
     // -----------------------------
-    unsafe {
-        gl::Enable(gl::DEPTH_TEST);
-    }
+    unsafe { gl::Enable(gl::DEPTH_TEST); }
 
-    let ourModel = Model::new("resources/objects/cyborg/cyborg.obj", Gamma(false), FlipV(false));
-    // let ourModel = Model::new("resources/objects/backpack/backpack.obj", Gamma(false), FlipV(true));
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Repos/russimp/models/OBJ/cube.obj", Gamma(false), FlipV(false));
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", Gamma(false), FlipV(false));
+    // build and compile our shader program
+    // ------------------------------------
+    let shader = Shader::new(
+        "examples/4-advanced_opengl/9_2-geometry_shader_exploding/9_2-geometry_shader.vert",
+        "examples/4-advanced_opengl/9_2-geometry_shader_exploding/9_2-geometry_shader.frag",
+        Some("examples/4-advanced_opengl/9_2-geometry_shader_exploding/9_2-geometry_shader.geom")
+    )
+    .unwrap();
+
+    let nanosuit = Model::new("resources/objects/nanosuit/nanosuit.obj", Gamma(false), FlipV(false));
 
     // render loop
     while !window.should_close() {
-        let currentFrame = glfw.get_time() as f32;
-        state.deltaTime = currentFrame - state.lastFrame;
-        state.lastFrame = currentFrame;
+        let currentFrameTime = glfw.get_time() as f32;
+        state.deltaTime = currentFrameTime - state.lastFrame;
+        state.lastFrame = currentFrameTime;
 
         glfw.poll_events();
         for (_, event) in glfw::flush_messages(&events) {
@@ -95,23 +90,20 @@ fn main() {
 
         unsafe {
             // render
-            gl::ClearColor(0.05, 0.05, 0.05, 1.0);
+            gl::ClearColor(0.1, 0.1, 0.1, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-            // be sure to activate shader when setting uniforms/drawing objects
-            ourShader.use_shader();
-
-            // view/projection transformations
-            let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
             let view = state.camera.GetViewMatrix();
-            ourShader.setMat4("projection", &projection);
-            ourShader.setMat4("view", &view);
+            let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
 
-            let mut model = Mat4::from_translation(vec3(0.0, 0.0, 0.0));
-            model = model * Mat4::from_scale(vec3(1.0, 1.0, 1.0));
-            ourShader.setMat4("model", &model);
+            shader.use_shader();
+            shader.setMat4("projection", &projection);
+            shader.setMat4("view", &view);
+            shader.setMat4("model", &Mat4::IDENTITY);
 
-            ourModel.Draw(ourShader.programId);
+            shader.setFloat("time", currentFrameTime);
+
+            nanosuit.Draw(shader.programId);
         }
 
         window.swap_buffers();
@@ -120,7 +112,7 @@ fn main() {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     unsafe {
-        gl::DeleteProgram(ourShader.programId);
+        gl::DeleteShader(shader.programId);
     }
 }
 
@@ -145,6 +137,12 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
         glfw::WindowEvent::Key(Key::D, _, _, _) => {
             state.camera.ProcessKeyboard(CameraMovement::RIGHT, state.deltaTime);
         }
+        glfw::WindowEvent::Key(Key::Q, _, _, _) => {
+            state.camera.ProcessKeyboard(CameraMovement::UP, state.deltaTime);
+        }
+        glfw::WindowEvent::Key(Key::Z, _, _, _) => {
+            state.camera.ProcessKeyboard(CameraMovement::DOWN, state.deltaTime);
+        }
         glfw::WindowEvent::CursorPos(xpos, ypos) => mouse_handler(state, xpos, ypos),
         glfw::WindowEvent::Scroll(xoffset, ysoffset) => scroll_handler(state, xoffset, ysoffset),
         _evt => {
@@ -158,6 +156,7 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
 fn framebuffer_size_event(_window: &mut glfw::Window, width: i32, height: i32) {
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
+    println!("Framebuffer size: {}, {}", width, height);
     unsafe {
         gl::Viewport(0, 0, width, height);
     }
@@ -242,8 +241,10 @@ fn loadTexture(path: &str) -> GLuint {
         );
         gl::GenerateMipmap(gl::TEXTURE_2D);
 
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as GLint);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
+        // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat
+        let param = if format == gl::RGBA { gl::CLAMP_TO_EDGE } else { gl::REPEAT };
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, param as GLint);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, param as GLint);
 
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
