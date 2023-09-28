@@ -13,7 +13,7 @@ use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::{vec3, Vec2};
 use glfw::{Action, Context, Key};
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
-use learn_opengl_with_rust::shader_m::Shader_M;
+use learn_opengl_with_rust::shader::Shader;
 use learn_opengl_with_rust::{size_of_floats, SIZE_OF_FLOAT};
 use std::mem;
 
@@ -70,9 +70,10 @@ fn main() {
     // build and compile our shader program
     // ------------------------------------
     // Shader program
-    let shader = Shader_M::new(
+    let shader = Shader::new(
         "examples/4-advanced_opengl/10_1-instancing_quads/10_1-instancing.vert",
         "examples/4-advanced_opengl/10_1-instancing_quads/10_1-instancing.frag",
+        None,
     )
     .unwrap();
 
@@ -184,7 +185,7 @@ fn main() {
         gl::DeleteBuffers(1, &instanceVBO);
         gl::DeleteVertexArrays(1, &quadVAO);
         gl::DeleteBuffers(1, &quadVBO);
-        gl::DeleteShader(shader.programId);
+        gl::DeleteShader(shader.id);
     }
 }
 
@@ -256,4 +257,3 @@ fn mouse_handler(state: &mut State, xposIn: f64, yposIn: f64) {
 fn scroll_handler(state: &mut State, _xoffset: f64, yoffset: f64) {
     state.camera.ProcessMouseScroll(yoffset as f32);
 }
-

@@ -305,8 +305,8 @@ fn main() {
         gl::DeleteVertexArrays(2, &cubeVAO);
         gl::DeleteVertexArrays(2, &lightCubeVAO);
         gl::DeleteBuffers(2, &VBO);
-        gl::DeleteProgram(lightingShader.programId);
-        gl::DeleteProgram(lightCubeShader.programId);
+        gl::DeleteProgram(lightingShader.id);
+        gl::DeleteProgram(lightCubeShader.id);
     }
 }
 

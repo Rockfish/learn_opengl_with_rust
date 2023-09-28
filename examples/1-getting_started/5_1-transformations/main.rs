@@ -187,7 +187,7 @@ fn main() {
         ourShader.use_shader(); // don't forget to activate/use the shader before setting uniforms!
                                 // either set it manually like so:
         let c_str = c_string!("texture1");
-        gl::Uniform1i(gl::GetUniformLocation(ourShader.programId, c_str.as_ptr()), 0);
+        gl::Uniform1i(gl::GetUniformLocation(ourShader.id, c_str.as_ptr()), 0);
         // or set it via the texture class
         ourShader.setInt("texture2", 1);
     }
@@ -217,7 +217,7 @@ fn main() {
 
             // get matrix's uniform location and set matrix
             let c_str = c_string!("transform");
-            let transformLoc = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
+            let transformLoc = gl::GetUniformLocation(ourShader.id, c_str.as_ptr());
             gl::UniformMatrix4fv(transformLoc, 1, gl::FALSE, transform.to_cols_array().as_ptr());
 
             // render the triangle

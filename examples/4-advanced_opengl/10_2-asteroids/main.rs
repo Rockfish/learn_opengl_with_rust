@@ -1,3 +1,4 @@
+#![feature(is_sorted)]
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
@@ -8,21 +9,18 @@
 extern crate glfw;
 
 use glad_gl::gl;
-use glad_gl::gl::{GLint, GLsizei, GLuint, GLvoid};
-use glam::*;
+use glam::{vec3, Mat4};
 use glfw::{Action, Context, Key};
-use image::ColorType;
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
 use learn_opengl_with_rust::model::{FlipV, Gamma, Model};
-use learn_opengl_with_rust::shader_m::Shader_M;
+use learn_opengl_with_rust::shader::Shader;
+use rand::prelude::*;
 
 const SCR_WIDTH: f32 = 800.0;
 const SCR_HEIGHT: f32 = 800.0;
 
-// Struct for passing state between the window loop and the event handler.
 struct State {
     camera: Camera,
-    lightPos: Vec3,
     deltaTime: f32,
     lastFrame: f32,
     firstMouse: bool,
@@ -51,19 +49,11 @@ fn main() {
     // --------------------------------------------------
     gl::load(|e| glfw.get_proc_address_raw(e) as *const std::os::raw::c_void);
 
-    let camera = Camera::camera_vec3(vec3(0.0, 0.5, 4.0));
-
-    // build and compile our shaders
-    let ourShader = Shader_M::new(
-        "examples/3-model_loading/1-model_loading/1-model_loading.vert",
-        "examples/3-model_loading/1-model_loading/1-model_loading.frag",
-    )
-    .unwrap();
+    let camera = Camera::camera_vec3(vec3(0.0, 0.0, 55.0));
 
     // Initialize the world state
     let mut state = State {
         camera,
-        lightPos: vec3(1.2, 1.0, 2.0),
         deltaTime: 0.0,
         lastFrame: 0.0,
         firstMouse: true,
@@ -71,16 +61,57 @@ fn main() {
         lastY: SCR_HEIGHT / 2.0,
     };
 
-    // configure global opengl state
-    // -----------------------------
     unsafe {
+        // configure global opengl state
+        // -----------------------------
         gl::Enable(gl::DEPTH_TEST);
     }
 
-    let ourModel = Model::new("resources/objects/cyborg/cyborg.obj", Gamma(false), FlipV(false));
-    // let ourModel = Model::new("resources/objects/backpack/backpack.obj", Gamma(false), FlipV(true));
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Repos/russimp/models/OBJ/cube.obj", Gamma(false), FlipV(false));
-    // let ourModel = Model::new("/Users/john/Dev_Rust/Dev/Models/Oyanirami0.3ds", Gamma(false), FlipV(false));
+    // build and compile our shader program
+    // ------------------------------------
+    // Shader program
+    let shader = Shader::new(
+        "examples/4-advanced_opengl/10_2-asteroids/10_2-instancing.vert",
+        "examples/4-advanced_opengl/10_2-asteroids/10_2-instancing.frag",
+        None,
+    )
+    .unwrap();
+
+    // load models
+    // -----------
+    let rock = Model::new("resources/objects/rock/rock.obj", Gamma(false), FlipV(false));
+    let planet = Model::new("resources/objects/planet/planet.obj", Gamma(false), FlipV(false));
+
+    // generate a large list of semi-random model transformation matrices
+    // ------------------------------------------------------------------
+    let amount: i32 = 1000;
+    let radius: f32 = 50.0;
+    let offset: f32 = 2.5;
+    let mut rng = rand::thread_rng();
+    let mut modelMatrices: Vec<Mat4> = vec![];
+
+    for i in 0..amount {
+        // 1. translation: displace along circle with 'radius' in range [-offset, offset]
+        let angle = (i as f32) / (amount as f32) * 360.0;
+        let displacement: f32 = rng.gen::<f32>() * (2.0 * offset * 100.0) / 100.0 - offset;
+        let x = angle.sin() * radius + displacement;
+        let displacement: f32 = rng.gen::<f32>() * (2.0 * offset * 100.0) / 100.0 - offset;
+        let y = displacement * 4.0; // keep height of asteroid field smaller compared to width of x and z
+        let displacement: f32 = rng.gen::<f32>() * (2.0 * offset * 100.0) / 100.0 - offset;
+        let z = angle.cos() * radius + displacement;
+        let mut model = Mat4::from_translation(vec3(x, y, z));
+
+        // 2. scale: Scale between 0.05 and 0.25f
+        let scale = rng.gen_range(0.0..20.0) / 100.0 + 0.05;
+        model *= Mat4::from_scale(vec3(scale, scale, scale));
+
+        // 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
+        let rot_angle = rng.gen_range(0..360) as f32;
+        model *= Mat4::from_axis_angle(vec3(0.4, 0.6, 0.8), rot_angle.to_radians());
+
+        // 4. now add to list of matrices
+        modelMatrices.push(model);
+    }
 
     // render loop
     while !window.should_close() {
@@ -95,23 +126,27 @@ fn main() {
 
         unsafe {
             // render
-            gl::ClearColor(0.05, 0.05, 0.05, 1.0);
+            gl::ClearColor(0.1, 0.1, 0.1, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-            // be sure to activate shader when setting uniforms/drawing objects
-            ourShader.use_shader();
-
-            // view/projection transformations
+            // configure transformation matrices
             let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
             let view = state.camera.GetViewMatrix();
-            ourShader.setMat4("projection", &projection);
-            ourShader.setMat4("view", &view);
+            shader.use_shader();
+            shader.setMat4("projection", &projection);
+            shader.setMat4("view", &view);
 
-            let mut model = Mat4::from_translation(vec3(0.0, 0.0, 0.0));
-            model = model * Mat4::from_scale(vec3(1.0, 1.0, 1.0));
-            ourShader.setMat4("model", &model);
+            // draw planet
+            let mut model = Mat4::from_translation(vec3(0.0, -3.0, 0.0));
+            model = model * Mat4::from_scale(vec3(4.0, 4.0, 4.0));
+            shader.setMat4("model", &model);
+            planet.Draw(shader.id);
 
-            ourModel.Draw(ourShader.id);
+            // draw meteorites
+            for model in &modelMatrices {
+                shader.setMat4("model", &model);
+                rock.Draw(shader.id);
+            }
         }
 
         window.swap_buffers();
@@ -120,7 +155,7 @@ fn main() {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     unsafe {
-        gl::DeleteProgram(ourShader.id);
+        gl::DeleteShader(shader.id);
     }
 }
 
@@ -145,6 +180,12 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
         glfw::WindowEvent::Key(Key::D, _, _, _) => {
             state.camera.ProcessKeyboard(CameraMovement::RIGHT, state.deltaTime);
         }
+        glfw::WindowEvent::Key(Key::Q, _, _, _) => {
+            state.camera.ProcessKeyboard(CameraMovement::UP, state.deltaTime);
+        }
+        glfw::WindowEvent::Key(Key::Z, _, _, _) => {
+            state.camera.ProcessKeyboard(CameraMovement::DOWN, state.deltaTime);
+        }
         glfw::WindowEvent::CursorPos(xpos, ypos) => mouse_handler(state, xpos, ypos),
         glfw::WindowEvent::Scroll(xoffset, ysoffset) => scroll_handler(state, xoffset, ysoffset),
         _evt => {
@@ -158,6 +199,7 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
 fn framebuffer_size_event(_window: &mut glfw::Window, width: i32, height: i32) {
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
+    println!("Framebuffer size: {}, {}", width, height);
     unsafe {
         gl::Viewport(0, 0, width, height);
     }
@@ -184,70 +226,4 @@ fn mouse_handler(state: &mut State, xposIn: f64, yposIn: f64) {
 
 fn scroll_handler(state: &mut State, _xoffset: f64, yoffset: f64) {
     state.camera.ProcessMouseScroll(yoffset as f32);
-}
-
-// utility function for loading a 2D texture from file
-// ---------------------------------------------------
-fn loadTexture(path: &str) -> GLuint {
-    let mut texture_id: GLuint = 0;
-
-    let img = image::open(path).expect("Texture failed to load");
-    let (width, height) = (img.width() as GLsizei, img.height() as GLsizei);
-
-    let color_type = img.color();
-    // let data = img.into_rgb8().into_raw();
-
-    unsafe {
-        let format = match color_type {
-            ColorType::L8 => gl::RED,
-            // ColorType::La8 => {}
-            ColorType::Rgb8 => gl::RGB,
-            ColorType::Rgba8 => gl::RGBA,
-            // ColorType::L16 => {}
-            // ColorType::La16 => {}
-            // ColorType::Rgb16 => {}
-            // ColorType::Rgba16 => {}
-            // ColorType::Rgb32F => {}
-            // ColorType::Rgba32F => {}
-            _ => panic!("no mapping for color type"),
-        };
-
-        let data = match color_type {
-            ColorType::L8 => img.into_rgb8().into_raw(),
-            // ColorType::La8 => {}
-            ColorType::Rgb8 => img.into_rgb8().into_raw(),
-            ColorType::Rgba8 => img.into_rgba8().into_raw(),
-            // ColorType::L16 => {}
-            // ColorType::La16 => {}
-            // ColorType::Rgb16 => {}
-            // ColorType::Rgba16 => {}
-            // ColorType::Rgb32F => {}
-            // ColorType::Rgba32F => {}
-            _ => panic!("no mapping for color type"),
-        };
-
-        gl::GenTextures(1, &mut texture_id);
-        gl::BindTexture(gl::TEXTURE_2D, texture_id);
-
-        gl::TexImage2D(
-            gl::TEXTURE_2D,
-            0,
-            format as GLint,
-            width,
-            height,
-            0,
-            format,
-            gl::UNSIGNED_BYTE,
-            data.as_ptr() as *const GLvoid,
-        );
-        gl::GenerateMipmap(gl::TEXTURE_2D);
-
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as GLint);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as GLint);
-
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
-    }
-
-    texture_id
 }

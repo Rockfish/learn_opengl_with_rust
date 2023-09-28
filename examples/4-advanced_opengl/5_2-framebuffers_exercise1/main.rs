@@ -403,8 +403,8 @@ fn main() {
         gl::DeleteBuffers(1, &quadVAO);
         gl::DeleteRenderbuffers(1, &rbo);
         gl::DeleteFramebuffers(1, &framebuffer);
-        gl::DeleteShader(shader.programId);
-        gl::DeleteShader(screenShader.programId);
+        gl::DeleteShader(shader.id);
+        gl::DeleteShader(screenShader.id);
     }
 }
 

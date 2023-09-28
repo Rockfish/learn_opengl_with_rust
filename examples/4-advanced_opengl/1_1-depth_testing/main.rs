@@ -259,7 +259,7 @@ fn main() {
         gl::DeleteVertexArrays(1, &planeVAO);
         gl::DeleteBuffers(1, &cubeVBO);
         gl::DeleteBuffers(1, &planeVBO);
-        gl::DeleteShader(ourShader.programId);
+        gl::DeleteShader(ourShader.id);
     }
 }
 

@@ -16,12 +16,12 @@ use std::ptr;
 use crate::*;
 
 pub struct Shader_S {
-    pub programId: ShaderId,
+    pub id: ShaderId,
 }
 
 impl Shader_S {
     pub fn new(vertexPath: &str, fragmentPath: &str) -> Result<Self, String> {
-        let mut shader = Shader_S { programId: 0 };
+        let mut shader = Shader_S { id: 0 };
         let mut vertexCode: String = Default::default();
         let mut fragmentCode: String = Default::default();
 
@@ -39,7 +39,7 @@ impl Shader_S {
             // vertex shader
             let vertexShader = gl::CreateShader(gl::VERTEX_SHADER);
             let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
-            shader.programId = gl::CreateProgram();
+            shader.id = gl::CreateProgram();
 
             let c_string = c_string!(vertexCode);
             gl::ShaderSource(vertexShader, 1, &c_string.as_ptr(), ptr::null());
@@ -59,11 +59,11 @@ impl Shader_S {
             }
 
             // link the first program object
-            gl::AttachShader(shader.programId, vertexShader);
-            gl::AttachShader(shader.programId, fragmentShader);
-            gl::LinkProgram(shader.programId);
+            gl::AttachShader(shader.id, vertexShader);
+            gl::AttachShader(shader.id, fragmentShader);
+            gl::LinkProgram(shader.id);
 
-            match checkCompileErrors(shader.programId, "PROGRAM") {
+            match checkCompileErrors(shader.id, "PROGRAM") {
                 Ok(_) => {}
                 Err(error) => return Err(error),
             }
@@ -78,7 +78,7 @@ impl Shader_S {
 
     pub fn use_shader(&self) {
         unsafe {
-            gl::UseProgram(self.programId);
+            gl::UseProgram(self.id);
         }
     }
 
@@ -88,7 +88,7 @@ impl Shader_S {
         unsafe {
             let v = if value { 1 } else { 0 };
             let c_string = c_string!(name);
-            gl::Uniform1i(gl::GetUniformLocation(self.programId, c_string.as_ptr()), v);
+            gl::Uniform1i(gl::GetUniformLocation(self.id, c_string.as_ptr()), v);
         }
     }
 
@@ -96,7 +96,7 @@ impl Shader_S {
     pub fn setInt(&self, name: &str, value: i32) {
         unsafe {
             let c_string = c_string!(name);
-            gl::Uniform1i(gl::GetUniformLocation(self.programId, c_string.as_ptr()), value);
+            gl::Uniform1i(gl::GetUniformLocation(self.id, c_string.as_ptr()), value);
         }
     }
 
@@ -104,7 +104,7 @@ impl Shader_S {
     pub fn setFloat(&self, name: &str, value: f32) {
         unsafe {
             let c_string = c_string!(name);
-            gl::Uniform1f(gl::GetUniformLocation(self.programId, c_string.as_ptr()), value);
+            gl::Uniform1f(gl::GetUniformLocation(self.id, c_string.as_ptr()), value);
         }
     }
 }

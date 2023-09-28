@@ -298,7 +298,7 @@ fn main() {
         gl::DeleteVertexArrays(1, &skyboxVAO);
         gl::DeleteBuffers(1, &cubeVBO);
         gl::DeleteBuffers(1, &skyboxVBO);
-        gl::DeleteShader(shader.programId);
+        gl::DeleteShader(shader.id);
     }
 }
 

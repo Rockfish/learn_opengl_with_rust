@@ -15,6 +15,7 @@ russimp = "2.0.6"
 #russimp = { path = "/Users/john/Dev_Rust/Repos/russimp" }
 ordered-float = { version = "3.0", default-features = false }
 itertools = "0.11.0"
+rand = "0.8.5"
 
 [dependencies.glfw]
 version = "*"
@@ -275,13 +276,13 @@ path = "examples/4-advanced_opengl/9_3-geometry_shader_normals/main.rs"
 name = "10_1-instancing_quads"
 path = "examples/4-advanced_opengl/10_1-instancing_quads/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "10_2-asteroids"
-#path = "examples/4-advanced_opengl/10_2-asteroids/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "10_2-asteroids"
+path = "examples/4-advanced_opengl/10_2-asteroids/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "10_3-asteroids_instanced"
-#path = "examples/4-advanced_opengl/10_3-asteroids_instanced/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "10_3-asteroids_instanced"
+path = "examples/4-advanced_opengl/10_3-asteroids_instanced/main.rs"
 
 #[[example]]  # 4-advanced_opengl
 #name = "11_1-anti_aliasing_msaa"

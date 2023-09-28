@@ -301,7 +301,7 @@ fn main() {
     unsafe {
         gl::DeleteVertexArrays(2, &VAO);
         gl::DeleteBuffers(2, &VBO);
-        gl::DeleteProgram(ourShader.programId);
+        gl::DeleteProgram(ourShader.id);
     }
 }
 

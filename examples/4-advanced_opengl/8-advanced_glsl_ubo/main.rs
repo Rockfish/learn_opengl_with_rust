@@ -164,16 +164,16 @@ fn main() {
         // ---------------------------------
         // first. We get the relevant block indices
         let c_string = c_string!("Matrices");
-        let uniformBlockIndexRed = gl::GetUniformBlockIndex(shaderRed.programId, c_string.as_ptr());
-        let uniformBlockIndexGreen = gl::GetUniformBlockIndex(shaderGreen.programId, c_string.as_ptr());
-        let uniformBlockIndexBlue = gl::GetUniformBlockIndex(shaderBlue.programId, c_string.as_ptr());
-        let uniformBlockIndexYellow = gl::GetUniformBlockIndex(shaderYellow.programId, c_string.as_ptr());
+        let uniformBlockIndexRed = gl::GetUniformBlockIndex(shaderRed.id, c_string.as_ptr());
+        let uniformBlockIndexGreen = gl::GetUniformBlockIndex(shaderGreen.id, c_string.as_ptr());
+        let uniformBlockIndexBlue = gl::GetUniformBlockIndex(shaderBlue.id, c_string.as_ptr());
+        let uniformBlockIndexYellow = gl::GetUniformBlockIndex(shaderYellow.id, c_string.as_ptr());
 
         // then we link each shader's uniform block to this uniform binding point
-        gl::UniformBlockBinding(shaderRed.programId, uniformBlockIndexRed, 0);
-        gl::UniformBlockBinding(shaderGreen.programId, uniformBlockIndexGreen, 0);
-        gl::UniformBlockBinding(shaderBlue.programId, uniformBlockIndexBlue, 0);
-        gl::UniformBlockBinding(shaderYellow.programId, uniformBlockIndexYellow, 0);
+        gl::UniformBlockBinding(shaderRed.id, uniformBlockIndexRed, 0);
+        gl::UniformBlockBinding(shaderGreen.id, uniformBlockIndexGreen, 0);
+        gl::UniformBlockBinding(shaderBlue.id, uniformBlockIndexBlue, 0);
+        gl::UniformBlockBinding(shaderYellow.id, uniformBlockIndexYellow, 0);
 
         // Now actually create the buffer
         gl::GenBuffers(1, &mut uboMatrices);
@@ -261,10 +261,10 @@ fn main() {
     unsafe {
         gl::DeleteVertexArrays(1, &cubeVAO);
         gl::DeleteBuffers(1, &cubeVBO);
-        gl::DeleteShader(shaderRed.programId);
-        gl::DeleteShader(shaderGreen.programId);
-        gl::DeleteShader(shaderYellow.programId);
-        gl::DeleteShader(shaderBlue.programId);
+        gl::DeleteShader(shaderRed.id);
+        gl::DeleteShader(shaderGreen.id);
+        gl::DeleteShader(shaderYellow.id);
+        gl::DeleteShader(shaderBlue.id);
     }
 }
 

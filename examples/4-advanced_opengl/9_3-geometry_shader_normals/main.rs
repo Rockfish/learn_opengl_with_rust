@@ -110,14 +110,14 @@ fn main() {
             shader.setMat4("view", &view);
             shader.setMat4("model", &Mat4::IDENTITY);
 
-            backpack.Draw(shader.programId);
+            backpack.Draw(shader.id);
 
             normalShader.use_shader();
             normalShader.setMat4("projection", &projection);
             normalShader.setMat4("view", &view);
             normalShader.setMat4("model", &Mat4::IDENTITY);
 
-            backpack.Draw(normalShader.programId);
+            backpack.Draw(normalShader.id);
         }
 
         window.swap_buffers();
@@ -126,7 +126,7 @@ fn main() {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     unsafe {
-        gl::DeleteShader(shader.programId);
+        gl::DeleteShader(shader.id);
     }
 }
 

@@ -150,7 +150,7 @@ fn main() {
     unsafe {
         gl::DeleteVertexArrays(1, &VAO);
         gl::DeleteBuffers(1, &VBO);
-        gl::DeleteShader(shader.programId);
+        gl::DeleteShader(shader.id);
     }
 }
 

@@ -16,12 +16,12 @@ use std::ptr;
 use crate::*;
 
 pub struct Shader_M {
-    pub programId: ShaderId,
+    pub id: ShaderId,
 }
 
 impl Shader_M {
     pub fn new(vertexPath: &str, fragmentPath: &str) -> Result<Self, String> {
-        let mut shader = Shader_M { programId: 0 };
+        let mut shader = Shader_M { id: 0 };
         let mut vertexCode: String = Default::default();
         let mut fragmentCode: String = Default::default();
 
@@ -39,7 +39,7 @@ impl Shader_M {
             // vertex shader
             let vertexShader = gl::CreateShader(gl::VERTEX_SHADER);
             let fragmentShader = gl::CreateShader(gl::FRAGMENT_SHADER);
-            shader.programId = gl::CreateProgram();
+            shader.id = gl::CreateProgram();
 
             let c_string = c_string!(vertexCode);
             gl::ShaderSource(vertexShader, 1, &c_string.as_ptr(), ptr::null());
@@ -60,11 +60,11 @@ impl Shader_M {
             }
 
             // link the first program object
-            gl::AttachShader(shader.programId, vertexShader);
-            gl::AttachShader(shader.programId, fragmentShader);
-            gl::LinkProgram(shader.programId);
+            gl::AttachShader(shader.id, vertexShader);
+            gl::AttachShader(shader.id, fragmentShader);
+            gl::LinkProgram(shader.id);
 
-            match checkCompileErrors(shader.programId, "PROGRAM") {
+            match checkCompileErrors(shader.id, "PROGRAM") {
                 Ok(_) => {}
                 Err(error) => return Err(error),
             }
@@ -79,7 +79,7 @@ impl Shader_M {
 
     pub fn use_shader(&self) {
         unsafe {
-            gl::UseProgram(self.programId);
+            gl::UseProgram(self.id);
         }
     }
 
@@ -89,7 +89,7 @@ impl Shader_M {
         unsafe {
             let v = if value { 1 } else { 0 };
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::Uniform1i(location, v);
         }
     }
@@ -98,7 +98,7 @@ impl Shader_M {
     pub fn setInt(&self, name: &str, value: i32) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::Uniform1i(location, value);
         }
     }
@@ -107,7 +107,7 @@ impl Shader_M {
     pub fn setFloat(&self, name: &str, value: f32) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::Uniform1f(location, value);
         }
     }
@@ -116,7 +116,7 @@ impl Shader_M {
     pub fn setVec2(&self, name: &str, value: &Vec2) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::Uniform2fv(location, 1, value.to_array().as_ptr());
         }
     }
@@ -125,7 +125,7 @@ impl Shader_M {
     pub fn setVec2_xy(&self, name: &str, x: f32, y: f32) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::Uniform2f(location, x, y);
         }
     }
@@ -134,7 +134,7 @@ impl Shader_M {
     pub fn setVec3(&self, name: &str, value: &Vec3) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::Uniform3fv(location, 1, value.to_array().as_ptr());
         }
     }
@@ -143,7 +143,7 @@ impl Shader_M {
     pub fn setVec3_xyz(&self, name: &str, x: f32, y: f32, z: f32) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::Uniform3f(location, x, y, z);
         }
     }
@@ -152,7 +152,7 @@ impl Shader_M {
     pub fn setVec4(&self, name: &str, value: &Vec4) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::Uniform4fv(location, 1, value.to_array().as_ptr());
         }
     }
@@ -161,7 +161,7 @@ impl Shader_M {
     pub fn setVec4_xyzw(&self, name: &str, x: f32, y: f32, z: f32, w: f32) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::Uniform4f(location, x, y, z, w);
         }
     }
@@ -170,7 +170,7 @@ impl Shader_M {
     pub fn setMat2(&self, name: &str, mat: &Mat2) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::UniformMatrix2fv(location, 1, gl::FALSE, mat.to_cols_array().as_ptr());
         }
     }
@@ -179,7 +179,7 @@ impl Shader_M {
     pub fn setMat3(&self, name: &str, mat: &Mat3) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::UniformMatrix3fv(location, 1, gl::FALSE, mat.to_cols_array().as_ptr());
         }
     }
@@ -188,7 +188,7 @@ impl Shader_M {
     pub fn setMat4(&self, name: &str, matrix: &Mat4) {
         unsafe {
             let c_string = c_string!(name);
-            let location = gl::GetUniformLocation(self.programId, c_string.as_ptr());
+            let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
             gl::UniformMatrix4fv(location, 1, gl::FALSE, matrix.to_cols_array().as_ptr());
         }
     }

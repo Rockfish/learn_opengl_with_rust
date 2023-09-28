@@ -220,8 +220,8 @@ fn main() {
             projection = projection * Mat4::perspective_rh_gl(45.0f32.to_radians(), (SCR_WIDTH / SCR_HEIGHT) as f32, 0.1, 100.0);
 
             // retrieve the matrix uniform locations
-            let modelLoc = gl_get_uniform_location!(ourShader.programId, "model");
-            let viewLoc = gl_get_uniform_location!(ourShader.programId, "view");
+            let modelLoc = gl_get_uniform_location!(ourShader.id, "model");
+            let viewLoc = gl_get_uniform_location!(ourShader.id, "view");
 
             // pass them to the shaders two different ways
             gl::UniformMatrix4fv(modelLoc, 1, gl::FALSE, model.to_cols_array().as_ptr());
@@ -244,7 +244,7 @@ fn main() {
         gl::DeleteVertexArrays(2, &VAO);
         gl::DeleteBuffers(2, &VBO);
         gl::DeleteBuffers(1, &EBO);
-        gl::DeleteProgram(ourShader.programId);
+        gl::DeleteProgram(ourShader.id);
     }
 }
 

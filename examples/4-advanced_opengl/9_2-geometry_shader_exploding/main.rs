@@ -105,7 +105,7 @@ fn main() {
 
             shader.setFloat("time", currentFrameTime);
 
-            nanosuit.Draw(shader.programId);
+            nanosuit.Draw(shader.id);
         }
 
         window.swap_buffers();
@@ -114,7 +114,7 @@ fn main() {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     unsafe {
-        gl::DeleteShader(shader.programId);
+        gl::DeleteShader(shader.id);
     }
 }
 

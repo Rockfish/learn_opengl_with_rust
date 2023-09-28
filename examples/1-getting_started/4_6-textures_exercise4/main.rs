@@ -202,7 +202,7 @@ fn main() {
         ourShader.use_shader(); // don't forget to activate/use the shader before setting uniforms!
                                 // either set it manually like so:
         let c_str = c_string!("texture1");
-        gl::Uniform1i(gl::GetUniformLocation(ourShader.programId, c_str.as_ptr()), 0);
+        gl::Uniform1i(gl::GetUniformLocation(ourShader.id, c_str.as_ptr()), 0);
         // or set it via the texture class
         ourShader.setInt("texture2", 1);
     }
@@ -229,7 +229,7 @@ fn main() {
 
             // Use the mixValue uniform to adjust the mixing of the texture in the fragment shader
             let c_str = CString::new("mixValue").unwrap();
-            let mixValueLocation = gl::GetUniformLocation(ourShader.programId, c_str.as_ptr());
+            let mixValueLocation = gl::GetUniformLocation(ourShader.id, c_str.as_ptr());
             gl::Uniform1f(mixValueLocation, state.mix_value);
 
             // render the triangle
