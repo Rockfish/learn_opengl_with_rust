@@ -284,13 +284,13 @@ path = "examples/4-advanced_opengl/10_2-asteroids/main.rs"
 name = "10_3-asteroids_instanced"
 path = "examples/4-advanced_opengl/10_3-asteroids_instanced/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "11_1-anti_aliasing_msaa"
-#path = "examples/4-advanced_opengl/11_1-anti_aliasing_msaa/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "11_1-anti_aliasing_msaa"
+path = "examples/4-advanced_opengl/11_1-anti_aliasing_msaa/main.rs"
 
-#[[example]]  # 4-advanced_opengl
-#name = "11_2-anti_aliasing_offscreen"
-#path = "examples/4-advanced_opengl/11_2-anti_aliasing_offscreen/main.rs"
+[[example]]  # 4-advanced_opengl
+name = "11_2-anti_aliasing_offscreen"
+path = "examples/4-advanced_opengl/11_2-anti_aliasing_offscreen/main.rs"
 
 #[[example]]  # 5-advanced_lighting
 #name = "1-advanced_lighting"
