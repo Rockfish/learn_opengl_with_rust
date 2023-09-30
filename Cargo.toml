@@ -292,13 +292,13 @@ path = "examples/4-advanced_opengl/11_1-anti_aliasing_msaa/main.rs"
 name = "11_2-anti_aliasing_offscreen"
 path = "examples/4-advanced_opengl/11_2-anti_aliasing_offscreen/main.rs"
 
-#[[example]]  # 5-advanced_lighting
-#name = "1-advanced_lighting"
-#path = "examples/5-advanced_lighting/1-advanced_lighting/main.rs"
+[[example]]  # 5-advanced_lighting
+name = "1-advanced_lighting"
+path = "examples/5-advanced_lighting/1-advanced_lighting/main.rs"
 
-#[[example]]  # 5-advanced_lighting
-#name = "2-gamma_correction"
-#path = "examples/5-advanced_lighting/2-gamma_correction/main.rs"
+[[example]]  # 5-advanced_lighting
+name = "2-gamma_correction"
+path = "examples/5-advanced_lighting/2-gamma_correction/main.rs"
 
 #[[example]]  # 5-advanced_lighting
 #name = "3_1_1-shadow_mapping_depth"
