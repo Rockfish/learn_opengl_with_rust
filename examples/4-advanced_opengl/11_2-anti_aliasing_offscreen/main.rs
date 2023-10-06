@@ -8,14 +8,14 @@
 
 extern crate glfw;
 
-use std::{mem, ptr};
 use glad_gl::gl;
+use glad_gl::gl::{GLenum, GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::{vec3, Mat4};
 use glfw::{Action, Context, Key};
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
 use learn_opengl_with_rust::shader::Shader;
-use glad_gl::gl::{GLenum, GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
-use learn_opengl_with_rust::{SIZE_OF_FLOAT, size_of_floats};
+use learn_opengl_with_rust::{size_of_floats, SIZE_OF_FLOAT};
+use std::{mem, ptr};
 
 const SCR_WIDTH: f32 = 800.0;
 const SCR_HEIGHT: f32 = 800.0;
@@ -213,10 +213,16 @@ fn main() {
             gl::RGB as GLenum,
             SCR_WIDTH as GLsizei,
             SCR_HEIGHT as GLsizei,
-            gl::TRUE
+            gl::TRUE,
         );
         gl::BindTexture(gl::TEXTURE_2D_MULTISAMPLE, 0);
-        gl::FramebufferTexture2D(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, gl::TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled, 0);
+        gl::FramebufferTexture2D(
+            gl::FRAMEBUFFER,
+            gl::COLOR_ATTACHMENT0,
+            gl::TEXTURE_2D_MULTISAMPLE,
+            textureColorBufferMultiSampled,
+            0,
+        );
 
         // create a (also multisampled) renderbuffer object for depth and stencil attachments
         gl::GenRenderbuffers(1, &mut rbo);
@@ -297,7 +303,18 @@ fn main() {
             // 2. now blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
             gl::BindFramebuffer(gl::READ_FRAMEBUFFER, framebuffer);
             gl::BindFramebuffer(gl::DRAW_FRAMEBUFFER, intermediateFBO);
-            gl::BlitFramebuffer(0, 0, SCR_WIDTH as GLint, SCR_HEIGHT as GLint, 0, 0, SCR_WIDTH as GLint, SCR_HEIGHT as GLint, gl::COLOR_BUFFER_BIT, gl::NEAREST);
+            gl::BlitFramebuffer(
+                0,
+                0,
+                SCR_WIDTH as GLint,
+                SCR_HEIGHT as GLint,
+                0,
+                0,
+                SCR_WIDTH as GLint,
+                SCR_HEIGHT as GLint,
+                gl::COLOR_BUFFER_BIT,
+                gl::NEAREST,
+            );
 
             // 3. now render quad with scene's visuals as its texture image
             gl::BindFramebuffer(gl::FRAMEBUFFER, 0);

@@ -8,7 +8,6 @@
 
 extern crate glfw;
 
-use std::ffi::c_uint;
 use glad_gl::gl;
 use glad_gl::gl::{GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::{vec3, Mat4};
@@ -16,7 +15,8 @@ use glfw::{Action, Context, Key};
 use image::ColorType;
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
 use learn_opengl_with_rust::shader::Shader;
-use learn_opengl_with_rust::{size_of_floats, SIZE_OF_FLOAT, c_string};
+use learn_opengl_with_rust::{c_string, size_of_floats, SIZE_OF_FLOAT};
+use std::ffi::c_uint;
 use std::mem;
 
 const SCR_WIDTH: f32 = 800.0;
@@ -144,17 +144,12 @@ fn main() {
 
     // lighting info
     // -------------
-    let lightPositions = vec![
-        vec3(-3.0, 0.0, 0.0),
-        vec3(-1.0, 0.0, 0.0),
-        vec3 (1.0, 0.0, 0.0),
-        vec3 (3.0, 0.0, 0.0)
-    ];
+    let lightPositions = vec![vec3(-3.0, 0.0, 0.0), vec3(-1.0, 0.0, 0.0), vec3(1.0, 0.0, 0.0), vec3(3.0, 0.0, 0.0)];
     let lightColors = vec![
         vec3(0.25, 0.25, 0.25),
         vec3(0.50, 0.50, 0.50),
         vec3(0.75, 0.75, 0.75),
-        vec3(1.00, 1.00, 1.00)
+        vec3(1.00, 1.00, 1.00),
     ];
 
     // render loop
@@ -192,7 +187,7 @@ fn main() {
             // floor
             gl::BindVertexArray(planeVAO);
             gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(gl::TEXTURE_2D,  if state.gammaEnabled { floorTexture }else { floorTextureGammaCorrected });
+            gl::BindTexture(gl::TEXTURE_2D, if state.gammaEnabled { floorTexture } else { floorTextureGammaCorrected });
             gl::DrawArrays(gl::TRIANGLES, 0, 6);
 
             println!("{}", if state.gammaEnabled { "Gamma enabled" } else { "Gamma disabled" });

@@ -300,17 +300,17 @@ path = "examples/5-advanced_lighting/1-advanced_lighting/main.rs"
 name = "2-gamma_correction"
 path = "examples/5-advanced_lighting/2-gamma_correction/main.rs"
 
-#[[example]]  # 5-advanced_lighting
-#name = "3_1_1-shadow_mapping_depth"
-#path = "examples/5-advanced_lighting/3_1_1-shadow_mapping_depth/main.rs"
+[[example]]  # 5-advanced_lighting
+name = "3_1_1-shadow_mapping_depth"
+path = "examples/5-advanced_lighting/3_1_1-shadow_mapping_depth/main.rs"
 
-#[[example]]  # 5-advanced_lighting
-#name = "3_1_2-shadow_mapping_base"
-#path = "examples/5-advanced_lighting/3_1_2-shadow_mapping_base/main.rs"
+[[example]]  # 5-advanced_lighting
+name = "3_1_2-shadow_mapping_base"
+path = "examples/5-advanced_lighting/3_1_2-shadow_mapping_base/main.rs"
 
-#[[example]]  # 5-advanced_lighting
-#name = "3_1_3-shadow_mapping"
-#path = "examples/5-advanced_lighting/3_1_3-shadow_mapping/main.rs"
+[[example]]  # 5-advanced_lighting
+name = "3_1_3-shadow_mapping"
+path = "examples/5-advanced_lighting/3_1_3-shadow_mapping/main.rs"
 
 #[[example]]  # 5-advanced_lighting
 #name = "3_2_1-point_shadows"

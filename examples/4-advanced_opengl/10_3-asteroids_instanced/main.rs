@@ -8,15 +8,15 @@
 
 extern crate glfw;
 
-use std::mem;
 use glad_gl::gl;
+use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::{vec3, Mat4, Vec4};
 use glfw::{Action, Context, Key};
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
 use learn_opengl_with_rust::model::{FlipV, Gamma, Model};
 use learn_opengl_with_rust::shader::Shader;
 use rand::prelude::*;
-use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
+use std::mem;
 
 const SCR_WIDTH: f32 = 800.0;
 const SCR_HEIGHT: f32 = 800.0;
@@ -147,11 +147,32 @@ fn main() {
             gl::EnableVertexAttribArray(3);
             gl::VertexAttribPointer(3, 4, gl::FLOAT, gl::FALSE, mem::size_of::<Mat4>() as GLsizei, 0 as *const GLvoid);
             gl::EnableVertexAttribArray(4);
-            gl::VertexAttribPointer(4, 4, gl::FLOAT, gl::FALSE, mem::size_of::<Mat4>() as GLsizei, mem::size_of::<Vec4>() as *const GLvoid);
+            gl::VertexAttribPointer(
+                4,
+                4,
+                gl::FLOAT,
+                gl::FALSE,
+                mem::size_of::<Mat4>() as GLsizei,
+                mem::size_of::<Vec4>() as *const GLvoid,
+            );
             gl::EnableVertexAttribArray(3);
-            gl::VertexAttribPointer(5, 4, gl::FLOAT, gl::FALSE, mem::size_of::<Mat4>() as GLsizei, (2 * mem::size_of::<Vec4>()) as *const GLvoid);
+            gl::VertexAttribPointer(
+                5,
+                4,
+                gl::FLOAT,
+                gl::FALSE,
+                mem::size_of::<Mat4>() as GLsizei,
+                (2 * mem::size_of::<Vec4>()) as *const GLvoid,
+            );
             gl::EnableVertexAttribArray(6);
-            gl::VertexAttribPointer(6, 4, gl::FLOAT, gl::FALSE, mem::size_of::<Mat4>() as GLsizei, (3 * mem::size_of::<Vec4>()) as *const GLvoid);
+            gl::VertexAttribPointer(
+                6,
+                4,
+                gl::FLOAT,
+                gl::FALSE,
+                mem::size_of::<Mat4>() as GLsizei,
+                (3 * mem::size_of::<Vec4>()) as *const GLvoid,
+            );
 
             gl::VertexAttribDivisor(3, 1);
             gl::VertexAttribDivisor(4, 1);

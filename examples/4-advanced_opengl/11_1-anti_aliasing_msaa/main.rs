@@ -8,14 +8,14 @@
 
 extern crate glfw;
 
-use std::mem;
 use glad_gl::gl;
+use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use glam::{vec3, Mat4};
 use glfw::{Action, Context, Key};
 use learn_opengl_with_rust::camera::{Camera, CameraMovement};
 use learn_opengl_with_rust::shader::Shader;
-use glad_gl::gl::{GLsizei, GLsizeiptr, GLuint, GLvoid};
 use learn_opengl_with_rust::size_of_floats;
+use std::mem;
 
 const SCR_WIDTH: f32 = 800.0;
 const SCR_HEIGHT: f32 = 800.0;
