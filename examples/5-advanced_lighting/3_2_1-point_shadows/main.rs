@@ -28,7 +28,7 @@ struct State {
     firstMouse: bool,
     lastX: f32,
     lastY: f32,
-    gammaEnabled: bool,
+    shadows: bool,
 }
 
 fn main() {
@@ -62,126 +62,65 @@ fn main() {
         firstMouse: true,
         lastX: SCR_WIDTH / 2.0,
         lastY: SCR_HEIGHT / 2.0,
-        gammaEnabled: false,
+        shadows: false,
     };
 
     // build and compile our shader program
     // ------------------------------------
     let shader = Shader::new(
-        "examples/5-advanced_lighting/3_1_3-shadow_mapping/3_1_3-shadow_mapping.vert",
-        "examples/5-advanced_lighting/3_1_3-shadow_mapping/3_1_3-shadow_mapping.frag",
+        "examples/5-advanced_lighting/3_2_1-point_shadows/3_2_1-point_shadows.vert",
+        "examples/5-advanced_lighting/3_2_1-point_shadows/3_2_1-point_shadows.frag",
         None,
     )
     .unwrap();
 
     let simpleDepthShader = Shader::new(
-        "examples/5-advanced_lighting/3_1_3-shadow_mapping/3_1_3-shadow_mapping_depth.vert",
-        "examples/5-advanced_lighting/3_1_3-shadow_mapping/3_1_3-shadow_mapping_depth.frag",
-        None,
+        "examples/5-advanced_lighting/3_2_1-point_shadows/3_2_1-point_shadows_depth.vert",
+        "examples/5-advanced_lighting/3_2_1-point_shadows/3_2_1-point_shadows_depth.frag",
+        Some("examples/5-advanced_lighting/3_2_1-point_shadows/3_2_1-point_shadows_depth.geom"),
     )
     .unwrap();
-
-    let debugDepthQuad = Shader::new(
-        "examples/5-advanced_lighting/3_1_3-shadow_mapping/3_1_3-debug_quad.vert",
-        "examples/5-advanced_lighting/3_1_3-shadow_mapping/3_1_3-debug_quad_depth.frag",
-        None,
-    )
-    .unwrap();
-
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    #[rustfmt::skip]
-    let planeVertices: [f32; 48] = [
-        // positions         // normals      // texcoords
-         25.0, -0.5,  25.0,  0.0, 1.0, 0.0,  25.0,  0.0,
-        -25.0, -0.5,  25.0,  0.0, 1.0, 0.0,   0.0,  0.0,
-        -25.0, -0.5, -25.0,  0.0, 1.0, 0.0,   0.0, 25.0,
-
-         25.0, -0.5,  25.0,  0.0, 1.0, 0.0,  25.0,  0.0,
-        -25.0, -0.5, -25.0,  0.0, 1.0, 0.0,   0.0, 25.0,
-         25.0, -0.5, -25.0,  0.0, 1.0, 0.0,  25.0, 25.0,
-    ];
-
-    // Vertex Array Object id
-    let mut planeVAO: GLuint = 0;
-    let mut planeVBO: GLuint = 0;
-    let mut cubeVAO: GLuint = 0;
-    #[allow(unused_variables, unused_mut)]
-    let mut quadVAO: GLuint = 0;
-    let mut depthMapFBO: GLuint = 0;
-    let mut depthMap: GLuint = 0;
-
-    unsafe {
-        // configure global opengl state
-        // -----------------------------
-        gl::Enable(gl::DEPTH_TEST);
-
-        // plane VAO
-        gl::GenVertexArrays(1, &mut planeVAO);
-        gl::GenBuffers(1, &mut planeVBO);
-        gl::BindVertexArray(planeVAO);
-        gl::BindBuffer(gl::ARRAY_BUFFER, planeVAO);
-        gl::BufferData(
-            gl::ARRAY_BUFFER,
-            (planeVertices.len() * SIZE_OF_FLOAT) as GLsizeiptr,
-            planeVertices.as_ptr() as *const GLvoid,
-            gl::STATIC_DRAW,
-        );
-        gl::EnableVertexAttribArray(0);
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, (8 * SIZE_OF_FLOAT) as GLsizei, 0 as *const GLvoid);
-        gl::EnableVertexAttribArray(1);
-        gl::VertexAttribPointer(
-            1,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            (8 * SIZE_OF_FLOAT) as GLsizei,
-            (3 * SIZE_OF_FLOAT) as *const GLvoid,
-        );
-        gl::EnableVertexAttribArray(2);
-        gl::VertexAttribPointer(
-            2,
-            2,
-            gl::FLOAT,
-            gl::FALSE,
-            (8 * SIZE_OF_FLOAT) as GLsizei,
-            (6 * SIZE_OF_FLOAT) as *const GLvoid,
-        );
-        gl::BindVertexArray(0);
-    }
 
     // load textures
     let woodTexture = loadTexture("resources/textures/wood.png", false);
 
-    // configure depth map FBO
-    // -----------------------
     let SHADOW_WIDTH = 1024;
     let SHADOW_HEIGHT = 1024;
+    let mut depthMapFBO: GLuint = 0;
+    let mut depthCubeMap: GLuint = 0;
     unsafe {
+        // configure global opengl state
+        // -----------------------------
+        gl::Enable(gl::DEPTH_TEST);
+        gl::Enable(gl::CULL_FACE);
+
+        // configure depth map FBO
+        // -----------------------
         gl::GenFramebuffers(1, &mut depthMapFBO);
-        // create depth texture
-        gl::GenTextures(1, &mut depthMap);
-        gl::BindTexture(gl::TEXTURE_2D, depthMap);
-        gl::TexImage2D(
-            gl::TEXTURE_2D,
-            0,
-            gl::DEPTH_COMPONENT as GLint,
-            SHADOW_WIDTH,
-            SHADOW_HEIGHT,
-            0,
-            gl::DEPTH_COMPONENT,
-            gl::FLOAT,
-            0 as *const GLvoid,
-        );
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as GLint);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as GLint);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_BORDER as GLint);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_BORDER as GLint);
-        let borderColor = vec![1.0, 1.0, 1.0, 1.0];
-        gl::TexParameterfv(gl::TEXTURE_2D, gl::TEXTURE_BORDER_COLOR, borderColor.as_ptr());
+        // create depth cubemap texture
+        gl::GenTextures(1, &mut depthCubeMap);
+        gl::BindTexture(gl::TEXTURE_CUBE_MAP, depthCubeMap);
+        for i in 0..6 {
+            gl::TexImage2D(
+                gl::TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0,
+                gl::DEPTH_COMPONENT as GLint,
+                SHADOW_WIDTH,
+                SHADOW_HEIGHT,
+                0,
+                gl::DEPTH_COMPONENT,
+                gl::FLOAT,
+                0 as *const GLvoid,
+            );
+        }
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_MAG_FILTER, gl::NEAREST as GLint);
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_MIN_FILTER, gl::NEAREST as GLint);
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as GLint);
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as GLint);
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_R, gl::CLAMP_TO_EDGE as GLint);
         // attach depth texture as FBO's depth buffer
         gl::BindFramebuffer(gl::FRAMEBUFFER, depthMapFBO);
-        gl::FramebufferTexture2D(gl::FRAMEBUFFER, gl::DEPTH_ATTACHMENT, gl::TEXTURE_2D, depthMap, 0);
+        gl::FramebufferTexture(gl::FRAMEBUFFER, gl::DEPTH_ATTACHMENT, depthCubeMap, 0);
         gl::DrawBuffer(gl::NONE);
         gl::ReadBuffer(gl::NONE);
         gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
@@ -191,13 +130,13 @@ fn main() {
     // --------------------
     shader.use_shader();
     shader.setInt("diffuseTexture", 0);
-    shader.setInt("shadowMap", 1);
-    debugDepthQuad.use_shader();
-    debugDepthQuad.setInt("depthMap", 0);
+    shader.setInt("depthMap", 1);
 
     // lighting info
     // -------------
-    let lightPos = vec3(-2.0, 4.0, -1.0);
+    let mut lightPos = vec3(0.0, 0.0, 0.0);
+
+    let mut cubeVAO: GLuint = 0;
 
     // render loop
     while !window.should_close() {
@@ -210,62 +149,64 @@ fn main() {
             handle_window_event(&mut window, event, &mut state);
         }
 
+        // move light position over time
+        lightPos.z = (glfw.get_time() as f32 * 0.5).sin() * 3.0;
+
         unsafe {
             // render
             // ------
             gl::ClearColor(0.1, 0.1, 0.1, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-            // 1. render depth of scene to texture (from light's perspective)
-            // --------------------------------------------------------------
+            // 0. create depth cubemap transformation matrices
+            // -----------------------------------------------
             let near_plane: f32 = 1.0;
-            let far_plane: f32 = 7.5;
+            //let far_plane: f32 = 25.0; // too close, causes weird shadows
+            let far_plane: f32 = 26.0;
 
-            let lightProjection = Mat4::orthographic_rh_gl(-10.0, 10.0, -10.0, 10.0, near_plane, far_plane);
-            let lightView = Mat4::look_at_rh(lightPos, vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
-            let lightSpaceMatrix = lightProjection * lightView;
+            let shadowProj = Mat4::perspective_rh_gl(90f32.to_radians(), SCR_WIDTH / SCR_HEIGHT, near_plane, far_plane);
+            let mut shadowTransforms: Vec<Mat4> = vec![];
+            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(1.0, 0.0, 0.0), vec3(0.0, -1.0, 0.0)));
+            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(-1.0, 0.0, 0.0), vec3(0.0, -1.0, 0.0)));
+            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0)));
+            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, -1.0, 0.0), vec3(0.0, 0.0, -1.0)));
+            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, 0.0, 1.0), vec3(0.0, -1.0, 0.0)));
+            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, 0.0, -1.0), vec3(0.0, -1.0, 0.0)));
 
-            // render scene from light's point of view
-            simpleDepthShader.use_shader();
-            simpleDepthShader.setMat4("lightSpaceMatrix", &lightSpaceMatrix);
-
+            // 1. render scene to depth cubemap
+            // --------------------------------
             gl::Viewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
             gl::BindFramebuffer(gl::FRAMEBUFFER, depthMapFBO);
             gl::Clear(gl::DEPTH_BUFFER_BIT);
-            gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(gl::TEXTURE_2D, woodTexture);
-            renderScene(&simpleDepthShader, planeVAO, &mut cubeVAO);
+            simpleDepthShader.use_shader();
+            for (i, transform) in shadowTransforms.iter().enumerate() {
+                simpleDepthShader.setMat4(&format!("shadowMatrices[{}]", i), transform);
+            }
+            simpleDepthShader.setFloat("far_plane", far_plane);
+            simpleDepthShader.setVec3("lightPos", &lightPos);
+            renderScene(&simpleDepthShader, &mut cubeVAO);
             gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
-
-            // reset viewport
-            gl::Viewport(0, 0, SCR_WIDTH as GLsizei, SCR_HEIGHT as GLsizei);
-            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
             // 2. render scene as normal using the generated depth/shadow map
             // --------------------------------------------------------------
+            gl::Viewport(0, 0, SCR_WIDTH as GLsizei, SCR_HEIGHT as GLsizei);
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             shader.use_shader();
             let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
             let view = state.camera.GetViewMatrix();
             shader.setMat4("projection", &projection);
             shader.setMat4("view", &view);
             // set light uniforms
-            shader.setVec3("viewPos", &state.camera.Position);
             shader.setVec3("lightPos", &lightPos);
-            shader.setMat4("lightSpaceMatrix", &lightSpaceMatrix);
+            shader.setVec3("viewPos", &state.camera.Position);
+            shader.setInt("shadows", state.shadows as i32); // enable/disable shadows by pressing 'SPACE'
+            shader.setFloat("far_plane", far_plane);
+
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, woodTexture);
             gl::ActiveTexture(gl::TEXTURE1);
-            gl::BindTexture(gl::TEXTURE_2D, depthMap);
-            renderScene(&shader, planeVAO, &mut cubeVAO);
-
-            // render Depth map to quad for visual debugging
-            // ---------------------------------------------
-            debugDepthQuad.use_shader();
-            debugDepthQuad.setFloat("near_plane", near_plane);
-            debugDepthQuad.setFloat("far_plane", far_plane);
-            gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(gl::TEXTURE_2D, depthMap);
-            // renderQuad(&mut quadVAO);
+            gl::BindTexture(gl::TEXTURE_CUBE_MAP, depthCubeMap);
+            renderScene(&shader, &mut cubeVAO);
         }
 
         window.swap_buffers();
@@ -274,38 +215,52 @@ fn main() {
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     unsafe {
-        gl::DeleteVertexArrays(1, &planeVAO);
-        gl::DeleteBuffers(1, &planeVBO);
+        gl::DeleteVertexArrays(1, &cubeVAO);
+        gl::DeleteShader(shader.id);
         gl::DeleteShader(simpleDepthShader.id);
-        gl::DeleteShader(debugDepthQuad.id);
     }
 }
 
 // renders the 3D scene
 // --------------------
-fn renderScene(shader: &Shader, planeVAO: GLuint, cubeVAO: &mut GLuint) {
-    // floor
-    let model = Mat4::IDENTITY;
+fn renderScene(shader: &Shader, cubeVAO: &mut GLuint) {
+    // room cube
+    let model = Mat4::from_scale(vec3(5.0, 5.0, 5.0));
     shader.setMat4("model", &model);
     unsafe {
-        gl::BindVertexArray(planeVAO);
-        gl::DrawArrays(gl::TRIANGLES, 0, 6);
+        gl::Disable(gl::CULL_FACE);
+    } // note that we disable culling here since we render 'inside' the cube instead of the usual 'outside' which throws off the normal culling methods.
+    shader.setInt("reverse_normals", 1); // A small little hack to invert normals when drawing cube from the inside so lighting still works.
+    renderCube(cubeVAO);
+    shader.setInt("reverse_normals", 0); // and of course disable it
+    unsafe {
+        gl::Enable(gl::CULL_FACE);
     }
 
     // cubes
-    let mut model = Mat4::from_translation(vec3(0.0, 1.5, 0.0));
+    let mut model = Mat4::from_translation(vec3(4.0, -3.5, 0.0));
     model *= Mat4::from_scale(vec3(0.5, 0.5, 0.5));
     shader.setMat4("model", &model);
     renderCube(cubeVAO);
 
-    let mut model = Mat4::from_translation(vec3(2.0, 0.0, 1.0));
+    let mut model = Mat4::from_translation(vec3(2.0, 3.0, 1.0));
+    model *= Mat4::from_scale(vec3(0.75, 0.75, 0.75));
+    shader.setMat4("model", &model);
+    renderCube(cubeVAO);
+
+    let mut model = Mat4::from_translation(vec3(-3.0, -1.0, 0.0));
     model *= Mat4::from_scale(vec3(0.5, 0.5, 0.5));
     shader.setMat4("model", &model);
     renderCube(cubeVAO);
 
-    let mut model = Mat4::from_translation(vec3(-1.0, 0.0, 2.0));
+    let mut model = Mat4::from_translation(vec3(-1.5, 1.0, 1.5));
+    model *= Mat4::from_scale(vec3(0.5, 0.5, 0.5));
+    shader.setMat4("model", &model);
+    renderCube(cubeVAO);
+
+    let mut model = Mat4::from_translation(vec3(-1.5, 2.0, -3.0));
     model *= Mat4::from_axis_angle(vec3(1.0, 0.0, 1.0).normalize(), 60.0f32.to_radians());
-    model *= Mat4::from_scale(vec3(0.25, 0.25, 0.25));
+    model *= Mat4::from_scale(vec3(0.75, 0.75, 0.75));
     shader.setMat4("model", &model);
     renderCube(cubeVAO);
 }
@@ -405,51 +360,6 @@ fn renderCube(cubeVAO: &mut GLuint) {
     }
 }
 
-fn renderQuad(quadVAO: &mut GLuint) {
-    // initialize (if necessary)
-    if *quadVAO == 0 {
-        #[rustfmt::skip]
-        let quadVertices: [f32; 20] = [
-            // positions     // texture Coords
-            -1.0,  1.0, 0.0, 0.0, 1.0,
-            -1.0, -1.0, 0.0, 0.0, 0.0,
-             1.0,  1.0, 0.0, 1.0, 1.0,
-             1.0, -1.0, 0.0, 1.0, 0.0,
-        ];
-
-        // setup plane VAO
-        unsafe {
-            let mut quadVBO: GLuint = 0;
-            gl::GenVertexArrays(1, quadVAO);
-            gl::GenBuffers(1, &mut quadVBO);
-            gl::BindVertexArray(*quadVAO);
-            gl::BindBuffer(gl::ARRAY_BUFFER, quadVBO);
-            gl::BufferData(
-                gl::ARRAY_BUFFER,
-                (quadVertices.len() * SIZE_OF_FLOAT) as GLsizeiptr,
-                quadVertices.as_ptr() as *const GLvoid,
-                gl::STATIC_DRAW,
-            );
-            gl::EnableVertexAttribArray(0);
-            gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, (5 * SIZE_OF_FLOAT) as GLsizei, 0 as *const GLvoid);
-            gl::EnableVertexAttribArray(1);
-            gl::VertexAttribPointer(
-                1,
-                2,
-                gl::FLOAT,
-                gl::FALSE,
-                (5 * SIZE_OF_FLOAT) as GLsizei,
-                (3 * SIZE_OF_FLOAT) as *const GLvoid,
-            );
-        }
-    }
-    unsafe {
-        gl::BindVertexArray(*quadVAO);
-        gl::DrawArrays(gl::TRIANGLE_STRIP, 0, 4);
-        gl::BindVertexArray(0);
-    }
-}
-
 //
 // GLFW maps callbacks to events.
 //
@@ -479,7 +389,8 @@ fn handle_window_event(window: &mut glfw::Window, event: glfw::WindowEvent, stat
         }
         glfw::WindowEvent::Key(Key::Space, _, action, _) => {
             if action == Action::Press {
-                state.gammaEnabled = !state.gammaEnabled
+                state.shadows = !state.shadows;
+                println!("shadows: {:?}", state.shadows);
             }
         }
         glfw::WindowEvent::CursorPos(xpos, ypos) => mouse_handler(state, xpos, ypos),

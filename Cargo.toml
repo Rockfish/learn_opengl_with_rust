@@ -312,9 +312,9 @@ path = "examples/5-advanced_lighting/3_1_2-shadow_mapping_base/main.rs"
 name = "3_1_3-shadow_mapping"
 path = "examples/5-advanced_lighting/3_1_3-shadow_mapping/main.rs"
 
-#[[example]]  # 5-advanced_lighting
-#name = "3_2_1-point_shadows"
-#path = "examples/5-advanced_lighting/3_2_1-point_shadows/main.rs"
+[[example]]  # 5-advanced_lighting
+name = "3_2_1-point_shadows"
+path = "examples/5-advanced_lighting/3_2_1-point_shadows/main.rs"
 
 #[[example]]  # 5-advanced_lighting
 #name = "3_2_2-point_shadows_soft"
