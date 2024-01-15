@@ -265,7 +265,7 @@ fn main() {
     }
 
     screenShader.use_shader();
-    screenShader.setInt("screenTexture", 0);
+    screenShader.set_int("screenTexture", 0);
 
     // render loop
     while !window.should_close() {
@@ -293,9 +293,9 @@ fn main() {
             shader.use_shader();
             let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 1000.0);
             let view = state.camera.GetViewMatrix();
-            shader.setMat4("projection", &projection);
-            shader.setMat4("view", &view);
-            shader.setMat4("model", &Mat4::IDENTITY);
+            shader.set_mat4("projection", &projection);
+            shader.set_mat4("view", &view);
+            shader.set_mat4("model", &Mat4::IDENTITY);
 
             gl::BindVertexArray(cubeVAO);
             gl::DrawArrays(gl::TRIANGLES, 0, 36);

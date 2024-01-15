@@ -141,7 +141,7 @@ fn main() {
 
     // shader configuration
     shader.use_shader();
-    shader.setInt("texture1", 0);
+    shader.set_int("texture1", 0);
 
     let lightPos = vec3(0.0, 0.0, 0.0);
 
@@ -166,13 +166,13 @@ fn main() {
             shader.use_shader();
             let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
             let view = state.camera.GetViewMatrix();
-            shader.setMat4("projection", &projection);
-            shader.setMat4("view", &view);
+            shader.set_mat4("projection", &projection);
+            shader.set_mat4("view", &view);
 
             // set light uniforms
-            shader.setVec3("viewPos", &state.camera.Position);
-            shader.setVec3("lightPos", &lightPos);
-            shader.setInt("blinn", state.blinn as i32);
+            shader.set_vec3("viewPos", &state.camera.Position);
+            shader.set_vec3("lightPos", &lightPos);
+            shader.set_int("blinn", state.blinn as i32);
 
             // floor
             gl::BindVertexArray(planeVAO);

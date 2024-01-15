@@ -204,22 +204,22 @@ fn main() {
             let view = state.camera.GetViewMatrix();
 
             asteroidShader.use_shader();
-            asteroidShader.setMat4("projection", &projection);
-            asteroidShader.setMat4("view", &view);
+            asteroidShader.set_mat4("projection", &projection);
+            asteroidShader.set_mat4("view", &view);
 
             planetShader.use_shader();
-            planetShader.setMat4("projection", &projection);
-            planetShader.setMat4("view", &view);
+            planetShader.set_mat4("projection", &projection);
+            planetShader.set_mat4("view", &view);
 
             // draw planet
             let mut model = Mat4::from_translation(vec3(0.0, -3.0, 0.0));
             model = model * Mat4::from_scale(vec3(4.0, 4.0, 4.0));
-            planetShader.setMat4("model", &model);
+            planetShader.set_mat4("model", &model);
             planet.Draw(planetShader.id);
 
             // draw meteorites
             asteroidShader.use_shader();
-            asteroidShader.setInt("texture_diffuse1", 0);
+            asteroidShader.set_int("texture_diffuse1", 0);
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, rock.textures_loaded[0].id);
 

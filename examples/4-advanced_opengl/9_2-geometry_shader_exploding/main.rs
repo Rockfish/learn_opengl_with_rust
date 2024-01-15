@@ -99,11 +99,11 @@ fn main() {
             let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
 
             shader.use_shader();
-            shader.setMat4("projection", &projection);
-            shader.setMat4("view", &view);
-            shader.setMat4("model", &Mat4::IDENTITY);
+            shader.set_mat4("projection", &projection);
+            shader.set_mat4("view", &view);
+            shader.set_mat4("model", &Mat4::IDENTITY);
 
-            shader.setFloat("time", currentFrameTime);
+            shader.set_float("time", currentFrameTime);
 
             nanosuit.Draw(shader.id);
         }

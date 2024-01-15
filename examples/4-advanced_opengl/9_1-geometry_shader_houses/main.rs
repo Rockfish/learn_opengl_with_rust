@@ -118,7 +118,7 @@ fn main() {
 
     // shader configuration
     shader.use_shader();
-    shader.setInt("texture1", 0);
+    shader.set_int("texture1", 0);
 
     // render loop
     while !window.should_close() {

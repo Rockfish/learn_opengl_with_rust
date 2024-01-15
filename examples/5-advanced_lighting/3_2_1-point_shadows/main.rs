@@ -129,8 +129,8 @@ fn main() {
     // shader configuration
     // --------------------
     shader.use_shader();
-    shader.setInt("diffuseTexture", 0);
-    shader.setInt("depthMap", 1);
+    shader.set_int("diffuseTexture", 0);
+    shader.set_int("depthMap", 1);
 
     // lighting info
     // -------------
@@ -165,47 +165,57 @@ fn main() {
             let far_plane: f32 = 26.0;
 
             let shadowProj = Mat4::perspective_rh_gl(90f32.to_radians(), SCR_WIDTH / SCR_HEIGHT, near_plane, far_plane);
-            let mut shadowTransforms: Vec<Mat4> = vec![];
-            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(1.0, 0.0, 0.0), vec3(0.0, -1.0, 0.0)));
-            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(-1.0, 0.0, 0.0), vec3(0.0, -1.0, 0.0)));
-            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0)));
-            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, -1.0, 0.0), vec3(0.0, 0.0, -1.0)));
-            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, 0.0, 1.0), vec3(0.0, -1.0, 0.0)));
-            shadowTransforms.push(shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, 0.0, -1.0), vec3(0.0, -1.0, 0.0)));
+
+            let shadowTransforms: Vec<Mat4> = vec![
+                shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(1.0, 0.0, 0.0), vec3(0.0, -1.0, 0.0)),
+                shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(-1.0, 0.0, 0.0), vec3(0.0, -1.0, 0.0)),
+                shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0)),
+                shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, -1.0, 0.0), vec3(0.0, 0.0, -1.0)),
+                shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, 0.0, 1.0), vec3(0.0, -1.0, 0.0)),
+                shadowProj * Mat4::look_at_rh(lightPos, lightPos + vec3(0.0, 0.0, -1.0), vec3(0.0, -1.0, 0.0)),
+            ];
 
             // 1. render scene to depth cubemap
             // --------------------------------
             gl::Viewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
             gl::BindFramebuffer(gl::FRAMEBUFFER, depthMapFBO);
             gl::Clear(gl::DEPTH_BUFFER_BIT);
+
             simpleDepthShader.use_shader();
+
             for (i, transform) in shadowTransforms.iter().enumerate() {
-                simpleDepthShader.setMat4(&format!("shadowMatrices[{}]", i), transform);
+                simpleDepthShader.set_mat4(&format!("shadowMatrices[{}]", i), transform);
             }
-            simpleDepthShader.setFloat("far_plane", far_plane);
-            simpleDepthShader.setVec3("lightPos", &lightPos);
+
+            simpleDepthShader.set_float("far_plane", far_plane);
+            simpleDepthShader.set_vec3("lightPos", &lightPos);
+
             renderScene(&simpleDepthShader, &mut cubeVAO);
+
             gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
 
             // 2. render scene as normal using the generated depth/shadow map
             // --------------------------------------------------------------
             gl::Viewport(0, 0, SCR_WIDTH as GLsizei, SCR_HEIGHT as GLsizei);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+
             shader.use_shader();
             let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
             let view = state.camera.GetViewMatrix();
-            shader.setMat4("projection", &projection);
-            shader.setMat4("view", &view);
+
+            shader.set_mat4("projection", &projection);
+            shader.set_mat4("view", &view);
             // set light uniforms
-            shader.setVec3("lightPos", &lightPos);
-            shader.setVec3("viewPos", &state.camera.Position);
-            shader.setInt("shadows", state.shadows as i32); // enable/disable shadows by pressing 'SPACE'
-            shader.setFloat("far_plane", far_plane);
+            shader.set_vec3("lightPos", &lightPos);
+            shader.set_vec3("viewPos", &state.camera.Position);
+            shader.set_int("shadows", state.shadows as i32); // enable/disable shadows by pressing 'SPACE'
+            shader.set_float("far_plane", far_plane);
 
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, woodTexture);
             gl::ActiveTexture(gl::TEXTURE1);
             gl::BindTexture(gl::TEXTURE_CUBE_MAP, depthCubeMap);
+
             renderScene(&shader, &mut cubeVAO);
         }
 
@@ -226,13 +236,13 @@ fn main() {
 fn renderScene(shader: &Shader, cubeVAO: &mut GLuint) {
     // room cube
     let model = Mat4::from_scale(vec3(5.0, 5.0, 5.0));
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     unsafe {
         gl::Disable(gl::CULL_FACE);
     } // note that we disable culling here since we render 'inside' the cube instead of the usual 'outside' which throws off the normal culling methods.
-    shader.setInt("reverse_normals", 1); // A small little hack to invert normals when drawing cube from the inside so lighting still works.
+    shader.set_int("reverse_normals", 1); // A small little hack to invert normals when drawing cube from the inside so lighting still works.
     renderCube(cubeVAO);
-    shader.setInt("reverse_normals", 0); // and of course disable it
+    shader.set_int("reverse_normals", 0); // and of course disable it
     unsafe {
         gl::Enable(gl::CULL_FACE);
     }
@@ -240,28 +250,28 @@ fn renderScene(shader: &Shader, cubeVAO: &mut GLuint) {
     // cubes
     let mut model = Mat4::from_translation(vec3(4.0, -3.5, 0.0));
     model *= Mat4::from_scale(vec3(0.5, 0.5, 0.5));
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     renderCube(cubeVAO);
 
     let mut model = Mat4::from_translation(vec3(2.0, 3.0, 1.0));
     model *= Mat4::from_scale(vec3(0.75, 0.75, 0.75));
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     renderCube(cubeVAO);
 
     let mut model = Mat4::from_translation(vec3(-3.0, -1.0, 0.0));
     model *= Mat4::from_scale(vec3(0.5, 0.5, 0.5));
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     renderCube(cubeVAO);
 
     let mut model = Mat4::from_translation(vec3(-1.5, 1.0, 1.5));
     model *= Mat4::from_scale(vec3(0.5, 0.5, 0.5));
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     renderCube(cubeVAO);
 
     let mut model = Mat4::from_translation(vec3(-1.5, 2.0, -3.0));
     model *= Mat4::from_axis_angle(vec3(1.0, 0.0, 1.0).normalize(), 60.0f32.to_radians());
     model *= Mat4::from_scale(vec3(0.75, 0.75, 0.75));
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     renderCube(cubeVAO);
 }
 

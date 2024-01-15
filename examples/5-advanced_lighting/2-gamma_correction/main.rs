@@ -140,7 +140,7 @@ fn main() {
 
     // shader configuration
     shader.use_shader();
-    shader.setInt("floorTexture", 0);
+    shader.set_int("floorTexture", 0);
 
     // lighting info
     // -------------
@@ -173,16 +173,16 @@ fn main() {
             shader.use_shader();
             let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
             let view = state.camera.GetViewMatrix();
-            shader.setMat4("projection", &projection);
-            shader.setMat4("view", &view);
+            shader.set_mat4("projection", &projection);
+            shader.set_mat4("view", &view);
 
             // set light uniforms
             let c_str = c_string!("lightPositions");
             gl::Uniform3fv(gl::GetUniformLocation(shader.id, c_str.as_ptr()), 4, &lightPositions[0][0]);
             let c_str = c_string!("lightColors");
             gl::Uniform3fv(gl::GetUniformLocation(shader.id, c_str.as_ptr()), 4, &lightColors[0][0]);
-            shader.setVec3("viewPos", &state.camera.Position);
-            shader.setInt("gamma", state.gammaEnabled as i32);
+            shader.set_vec3("viewPos", &state.camera.Position);
+            shader.set_int("gamma", state.gammaEnabled as i32);
 
             // floor
             gl::BindVertexArray(planeVAO);

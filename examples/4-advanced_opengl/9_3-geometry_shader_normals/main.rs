@@ -106,16 +106,16 @@ fn main() {
             let projection = Mat4::perspective_rh_gl(state.camera.Zoom.to_radians(), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0);
 
             shader.use_shader();
-            shader.setMat4("projection", &projection);
-            shader.setMat4("view", &view);
-            shader.setMat4("model", &Mat4::IDENTITY);
+            shader.set_mat4("projection", &projection);
+            shader.set_mat4("view", &view);
+            shader.set_mat4("model", &Mat4::IDENTITY);
 
             backpack.Draw(shader.id);
 
             normalShader.use_shader();
-            normalShader.setMat4("projection", &projection);
-            normalShader.setMat4("view", &view);
-            normalShader.setMat4("model", &Mat4::IDENTITY);
+            normalShader.set_mat4("projection", &projection);
+            normalShader.set_mat4("view", &view);
+            normalShader.set_mat4("model", &Mat4::IDENTITY);
 
             backpack.Draw(normalShader.id);
         }

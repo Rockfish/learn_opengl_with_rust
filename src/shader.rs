@@ -110,7 +110,7 @@ impl Shader {
 
     // utility uniform functions
     // ------------------------------------------------------------------------
-    pub fn setBool(&self, name: &str, value: bool) {
+    pub fn set_bool(&self, name: &str, value: bool) {
         unsafe {
             let v = if value { 1 } else { 0 };
             let c_string = c_string!(name);
@@ -120,7 +120,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setInt(&self, name: &str, value: i32) {
+    pub fn set_int(&self, name: &str, value: i32) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -129,7 +129,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setFloat(&self, name: &str, value: f32) {
+    pub fn set_float(&self, name: &str, value: f32) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -138,7 +138,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setVec2(&self, name: &str, value: &Vec2) {
+    pub fn set_vec2(&self, name: &str, value: &Vec2) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -147,7 +147,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setVec2_xy(&self, name: &str, x: f32, y: f32) {
+    pub fn set_xy(&self, name: &str, x: f32, y: f32) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -156,7 +156,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setVec3(&self, name: &str, value: &Vec3) {
+    pub fn set_vec3(&self, name: &str, value: &Vec3) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -165,7 +165,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setVec3_xyz(&self, name: &str, x: f32, y: f32, z: f32) {
+    pub fn set_xyz(&self, name: &str, x: f32, y: f32, z: f32) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -174,7 +174,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setVec4(&self, name: &str, value: &Vec4) {
+    pub fn set_vec4(&self, name: &str, value: &Vec4) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -183,7 +183,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setVec4_xyzw(&self, name: &str, x: f32, y: f32, z: f32, w: f32) {
+    pub fn set_xyzw(&self, name: &str, x: f32, y: f32, z: f32, w: f32) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -192,7 +192,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setMat2(&self, name: &str, mat: &Mat2) {
+    pub fn set_mat2(&self, name: &str, mat: &Mat2) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -201,7 +201,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setMat3(&self, name: &str, mat: &Mat3) {
+    pub fn set_mat3(&self, name: &str, mat: &Mat3) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());
@@ -210,7 +210,7 @@ impl Shader {
     }
 
     // ------------------------------------------------------------------------
-    pub fn setMat4(&self, name: &str, matrix: &Mat4) {
+    pub fn set_mat4(&self, name: &str, matrix: &Mat4) {
         unsafe {
             let c_string = c_string!(name);
             let location = gl::GetUniformLocation(self.id, c_string.as_ptr());

@@ -180,7 +180,7 @@ fn main() {
     // shader configuration
     // --------------------
     debugDepthQuad.use_shader();
-    debugDepthQuad.setInt("depthMap", 0);
+    debugDepthQuad.set_int("depthMap", 0);
 
     // lighting info
     // -------------
@@ -214,14 +214,17 @@ fn main() {
 
             // render scene from light's point of view
             simpleDepthShader.use_shader();
-            simpleDepthShader.setMat4("lightSpaceMatrix", &lightSpaceMatrix);
+            simpleDepthShader.set_mat4("lightSpaceMatrix", &lightSpaceMatrix);
 
             gl::Viewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
             gl::BindFramebuffer(gl::FRAMEBUFFER, depthMapFBO);
             gl::Clear(gl::DEPTH_BUFFER_BIT);
+
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, woodTexture);
+
             renderScene(&simpleDepthShader, planeVAO, &mut cubeVAO);
+
             gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
 
             // reset viewport
@@ -231,10 +234,12 @@ fn main() {
             // render Depth map to quad for visual debugging
             // ---------------------------------------------
             debugDepthQuad.use_shader();
-            debugDepthQuad.setFloat("near_plane", near_plane);
-            debugDepthQuad.setFloat("far_plane", far_plane);
+            debugDepthQuad.set_float("near_plane", near_plane);
+            debugDepthQuad.set_float("far_plane", far_plane);
+
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, depthMap);
+
             renderQuad(&mut quadVAO);
         }
 
@@ -256,7 +261,7 @@ fn main() {
 fn renderScene(shader: &Shader, planeVAO: GLuint, cubeVAO: &mut GLuint) {
     // floor
     let model = Mat4::IDENTITY;
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     unsafe {
         gl::BindVertexArray(planeVAO);
         gl::DrawArrays(gl::TRIANGLES, 0, 6);
@@ -265,18 +270,18 @@ fn renderScene(shader: &Shader, planeVAO: GLuint, cubeVAO: &mut GLuint) {
     // cubes
     let mut model = Mat4::from_translation(vec3(0.0, 1.5, 0.0));
     model *= Mat4::from_scale(vec3(0.5, 0.5, 0.5));
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     renderCube(cubeVAO);
 
     let mut model = Mat4::from_translation(vec3(2.0, 0.0, 1.0));
     model *= Mat4::from_scale(vec3(0.5, 0.5, 0.5));
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     renderCube(cubeVAO);
 
     let mut model = Mat4::from_translation(vec3(-1.0, 0.0, 2.0));
     model *= Mat4::from_axis_angle(vec3(1.0, 0.0, 1.0).normalize(), 60.0f32.to_radians());
     model *= Mat4::from_scale(vec3(0.25, 0.25, 0.25));
-    shader.setMat4("model", &model);
+    shader.set_mat4("model", &model);
     renderCube(cubeVAO);
 }
 
